@@ -1,9 +1,11 @@
+from typing_extensions import final
 import numpy as np
 import pandas as pd
 from itertools import product
 from tqdm import tqdm
 
-""" Functions to compute entire board from a few cells """
+
+''' Functions to compute entire board from a few cells '''
 
 
 # func: 1 number -> 4 numbers, non canonical
@@ -79,7 +81,7 @@ def board_from_four(a, b, c, x):
     )
 
 
-""" Functions to test if the resulting board satisfies all conditions """
+''' Functions to test if the resulting board satisfies all conditions '''
 
 
 # func: entire board -> int, sum
@@ -96,6 +98,9 @@ def all_numbers_positive(ar):
 def no_duplicate_numbers(ar):
     ar_f = ar[ar!=None]
     return len(np.unique(ar_f)) == len(ar_f)
+
+
+''' Functions to confirm that the result is correct '''
 
 
 # func: entire board -> bool, is magic/almost magic
@@ -138,9 +143,14 @@ def is_magic(ar):
     )
 
 
-""" Loop that finds a magic square"""
+# func: entire board -> list, sorted list of elements of array
+def sorted_list(ar):
+    return sorted(ar[ar!=None])
 
-iterator = product(range(0,35), repeat = 4)
+
+''' Loop that finds a magic square'''
+
+iterator = product(range(1,35), repeat = 4)
 
 final_grid = board_from_four(0, 0, 0, 0)
 final_sum = 9999
@@ -157,6 +167,26 @@ for (a, b, c, x) in tqdm(iterator):
         final_sum = s
         updated = True
 
-print(final_grid)
-print(final_sum)
-print(updated)
+''' Result and tests '''
+
+print('\nmagic square = \n\n{}\n'.format(pd.DataFrame(final_grid).to_string(header=False, index=False)))
+print('\nsum = {}\n'.format(final_sum))
+print('\nsorted flattened array = {}'.format(sorted_list(final_grid)))
+print('sum of sorted flattened array = {}'.format(sum(sorted_list(final_grid))))
+print('length of sorted flattened array = {}\n'.format(len(sorted_list(final_grid))))
+
+grid_r = square_right(final_grid)
+grid_u = square_up(final_grid)
+grid_l = square_left(final_grid)
+grid_b = square_bottom(final_grid)
+
+sqq = [grid_r, grid_u, grid_l, grid_b]
+nqq = ['grid_right', 'grid_up', 'grid_left', 'grid_bottom']
+
+for i in range(0,4):
+    print('s({}) = {}'.format(nqq[i], sqq[i].trace()))
+    print('is_magic_square({}) = {}'.format(nqq[i], is_magic_square(sqq[i])))
+    print('{} = \n\n{}\n\n'.format(nqq[i], pd.DataFrame(sqq[i]).to_string(header=False, index=False)))
+
+# Converts the result to be submitted
+print('list for submission = {}'.format(list(final_grid[final_grid!=None])))
