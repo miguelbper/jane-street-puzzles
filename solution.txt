@@ -1,8 +1,54 @@
-[[None 19 52 40 None None]
- [None 58 37 16 41 39]
- [7 34 22 55 32 9]
- [36 21 6 25 23 48]
- [20 8 35 18 1 None]
- [None None 13 11 30 None]]
+magic square =
 
-756
+None   19 52 40 None None
+None   58 37 16   41   39
+   7   34 22 55   32    9
+  36   21  6 25   23   48
+  20    8 35 18    1 None
+None None 13 11   30 None
+
+
+sum = 756
+
+
+sorted flattened array = [1, 6, 7, 8, 9, 11, 13, 16, 18, 19, 20, 21, 22, 23, 25, 30, 32, 34, 35, 36, 37, 39, 40, 41, 48, 52, 55, 58]
+sum of sorted flattened array = 756
+length of sorted flattened array = 28
+
+s(grid_right) = 96
+is_magic_square(grid_right) = True
+grid_right =
+
+16 41 39
+55 32  9
+25 23 48
+
+
+s(grid_up) = 111
+is_magic_square(grid_up) = True
+grid_up =
+
+19 52 40
+58 37 16
+34 22 55
+
+
+s(grid_left) = 63
+is_magic_square(grid_left) = True
+grid_left =
+
+ 7 34 22
+36 21  6
+20  8 35
+
+
+s(grid_bottom) = 54
+is_magic_square(grid_bottom) = True
+grid_bottom =
+
+ 6 25 23
+35 18  1
+13 11 30
+
+
+list for submission = [19, 52, 40, 58, 37, 16, 41, 39, 7, 34, 22, 55, 32, 9, 36, 21, 6, 25, 23, 48, 20, 8, 35, 18, 1, 13, 11, 30]

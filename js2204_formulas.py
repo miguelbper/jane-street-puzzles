@@ -70,3 +70,17 @@ zz = -4*aa + 6*bb + 3*cc - 4*xx
 
 We will only use the formula for dd
 '''
+
+# update 08 04 2022
+outside = next(iter(linsolve(equations, (aa, bb, cc, dd))))
+
+print('\n\nFormulas for other 4 entries in cross, given 4 entries:\n\n')
+for i in range(0,4):
+    print("{} = {}".format(('aa', 'bb', 'cc', 'dd')[i], outside[i]))
+'''
+Conclusion:
+aa = 12*ww/35 - 2*xx/35 + 9*yy/35 + 16*zz/35
+bb = 9*ww/35 + 16*xx/35 - 2*yy/35 + 12*zz/35
+cc = -2*ww/35 + 12*xx/35 + 16*yy/35 + 9*zz/35
+dd = 16*ww/35 + 9*xx/35 + 12*yy/35 - 2*zz/35
+'''

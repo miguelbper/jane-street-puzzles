@@ -1,14 +1,10 @@
-from typing_extensions import final
 import numpy as np
 import pandas as pd
-from itertools import product
+from itertools import permutations
 from tqdm import tqdm
 
 
 ''' Functions to compute entire board from a few cells '''
-
-
-# func: 1 number -> 4 numbers, non canonical
 
 
 # func: 4 numbers -> entire board
@@ -150,7 +146,7 @@ def sorted_list(ar):
 
 ''' Loop that finds a magic square'''
 
-iterator = product(range(1,35), repeat = 4)
+iterator = permutations(range(1,35), 4)
 
 final_grid = board_from_four(0, 0, 0, 0)
 final_sum = 9999
