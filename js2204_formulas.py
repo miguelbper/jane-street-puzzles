@@ -43,7 +43,12 @@ We will only use the formula for h
 '''
 
 
-''' We show, using the above formula for h: if each square in the grid is magic, the whole square is determined by 4 numbers '''
+''' We show, using the above formula for h: if each square in the grid is magic, the whole square is determined by 4 numbers 
+cross = [[  ,  , b,  ],
+         [ c, w, y,  ],
+         [  , z, x, a],
+         [  , d,  ,  ]]
+'''
 
 
 (aa, bb, cc, dd) = symbols('aa, bb, cc, dd')
@@ -56,27 +61,11 @@ equations = [
     4*aa + xx - 2*zz - 3*dd
 ]
 
-inside = next(iter(linsolve(equations, (dd, yy, ww, zz))))
+abcd = next(iter(linsolve(equations, (aa, bb, cc, dd))))
 
 print('\n\nFormulas for other 4 entries in cross, given 4 entries:\n\n')
 for i in range(0,4):
-    print("{} = {}".format(('dd', 'yy', 'ww', 'zz')[i], inside[i]))
-'''
-Conclusion:
-dd = 4*aa - 4*bb - 2*cc + 3*xx
-yy = 3*aa - 4*bb + 2*xx
-ww = 6*aa - 5*bb - 4*cc + 4*xx
-zz = -4*aa + 6*bb + 3*cc - 4*xx
-
-We will only use the formula for dd
-'''
-
-# update 08 04 2022
-outside = next(iter(linsolve(equations, (aa, bb, cc, dd))))
-
-print('\n\nFormulas for other 4 entries in cross, given 4 entries:\n\n')
-for i in range(0,4):
-    print("{} = {}".format(('aa', 'bb', 'cc', 'dd')[i], outside[i]))
+    print("{} = {}".format(('aa', 'bb', 'cc', 'dd')[i], abcd[i]))
 '''
 Conclusion:
 aa = 12*ww/35 - 2*xx/35 + 9*yy/35 + 16*zz/35

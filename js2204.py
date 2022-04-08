@@ -4,12 +4,17 @@ from itertools import permutations
 from tqdm import tqdm
 
 
-''' Functions to compute entire board from a few cells '''
+''' Function that computes entire board from x, y, w, z '''
 
-
-# func: 4 numbers -> entire board
-def board_from_four(a, b, c, x):
+def board_from_four(x, y, w, z):
     
+    # compute elements in the cross
+    # if division has no remainder, the four squares will be magic 
+    a = (-2*x +  9*y + 12*w + 16*z) // 35
+    b = (16*x -  2*y +  9*w + 12*z) // 35
+    c = (12*x + 16*y -  2*w +  9*z) // 35
+    d = ( 9*x + 12*y + 16*w -  2*z) // 35
+
     # Empty entries
     m00 = None
     m10 = None
@@ -20,17 +25,16 @@ def board_from_four(a, b, c, x):
     m45 = None
     m55 = None
 
-    # Four given entries in cross
+    # cross
+    m33 = x
+    m23 = y
+    m22 = w
+    m32 = z
+
     m34 = a
     m13 = b
     m21 = c
-    m33 = x
-
-    # Four other entries in cross
-    m42 = 4*a - 4*b - 2*c + 3*x
-    m23 = 3*m34 + 2*m33 - 4*m13
-    m22 = 3*m13 + 2*m23 - 4*m21
-    m32 = 3*m21 + 2*m22 - 4*m42 
+    m42 = d
 
     # Right square
     sl = m13 + m23 + m33
@@ -100,7 +104,8 @@ def no_duplicate_numbers(ar):
 
 
 # func: entire board -> bool, is magic/almost magic
-# note: every board coming from the board_from_four function should satisfy this condition
+# note: every board coming from the board_from_four function should satisfy this condition 
+# as long as the divisions in board_from_four have no remainder. we check that this is the case before calling the function
 def square_right(ar):
     return ar[1:4, 3:]
 
@@ -144,26 +149,54 @@ def sorted_list(ar):
     return sorted(ar[ar!=None])
 
 
-''' Loop that finds a magic square'''
+''' Functions that define an iterator '''
 
-iterator = permutations(range(1,35), 4)
+def x_is_min(x, y, w, z):
+    return x == min(x, y, w, z)
 
-final_grid = board_from_four(0, 0, 0, 0)
-final_sum = 9999
-updated = False
 
-for (a, b, c, x) in tqdm(iterator):
-    grid = board_from_four(a, b, c, x)
-    s = sum_of(grid)
-    p = all_numbers_positive(grid)
-    nd = no_duplicate_numbers(grid)
+def abcd_are_ints(x, y, w, z):
+    return all([
+        (-2*x +  9*y + 12*w + 16*z) % 35 == 0,
+        (16*x -  2*y +  9*w + 12*z) % 35 == 0,
+        (12*x + 16*y -  2*w +  9*z) % 35 == 0,
+        ( 9*x + 12*y + 16*w -  2*z) % 35 == 0
+    ])
 
-    if p and nd and s < final_sum:
-        final_grid = grid
-        final_sum = s
-        updated = True
+
+def is_valid_tuple(tup):
+    (x, y, w, z) = tup
+    return x_is_min(x, y, w, z) and abcd_are_ints(x, y, w, z)
+
+
+def iterator(n):
+    return filter(is_valid_tuple, permutations(range(1,n), 4))
+
+
+''' Function that computes the magic square with the lowest sum such that x,y,w,z < n '''
+
+def lowest_sum_grid(n):
+    final_grid = board_from_four(0, 0, 0, 0)
+    final_sum = 9999
+    
+    for (x, y, w, z) in tqdm(iterator(n)):
+        grid = board_from_four(x, y, w, z)
+        s = sum_of(grid)
+        p = all_numbers_positive(grid)
+        nd = no_duplicate_numbers(grid)
+
+        if p and nd and s < final_sum:
+            final_grid = grid
+            final_sum = s
+
+    return final_grid
+
 
 ''' Result and tests '''
+
+final_grid = lowest_sum_grid(60)
+final_sum = sum_of(final_grid)
+
 
 print('\nmagic square = \n\n{}\n'.format(pd.DataFrame(final_grid).to_string(header=False, index=False)))
 print('\nsum = {}\n'.format(final_sum))
