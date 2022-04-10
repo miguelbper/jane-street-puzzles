@@ -2,6 +2,8 @@ import numpy as np
 import pandas as pd
 from itertools import permutations
 from tqdm import tqdm
+from functools import partial
+from operator import add
 
 
 ''' Function that computes entire board from x, y, w, z '''
@@ -81,6 +83,20 @@ def board_from_four(x, y, w, z):
     )
 
 
+def map_none(function, array):
+    def function_none(x):
+        return None if x == None else function(x)
+    function_vectorized = np.vectorize(function_none)
+    return function_vectorized(array)
+
+
+def make_minimum(l):
+    def make_minimum_l(ar):
+        m = min(ar[ar!=None])
+        return map_none(partial(add, l - m), ar)
+    return make_minimum_l
+
+
 ''' Functions to test if the resulting board satisfies all conditions '''
 
 
@@ -89,18 +105,18 @@ def sum_of(ar):
     return sum(ar[ar!=None])
 
 
-# func: entire board -> bool, all numbers positive
-def all_numbers_positive(ar):
-    return all(map(lambda x: x > 0, ar[ar!=None]))
-
-
 # func: entire board -> bool, no duplicate numbers
-def no_duplicate_numbers(ar):
+def exists_duplicate(ar):
     ar_f = ar[ar!=None]
-    return len(np.unique(ar_f)) == len(ar_f)
+    return len(np.unique(ar_f)) != len(ar_f)
 
 
 ''' Functions to confirm that the result is correct '''
+
+
+# func: entire board -> bool, all numbers positive
+def all_numbers_positive(ar):
+    return all(map(lambda x: x > 0, ar[ar!=None]))
 
 
 # func: entire board -> bool, is magic/almost magic
@@ -144,6 +160,36 @@ def is_magic(ar):
     )
 
 
+def is_almost_magic_square(ar):
+    sums = list(set((
+        sum(ar[0,:]),
+        sum(ar[1,:]),
+        sum(ar[2,:]),
+        sum(ar[:,0]),
+        sum(ar[:,1]),
+        sum(ar[:,2]),
+        ar.trace(),
+        ar[2,0] + ar[1,1] + ar[0,2]
+    )))
+
+    if len(sums) == 1:
+        return True
+    elif len(sums) == 2:
+        return abs(sums[1] - sums[0]) == 1
+    else:
+        return False
+
+
+def is_almost_magic(ar):
+    return all(
+        [
+            is_almost_magic_square(square_right(ar)),
+            is_almost_magic_square(square_up(ar)),
+            is_almost_magic_square(square_left(ar)),
+            is_almost_magic_square(square_bottom(ar))
+        ]
+    )
+
 # func: entire board -> list, sorted list of elements of array
 def sorted_list(ar):
     return sorted(ar[ar!=None])
@@ -175,47 +221,52 @@ def iterator(n):
 
 ''' Function that computes the magic square with the lowest sum such that x,y,w,z < n '''
 
+
 def lowest_sum_grid(n):
     final_grid = board_from_four(0, 0, 0, 0)
     final_sum = 9999
     
     for (x, y, w, z) in tqdm(iterator(n)):
         grid = board_from_four(x, y, w, z)
+        grid = make_minimum(1)(grid)
         s = sum_of(grid)
-        p = all_numbers_positive(grid)
-        nd = no_duplicate_numbers(grid)
 
-        if p and nd and s < final_sum:
+        if not exists_duplicate(grid) and s < final_sum:
             final_grid = grid
             final_sum = s
 
     return final_grid
 
 
-''' Result and tests '''
+def lowest_sum_grid_divide(p, n):
+    final_grid = board_from_four(0, 0, 0, 0)
+    final_sum = 9999
+    
+    for (x, y, w, z) in tqdm(iterator(n)):
+        grid = board_from_four(x, y, w, z)
+        grid = make_minimum(p)(grid)
+        grid = map_none(lambda x: x // p, grid)
+        s = sum_of(grid)
 
-final_grid = lowest_sum_grid(60)
-final_sum = sum_of(final_grid)
+        if not exists_duplicate(grid) and s < final_sum:
+            final_grid = grid
+            final_sum = s
+
+    return final_grid
 
 
-print('\nmagic square = \n\n{}\n'.format(pd.DataFrame(final_grid).to_string(header=False, index=False)))
-print('\nsum = {}\n'.format(final_sum))
-print('\nsorted flattened array = {}'.format(sorted_list(final_grid)))
-print('sum of sorted flattened array = {}'.format(sum(sorted_list(final_grid))))
-print('length of sorted flattened array = {}\n'.format(len(sorted_list(final_grid))))
+def lowest_sum_grid_divide_alt(p, n):
+    final_grid = board_from_four(0, 0, 0, 0)
+    final_sum = 9999
+    
+    for (x, y, w, z) in tqdm(iterator(n)):
+        grid = board_from_four(x, y, w, z)
+        grid = map_none(lambda x: x // p, grid)
+        grid = make_minimum(1)(grid)
+        s = sum_of(grid)
 
-grid_r = square_right(final_grid)
-grid_u = square_up(final_grid)
-grid_l = square_left(final_grid)
-grid_b = square_bottom(final_grid)
+        if not exists_duplicate(grid) and s < final_sum:
+            final_grid = grid
+            final_sum = s
 
-sqq = [grid_r, grid_u, grid_l, grid_b]
-nqq = ['grid_right', 'grid_up', 'grid_left', 'grid_bottom']
-
-for i in range(0,4):
-    print('s({}) = {}'.format(nqq[i], sqq[i].trace()))
-    print('is_magic_square({}) = {}'.format(nqq[i], is_magic_square(sqq[i])))
-    print('{} = \n\n{}\n\n'.format(nqq[i], pd.DataFrame(sqq[i]).to_string(header=False, index=False)))
-
-# Converts the result to be submitted
-print('list for submission = {}'.format(list(final_grid[final_grid!=None])))
+    return final_grid
