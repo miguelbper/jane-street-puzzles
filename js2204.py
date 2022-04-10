@@ -106,9 +106,9 @@ def sum_of(ar):
 
 
 # func: entire board -> bool, no duplicate numbers
-def exists_duplicate(ar):
+def num_duplicates(ar):
     ar_f = ar[ar!=None]
-    return len(np.unique(ar_f)) != len(ar_f)
+    return len(ar_f) - len(np.unique(ar_f))
 
 
 ''' Functions to confirm that the result is correct '''
@@ -222,7 +222,7 @@ def iterator(n):
 ''' Function that computes the magic square with the lowest sum such that x,y,w,z < n '''
 
 
-def lowest_sum_grid(n):
+def lowest_sum_grid(d, n):
     final_grid = board_from_four(0, 0, 0, 0)
     final_sum = 9999
     
@@ -231,14 +231,14 @@ def lowest_sum_grid(n):
         grid = make_minimum(1)(grid)
         s = sum_of(grid)
 
-        if not exists_duplicate(grid) and s < final_sum:
+        if num_duplicates(grid) <= d and s < final_sum:
             final_grid = grid
             final_sum = s
 
     return final_grid
 
 
-def lowest_sum_grid_divide(p, n):
+def lowest_sum_grid_divide(d, p, n):
     final_grid = board_from_four(0, 0, 0, 0)
     final_sum = 9999
     
@@ -248,14 +248,14 @@ def lowest_sum_grid_divide(p, n):
         grid = map_none(lambda x: x // p, grid)
         s = sum_of(grid)
 
-        if not exists_duplicate(grid) and s < final_sum:
+        if num_duplicates(grid) <= d and s < final_sum:
             final_grid = grid
             final_sum = s
 
     return final_grid
 
 
-def lowest_sum_grid_divide_alt(p, n):
+def lowest_sum_grid_divide_alt(d, p, n):
     final_grid = board_from_four(0, 0, 0, 0)
     final_sum = 9999
     
@@ -265,8 +265,34 @@ def lowest_sum_grid_divide_alt(p, n):
         grid = make_minimum(1)(grid)
         s = sum_of(grid)
 
-        if not exists_duplicate(grid) and s < final_sum:
+        if num_duplicates(grid) <= d and s < final_sum:
             final_grid = grid
             final_sum = s
 
     return final_grid
+
+
+def test_results(grid):
+    return '''magic square = 
+{m}
+
+sum = {s}
+is almost magic = {a}
+no duplicates = {d}
+only positive numbers = {p}
+
+sorted flattened array = {f}
+sum of sorted flattened array = {fs}
+length sorted flattened array = {fl}
+
+list to submit = {ll}'''.format(
+        m = pd.DataFrame(grid).to_string(header=False, index=False),
+        s = sum_of(grid),
+        a = is_almost_magic(grid),
+        d = num_duplicates(grid) == 0,
+        p = all_numbers_positive(grid),
+        f = sorted_list(grid),
+        fs = sum(sorted_list(grid)),
+        fl = len(sorted_list(grid)),
+        ll = list(grid[grid!=None])
+    )
