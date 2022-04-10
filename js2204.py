@@ -122,73 +122,56 @@ def all_numbers_positive(ar):
 # func: entire board -> bool, is magic/almost magic
 # note: every board coming from the board_from_four function should satisfy this condition 
 # as long as the divisions in board_from_four have no remainder. we check that this is the case before calling the function
-def square_right(ar):
+def square_r(ar):
     return ar[1:4, 3:]
 
-def square_up(ar):
+def square_u(ar):
     return ar[0:3, 1:4]
 
-def square_left(ar):
+def square_l(ar):
     return ar[2:5, 0:3]
 
-def square_bottom(ar):
+def square_d(ar):
     return ar[3:, 2:5]
 
-def is_magic_square(ar):
-    s = ar.trace()
-
-    return all(
-        [
-            s == sum(ar[0,:]),
-            s == sum(ar[1,:]),
-            s == sum(ar[2,:]),
-            s == sum(ar[:,0]),
-            s == sum(ar[:,1]),
-            s == sum(ar[:,2]),
-            s == ar[2,0] + ar[1,1] + ar[0,2]
-        ]
-    )
-
-def is_magic(ar):
-    return all(
-        [
-            is_magic_square(square_right(ar)),
-            is_magic_square(square_up(ar)),
-            is_magic_square(square_left(ar)),
-            is_magic_square(square_bottom(ar))
-        ]
-    )
-
-
-def is_almost_magic_square(ar):
-    sums = list(set((
-        sum(ar[0,:]),
-        sum(ar[1,:]),
-        sum(ar[2,:]),
-        sum(ar[:,0]),
-        sum(ar[:,1]),
-        sum(ar[:,2]),
+def sums_of_lines(ar):
+    return [
+        np.sum(ar[0,:]),
+        np.sum(ar[1,:]),
+        np.sum(ar[2,:]),
+        np.sum(ar[:,0]),
+        np.sum(ar[:,1]),
+        np.sum(ar[:,2]),
         ar.trace(),
         ar[2,0] + ar[1,1] + ar[0,2]
-    )))
+    ]
 
-    if len(sums) == 1:
-        return True
-    elif len(sums) == 2:
-        return abs(sums[1] - sums[0]) == 1
-    else:
-        return False
+def is_magic_square(ar):
+    return 1 == list(set(len(sums_of_lines(ar))))
 
+def is_magic(ar):
+    return all([is_magic_square(f(ar)) for f in [square_r, square_u, square_l, square_d]])
+
+def is_almost_magic_square(ar):
+    sums = list(set(sums_of_lines(ar)))
+    return len(sums) <= 2 and abs(sums[-1] - sums[0]) <= 1 
 
 def is_almost_magic(ar):
-    return all(
-        [
-            is_almost_magic_square(square_right(ar)),
-            is_almost_magic_square(square_up(ar)),
-            is_almost_magic_square(square_left(ar)),
-            is_almost_magic_square(square_bottom(ar))
-        ]
-    )
+    return all([is_almost_magic_square(f(ar)) for f in [square_r, square_u, square_l, square_d]])
+
+
+def square_sums(f, ar):
+    sq = f(ar)
+    
+    (r0, r1, r2, c0, c1, c2, d0, d1) = tuple(sums_of_lines(sq))
+
+    top_row = np.array([[d0, c0, c1, c2, d1]])
+    first_col = np.transpose(np.array([[r0, r1, r2]]))
+    last_col = np.transpose(np.array([[None, None, None]]))
+    bottom_block = np.concatenate((first_col, sq, last_col), 1)
+
+    return np.concatenate((top_row, bottom_block), 0)
+
 
 # func: entire board -> list, sorted list of elements of array
 def sorted_list(ar):
@@ -273,10 +256,12 @@ def lowest_sum_grid_divide_alt(d, p, n):
 
 
 def test_results(grid):
-    return '''magic square = 
+    return '''almost magic grid = 
 {m}
 
+is solution = {x}
 sum = {s}
+
 is almost magic = {a}
 no duplicates = {d}
 only positive numbers = {p}
@@ -287,6 +272,7 @@ length sorted flattened array = {fl}
 
 list to submit = {ll}'''.format(
         m = pd.DataFrame(grid).to_string(header=False, index=False),
+        x = is_almost_magic(grid) and num_duplicates(grid) == 0 and all_numbers_positive(grid),
         s = sum_of(grid),
         a = is_almost_magic(grid),
         d = num_duplicates(grid) == 0,
