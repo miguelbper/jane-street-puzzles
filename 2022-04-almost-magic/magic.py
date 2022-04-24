@@ -1,284 +1,98 @@
 import numpy as np
-import pandas as pd
 from itertools import permutations
-from tqdm import tqdm
 from functools import partial
-from operator import add
-
-
-''' Function that computes entire board from x, y, w, z '''
-
-def board_from_four(x, y, w, z):
-    
-    # compute elements in the cross
-    # if division has no remainder, the four squares will be magic 
-    a = (-2*x +  9*y + 12*w + 16*z) // 35
-    b = (16*x -  2*y +  9*w + 12*z) // 35
-    c = (12*x + 16*y -  2*w +  9*z) // 35
-    d = ( 9*x + 12*y + 16*w -  2*z) // 35
-
-    # Empty entries
-    m00 = None
-    m10 = None
-    m04 = None
-    m05 = None
-    m50 = None
-    m51 = None
-    m45 = None
-    m55 = None
-
-    # cross
-    m33 = x
-    m23 = y
-    m22 = w
-    m32 = z
-
-    m34 = a
-    m13 = b
-    m21 = c
-    m42 = d
-
-    # Right square
-    sl = m13 + m23 + m33
-    m35 = sl - m33 - m34
-    m24 = sl - m13 - m35
-    m14 = sl - m24 - m34
-    m25 = sl - m23 - m24
-    m15 = sl - m13 - m14
-
-    # Up square
-    su = m21 + m22 + m23
-    m03 = su - m13 - m23
-    m12 = su - m21 - m03
-    m11 = su - m12 - m13
-    m02 = su - m12 - m22
-    m01 = su - m02 - m03 
-
-    # Left square
-    sr = m22 + m32 + m42
-    m20 = sr - m21 - m22
-    m31 = sr - m20 - m42
-    m30 = sr - m31 - m32
-    m41 = sr - m31 - m21
-    m40 = sr - m41 - m42
-
-    # Bottom square
-    sb = m32 + m33 + m34
-    m52 = sb - m32 - m42
-    m43 = sb - m52 - m34
-    m53 = sb - m33 - m43
-    m44 = sb - m42 - m43
-    m54 = sb - m52 - m53 
-
-    # Define board
-    return np.array(
-        [
-            [m00, m01, m02, m03, m04, m05],
-            [m10, m11, m12, m13, m14, m15],
-            [m20, m21, m22, m23, m24, m25],
-            [m30, m31, m32, m33, m34, m35],
-            [m40, m41, m42, m43, m44, m45],
-            [m50, m51, m52, m53, m54, m55]
-        ]
-    )
-
-
-def map_none(function, array):
-    def function_none(x):
-        return None if x == None else function(x)
-    function_vectorized = np.vectorize(function_none)
-    return function_vectorized(array)
-
-
-def make_minimum(l):
-    def make_minimum_l(ar):
-        m = min(ar[ar!=None])
-        return map_none(partial(add, l - m), ar)
-    return make_minimum_l
-
-
-''' Functions to test if the resulting board satisfies all conditions '''
-
-
-# func: entire board -> int, sum
-def sum_of(ar):
-    return sum(ar[ar!=None])
-
-
-# func: entire board -> bool, no duplicate numbers
-def num_duplicates(ar):
-    ar_f = ar[ar!=None]
-    return len(ar_f) - len(np.unique(ar_f))
-
-
-''' Functions to confirm that the result is correct '''
-
-
-# func: entire board -> bool, all numbers positive
-def all_numbers_positive(ar):
-    return all(map(lambda x: x > 0, ar[ar!=None]))
-
-
-# func: entire board -> bool, is magic/almost magic
-# note: every board coming from the board_from_four function should satisfy this condition 
-# as long as the divisions in board_from_four have no remainder. we check that this is the case before calling the function
-def square_r(ar):
-    return ar[1:4, 3:]
-
-def square_u(ar):
-    return ar[0:3, 1:4]
-
-def square_l(ar):
-    return ar[2:5, 0:3]
-
-def square_d(ar):
-    return ar[3:, 2:5]
-
-def sums_of_lines(ar):
-    return [
-        np.sum(ar[0,:]),
-        np.sum(ar[1,:]),
-        np.sum(ar[2,:]),
-        np.sum(ar[:,0]),
-        np.sum(ar[:,1]),
-        np.sum(ar[:,2]),
-        ar.trace(),
-        ar[2,0] + ar[1,1] + ar[0,2]
-    ]
-
-def is_magic_square(ar):
-    return 1 == list(set(len(sums_of_lines(ar))))
-
-def is_magic(ar):
-    return all([is_magic_square(f(ar)) for f in [square_r, square_u, square_l, square_d]])
-
-def is_almost_magic_square(ar):
-    sums = list(set(sums_of_lines(ar)))
-    return len(sums) <= 2 and abs(sums[-1] - sums[0]) <= 1 
-
-def is_almost_magic(ar):
-    return all([is_almost_magic_square(f(ar)) for f in [square_r, square_u, square_l, square_d]])
-
-
-def square_sums(f, ar):
-    sq = f(ar)
-    
-    (r0, r1, r2, c0, c1, c2, d0, d1) = tuple(sums_of_lines(sq))
-
-    top_row = np.array([[d0, c0, c1, c2, d1]])
-    first_col = np.transpose(np.array([[r0, r1, r2]]))
-    last_col = np.transpose(np.array([[None, None, None]]))
-    bottom_block = np.concatenate((first_col, sq, last_col), 1)
-
-    return np.concatenate((top_row, bottom_block), 0)
-
-
-# func: entire board -> list, sorted list of elements of array
-def sorted_list(ar):
-    return sorted(ar[ar!=None])
-
-
-''' Functions that define an iterator '''
-
-def x_is_min(x, y, w, z):
-    return x == min(x, y, w, z)
-
-
-def abcd_are_ints(x, y, w, z):
-    return all([
-        (-2*x +  9*y + 12*w + 16*z) % 35 == 0,
-        (16*x -  2*y +  9*w + 12*z) % 35 == 0,
-        (12*x + 16*y -  2*w +  9*z) % 35 == 0,
-        ( 9*x + 12*y + 16*w -  2*z) % 35 == 0
-    ])
-
-
-def is_valid_tuple(tup):
-    (x, y, w, z) = tup
-    return x_is_min(x, y, w, z) and abcd_are_ints(x, y, w, z)
-
-
-def iterator(n):
-    return filter(is_valid_tuple, permutations(range(1,n), 4))
-
-
-''' Function that computes the magic square with the lowest sum such that x,y,w,z < n '''
-
-
-def lowest_sum_grid(d, n):
-    final_grid = board_from_four(0, 0, 0, 0)
-    final_sum = 9999
-    
-    for (x, y, w, z) in tqdm(iterator(n)):
-        grid = board_from_four(x, y, w, z)
-        grid = make_minimum(1)(grid)
-        s = sum_of(grid)
-
-        if num_duplicates(grid) <= d and s < final_sum:
-            final_grid = grid
-            final_sum = s
-
-    return final_grid
-
-
-def lowest_sum_grid_divide(d, p, n):
-    final_grid = board_from_four(0, 0, 0, 0)
-    final_sum = 9999
-    
-    for (x, y, w, z) in tqdm(iterator(n)):
-        grid = board_from_four(x, y, w, z)
-        grid = make_minimum(p)(grid)
-        grid = map_none(lambda x: x // p, grid)
-        s = sum_of(grid)
-
-        if num_duplicates(grid) <= d and s < final_sum:
-            final_grid = grid
-            final_sum = s
-
-    return final_grid
-
-
-def lowest_sum_grid_divide_alt(d, p, n):
-    final_grid = board_from_four(0, 0, 0, 0)
-    final_sum = 9999
-    
-    for (x, y, w, z) in tqdm(iterator(n)):
-        grid = board_from_four(x, y, w, z)
-        grid = map_none(lambda x: x // p, grid)
-        grid = make_minimum(1)(grid)
-        s = sum_of(grid)
-
-        if num_duplicates(grid) <= d and s < final_sum:
-            final_grid = grid
-            final_sum = s
-
-    return final_grid
-
-
-def test_results(grid):
-    return '''almost magic grid = 
-{m}
-
-is solution = {x}
-sum = {s}
-
-is almost magic = {a}
-no duplicates = {d}
-only positive numbers = {p}
-
-sorted flattened array = {f}
-sum of sorted flattened array = {fs}
-length sorted flattened array = {fl}
-
-list to submit = {ll}'''.format(
-        m = pd.DataFrame(grid).to_string(header=False, index=False),
-        x = is_almost_magic(grid) and num_duplicates(grid) == 0 and all_numbers_positive(grid),
-        s = sum_of(grid),
-        a = is_almost_magic(grid),
-        d = num_duplicates(grid) == 0,
-        p = all_numbers_positive(grid),
-        f = sorted_list(grid),
-        fs = sum(sorted_list(grid)),
-        fl = len(sorted_list(grid)),
-        ll = list(grid[grid!=None])
-    )
+from tqdm import tqdm
+
+# by formulas.py, the u-square is determined as follows
+def au(u, l, d, r):
+    return -l + d
+
+def bu(u, l, d, r):
+    return 2*u - 2*l + d - r
+
+def sq(u, l, d, r):
+    a = au(u, l, d, r)
+    b = bu(u, l, d, r)
+    c = u
+    return np.array([[c     - b, c + a + b, c - a    ],
+                     [c - a + b, c        , c + a - b],
+                     [c + a    , c - a - b, c     + b]])
+
+def rotate(n, m):
+    for i in range(n % 4):
+        m = np.array([np.transpose(m[:,2]), 
+                      np.transpose(m[:,1]), 
+                      np.transpose(m[:,0])])
+    return m
+
+# therefore the grid is determined as follows 
+# (where we are using rotational symmetry)
+def grid(u, l, d, r):
+    m = np.zeros([6,6], dtype = "int")
+
+    m[0:3,1:4] = rotate(0, sq(u, l, d, r))
+    m[2:5,0:3] = rotate(1, sq(l, d, r, u))
+    m[3:6,2:5] = rotate(2, sq(d, r, u, l))
+    m[1:4,3:6] = rotate(3, sq(r, u, l, d))
+
+    return m
+
+def no_dups(g):
+    g = g[g!=0]
+    return 0 == len(g) - len(np.unique(g))
+
+# it can be shown that the u-square has entries which are all positive iff
+# (we can use rotational symmetry to call this function for the other squares as well)
+def positive(u, l, d, r):
+    return u > abs(au(u, l, d, r)) + abs(bu(u, l, d, r))
+
+# it can be shown that if s = 7 * (u + l + d + r), 
+# where s is the sum of all the entries
+# let k = s / 7 = u + l + d + r
+def valid(k, tup):
+    (u, l, d) = tup
+    r = k - u - l - d
+    if r <= 0:
+        return False
+    if r in [u, l, d]:
+        return False
+    if u != min(u, l, d, r):
+        return False
+    if not positive(u, l, d, r):
+        return False
+    if not positive(l, d, r, u):
+        return False
+    if not positive(d, r, u, l):
+        return False
+    if not positive(r, u, l, d):
+        return False
+    return True
+
+# if (u, l, d, r) are such that u + l + d + r = k, 
+# then it is possible to show that u, l, d, r <= min(k - 6, 7*(k - 54))
+def iterator(k):
+    m = min(k - 6, 7*(k - 54))
+    val = partial(valid, k)
+    itr = permutations(range(1, m + 1), 3)
+    itr = filter(val, itr)
+    return itr
+
+# find the first grid such that u + l + d + r = k (if it exists)
+def find_sum(k):
+    for (u, l, d) in iterator(k):
+        r = k - u - l - d
+        g = grid(u, l, d, r)
+        if no_dups(g):
+            return g
+
+# loop over k to find the magic grid with the lowest sum
+# s_0 = 1 + 2 + ... + 28 = 406. k_0 = 406 / 7 = 58
+def magic(n):
+    for k in tqdm(range(58, 58 + n)):
+        g = find_sum(k)
+        if isinstance(g, np.ndarray):
+            return g
+
+x = magic(100)
+
+print(x)
