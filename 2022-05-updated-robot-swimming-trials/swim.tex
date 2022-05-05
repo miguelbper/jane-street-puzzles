@@ -9,6 +9,7 @@
 \usepackage{IEEEtrantools}
 \usepackage{geometry}
 \usepackage{parskip}
+\usepackage{xcolor}
 
 \newlength{\alphabet}
 \settowidth{\alphabet}{\normalfont abcdefghijklmnopqrstuvwxyz}
@@ -124,7 +125,7 @@ Find p, the probability a robot using the Nash equilibrium strategy when competi
         & = & \frac{n}{p} \sum_{i=0}^{mn-1} P(W(R_1) \cap D_1(R_1) \cap F_i)                                                            & \quad [\text{disjoint events}]\\
         & = & \frac{n}{p} \sum_{i=0}^{mn-1} P(D_1(R_1) \cap F_i) \cdot P(W(R_1) | D_1(R_1) \cap F_i)                                    & \quad [\text{conditional prob.}]\\
         & = & \frac{n}{p} \sum_{i=0}^{mn-1} P(D_1(R_1)) \cdot P(F_i) \cdot P(W(R_1) | D_1(R_1) \cap F_i)                                & \quad [\text{independent events}]\\
-        & = & \sum_{i=0}^{mn-1} b(i, mn-1, p/n) \frac{1}{1+i} \\
+        & = & \sum_{i=0}^{mn-1} b(i, mn-1, p/n) \frac{1}{1+i} & \quad [\text{\textcolor{red}{wrong! see below}}] \\
         & = & \sum_{i=0}^{mn-1} \binom{mn-1}{i} \left(\frac{p}{n}\right)^i \left(1 - \frac{p}{n}\right)^{mn-1-i} \frac{1}{1+i}          & \quad [\text{formula for $b$}] \\
         & = & \sum_{j=1}^{mn} \binom{mn-1}{j-1} \left(\frac{p}{n}\right)^{j-1} \left(1 - \frac{p}{n}\right)^{mn-j} \frac{1}{j}          & \quad [\text{$j = i + i$}]\\
         & = & \frac{n}{p} \frac{1}{mn} \sum_{j=1}^{mn} \binom{mn}{j} \left(\frac{p}{n}\right)^{j} \left(1 - \frac{p}{n}\right)^{mn-j} \\
@@ -163,6 +164,8 @@ which has solution $p = 0.95223967$.
             \end{IEEEeqnarray*}
         \item On the other hand, it feels like it should be $1/m$, because $R_1$ is playing discrete on race 1 and everyone else is also playing a discrete strategy. This feels like it should be symmetric.
         \item However, if it were $p=1$, then we would find that the Nash equilibrium is everyone playing discrete, which we know is not true.
+        \item But, for example, if $m = 1$, then the probability above should be $1$, and it is not\ldots Maybe I missed a term in the sum or something like that.
+        \item The step marked red above is wrong because of the following. The probability of $R_1$ winning (conditional) is not equal to $1/(1 + i)$. This is because $R_1$ may lose the first race, but win a later race, provided that no one else had fuel in the later race. So, what I computed was the probability that $R_1$ wins on the first race (suggests recursion?)
     \end{itemize}
 \end{remark}
 
