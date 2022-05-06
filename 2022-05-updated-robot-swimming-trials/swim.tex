@@ -121,9 +121,9 @@ Now let $\mu_1, \ldots, \mu_{mn}$ be the strategies of the $1, \ldots, mn$ robot
 
 \begin{lemma}
     \label{lem:how many robots}
-    Let $E \subset \Omega$ be any event, $S_i$ be a strategy for $R_i$ (for each $i = 1,\ldots,mn$) and $F_i$ be the event
+    Let $E \subset \Omega$ be any event, $S_i \subset X$ be a set of pure strategies for $R_i$ (for each $i = 1,\ldots,mn$) and $F_i$ be the event
     \begin{IEEEeqnarray*}{c+x*}
-        F_i \coloneqq \{\omega \in \Omega \mid \text{at $\omega$, $i = \# \{ j \in \{2, \ldots, mn\} \mid R_j \text{ uses strategy } S_j \}$}\},
+        F_i \coloneqq \{\omega \in \Omega \mid \text{at $\omega$, $i = \# \{ j \in \{2, \ldots, mn\} \mid R_j \text{ uses a strategy in } S_j \}$}\},
     \end{IEEEeqnarray*}
     for each $i = 0, \ldots, mn-1$. Then $P(E \mid S_1(R_1)) = \sum_{i=0}^{mn-1} P(F_i) P(E \mid S_1(R_1) \cap F_i)$ (and analogously for robots other than $R_1$).
 \end{lemma}
@@ -167,9 +167,9 @@ Now let $\mu_1, \ldots, \mu_{mn}$ be the strategies of the $1, \ldots, mn$ robot
 \end{lemma}
 \begin{proof}
     \begin{IEEEeqnarray*}{rCls+x*}
-        \IEEEeqnarraymulticol{3}{l}{P(W(R))}\\ \quad
-        & =    & \frac{n}{p} P(W(R) \cap D_1(R))                                 & \quad [\text{by \cref{cor:nash eq}}] \\
-        & \geq & \frac{n}{p} P(W_1(R) \cap D_1(R))                               & \quad \\
+        P(W(R))
+        & =    & P(W(R) \mid D_1(R))                                             & \quad [\text{by \cref{cor:nash eq}}] \\
+        & \geq & P(W_1(R) \mid D_1(R))                                           & \quad \\
         & =    & \frac{1}{mp} \left(1 - \left(1 - \frac{p}{n}\right)^{mn}\right) & \quad [\text{by \cref{lem:win race 1}}]. & \qedhere
     \end{IEEEeqnarray*}
 \end{proof}
