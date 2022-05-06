@@ -10,11 +10,22 @@
 \usepackage{geometry}
 \usepackage{parskip}
 \usepackage{xcolor}
+\usepackage{hyperref}               % Include hyperlinks in the PDF
+\usepackage{bookmark}               % Upgrades hyperref
+\usepackage[capitalise]{cleveref}   % Smart referencing
+\usepackage[all]{hypcap}            % Make hyperlinks to floats point to the top of the float instead of the caption
 
 \newlength{\alphabet}
 \settowidth{\alphabet}{\normalfont abcdefghijklmnopqrstuvwxyz}
 \geometry{textwidth=3\alphabet,textheight=4.5\alphabet,hcentering}
 \allowdisplaybreaks
+\hypersetup{
+    bookmarksnumbered=true,
+    colorlinks=true,
+    linkcolor=blue,
+    citecolor=blue,
+    urlcolor=blue
+}
 % --------------------
 % Theorem declarations
 % --------------------
@@ -31,6 +42,7 @@
 \newtheorem{example}    [theorem] {Example}
 \newtheorem{remark}     [theorem] {Remark}
 \newtheorem{assumption} [theorem] {Assumption}
+\newtheorem{axiom}      [theorem] {Axiom}
 
 \begin{document}
 
@@ -38,135 +50,141 @@
 
 \textbf{Problem:} Back in October, we were tasked with the puzzle of finding the smallest number of robots we could invite to a Robot Swimming Trial in order to change the optimal strategy of participants away from discrete. Click here to see the original puzzle explanation and example, in the next paragraph we will go over a quick refresher on the setup.
 
-The tournament directors choose a positive integer N, and then 3N robots are invited to compete in the trials, which are N races between all 3N robots. The robots commit to using a schedule of their identical fuel amounts to the N races, and on a given race whatever robot burns the most fuel wins (ties for most fuel spent on a given race are split uniformly randomly among the tying robots). All robots swim in all races according to their schedules, and then N distinct winners are determined, one from each race, by successively selecting the robot from the remaining races that spent the most fuel and finished ahead of all other robots that haven't yet won a race. Robots all compete (i.e. choose their fuel allotment distributions to maximize the probability) to be selected for the finals by this method. The discrete strategy is the one in which a robot chooses a race uniformly randomly and assigns all of its fuel to that race, and zero fuel to the other races.
+The tournament directors choose a positive integer $n$, and then $3n$ robots are invited to compete in the trials, which are $n$ races between all $3n$ robots. The robots commit to using a schedule of their identical fuel amounts to the $n$ races, and on a given race whatever robot burns the most fuel wins (ties for most fuel spent on a given race are split uniformly randomly among the tying robots). All robots swim in all races according to their schedules, and then $n$ distinct winners are determined, one from each race, by successively selecting the robot from the remaining races that spent the most fuel and finished ahead of all other robots that haven't yet won a race. Robots all compete (i.e. choose their fuel allotment distributions to maximize the probability) to be selected for the finals by this method. The discrete strategy is the one in which a robot chooses a race uniformly randomly and assigns all of its fuel to that race, and zero fuel to the other races.
 
-We found (spoiler alert!) that inviting 24 robots to compete in 8 trial races (i.e. N=8) created a tournament in which the discrete strategy was no longer optimal. The tournament organizers adopted this tournament size, and viewers were rewarded with a richer set of strategies and more diverse race results\footnote{Also, many fewer extremely slow races in which all robots devoted zero fuel, and whichever robot's random motion took it across the finish line first was declared the winner.}. As expected, the competitors switched from everyone always using the discrete strategy to more subtle and continuous allotments of fuel. The metagame evolved and eventually settled into a Nash equilibrium in which a given competitor chooses the discrete strategy with a certain probability p, and otherwise elects for an allotment that distributes nonzero fuel to at least two races.
+We found (spoiler alert!) that inviting 24 robots to compete in 8 trial races (i.e. $n$=8) created a tournament in which the discrete strategy was no longer optimal. The tournament organizers adopted this tournament size, and viewers were rewarded with a richer set of strategies and more diverse race results\footnote{Also, many fewer extremely slow races in which all robots devoted zero fuel, and whichever robot's random motion took it across the finish line first was declared the winner.}. As expected, the competitors switched from everyone always using the discrete strategy to more subtle and continuous allotments of fuel. The metagame evolved and eventually settled into a Nash equilibrium in which a given competitor chooses the discrete strategy with a certain probability $p$, and otherwise elects for an allotment that distributes nonzero fuel to at least two races.
 
-Find p, the probability a robot using the Nash equilibrium strategy when competing at a Robot Updated Swimming Trial with N=8 devotes all of its fuel to a single race, to 6 significant digits.
+Find $p$, the probability a robot using the Nash equilibrium strategy when competing at a Robot Updated Swimming Trial with $n=8$ devotes all of its fuel to a single race, to 6 significant digits.
 
-\textbf{Situation:} The robots are about to play a game, every Robot will execute the Nash equilibrium strategy. This can be modelled using a probability space, where each point is a tuple with one entry for each robot, and each entry has the strategy that that robot ended up using. Example: $((1,0,\ldots,0), \ldots, (0,1,0,\ldots,0))$. In this outcome, the first robot used all the fuel in the first race, while the last robot used all the fuel in the second race. Small note: actually this is not exactly the probability space. For ex, imagine that two robots use all their fuel in race one. Then the winner is chosen at random. Therefore, in the probability space we need to decompose points with ``ties'' into multiple points, one for each possible winner.
-\begin{itemize}
-    \item $n = $ number of races ($n = 8$);
-    \item $m n = $ number of robots ($m = 3$);
-    \item $p = $ probability that a robot uses a strategy which is discrete.
-\end{itemize}
-
-\begin{lemma}
-    $1/m = P(R_1 \text{ wins})$.
-\end{lemma}
-\begin{proof}
-    There exist $m n$ robots, and $n$ of them will win. In the Nash equilibrium, every Robot should have an equal chance of winning, since everyone is using the same strategy (Note: this isn't super rigorous, since I don't really know that everyone is using the same strategy. But should be true. Otherwise, how do I even solve this?).
-\end{proof}
-
-\begin{lemma}
-    \begin{IEEEeqnarray*}{rCl}
-        P(R_1\text{ wins}) 
-        & = & p P(R_1\text{ wins}|R_1\text{ plays discrete}) \\ 
-        &   & {} + (1-p) P(R_1\text{ wins}|R_1\text{ doesn't play discrete}).
-    \end{IEEEeqnarray*}
-\end{lemma}
-\begin{proof}
+\begin{definition}[parameters of the problem]
     \begin{IEEEeqnarray*}{rCls+x*}
-        \IEEEeqnarraymulticol{3}{l}{P(R_1\text{ wins})}\\ \quad
-        & = & P((R_1\text{ wins and plays discrete})\text{ or }(R_1\text{ wins and doesn't play discrete})) \\
-        & = & P(R_1\text{ wins and plays discrete}) + P(R_1\text{ wins and doesn't play discrete}) \\
-        & = & p P(R_1\text{ wins}|R_1\text{ plays discrete}) + (1-p) P(R_1\text{ wins}|R_1\text{ doesn't play discrete}),
+        n & \coloneqq & 8 = \text{number of races}, \\
+        m & \coloneqq & 3 = (\text{number of robots}) / (\text{number of races}), \\
+        p & \coloneqq & \text{probability that a robot uses a strategy which is discrete} \in (0,1).
     \end{IEEEeqnarray*}
-    where in the first equality we used De Morgan's laws, in the second we used the fact that the two events are disjoint, and in the third we used the definition of conditional probability.
-\end{proof}
+\end{definition}
 
-\begin{lemma}
-    $P(R_1\text{ wins}|R_1\text{ plays discrete}) = P(R_1\text{ wins}|R_1\text{ doesn't play discrete})$.
-\end{lemma}
-\begin{proof}
-    Assume by contradiction that they are different. 
-    
-    In the case where $P(R_1\text{ wins}|R_1\text{ plays discrete}) > P(R_1\text{ wins}|R_1\text{ doesn't play discrete})$, $R_1$ would always play a discrete strategy. This would imply that $p = 1$. But this is not an equilibrium by the solution, by the solution of the October 2021 puzzle.
-
-    In the case where $P(R_1\text{ wins}|R_1\text{ plays discrete}) < P(R_1\text{ wins}|R_1\text{ doesn't play discrete})$, $R_1$ would never play a discrete strategy. This would imply that $p = 0$. But this is not an equilibrium solution, because any robot could decide to start playing a discrete strategy and would always win.
-\end{proof}
-
-\begin{lemma}
-    $P(R_1\text{ wins}|R_1\text{ plays discrete}) = P(R_1\text{ wins}|R_1\text{ plays discrete on race 1})$.
-\end{lemma}
-\begin{proof}
-    Since
-    \begin{IEEEeqnarray*}{rCls+x*}
-        \IEEEeqnarraymulticol{3}{l}{P(R_1\text{ wins}|R_1\text{ plays discrete})}\\ \quad
-        & = & \frac{1}{p} P(R_1 \text{ wins and } R_1 \text{ plays discrete}) \\
-        & = & \frac{1}{p} P((R_1 \text{ wins}) \cap \bigcup_{r=1}^{n} (R_1 \text{ plays discrete on race } r)) \\
-        & = & \frac{1}{p} P(\bigcup_{r=1}^{n} (R_1 \text{ wins}) \cap (R_1 \text{ plays discrete on race } r)) \\
-        & = & \frac{1}{p} \sum_{r=1}^{n} P((R_1 \text{ wins}) \cap (R_1 \text{ plays discrete on race } r)) \\
-        & = & \frac{1}{p} \sum_{r=1}^{n} P(R_1 \text{ plays discrete on race } r) \cdot P(R_1 \text{ wins}|R_1\text{ plays discrete on race } r) \\
-        & = & \frac{1}{n} \sum_{r=1}^{n} P(R_1 \text{ wins}|R_1\text{ plays discrete on race } r),
-    \end{IEEEeqnarray*}
-    and since $P(R_1 \text{ wins}|R_1\text{ p.d.r. } r) = P(R_1 \text{ wins}|R_1\text{ p.d.r. } 1)$ (by symmetry).
-\end{proof}
-
-\begin{lemma}
-    \begin{IEEEeqnarray*}{c+x*}
-        P(R_1\text{ wins}|R_1\text{ plays discrete on race 1}) = \frac{1}{mp} \left(1 - \left(1 - \frac{p}{n}\right)^{mn}\right).
-    \end{IEEEeqnarray*}
-\end{lemma}
-\begin{proof}
-    Let
+\begin{definition}[strategies]
     \begin{itemize}
-        \item $D(R) = $ robot $R$ plays discrete;
-        \item $D_r(R) = $ robot $R$ plays discrete on race $i$;
-        \item $W(R) = $ robot $R$ wins;
-        \item $F_i = (i = \# \{R \in \{R_2, \ldots, R_{mn} | D_1(R)\}\})$;
-        \item $b = $ probability mass function for the binomial distribution, i.e.: I toss $k$ coins in the air, each of them has a probability $x$ of coming up heads, $b(j,k,x) = $ probability that exactly $j$ coins come up heads.
+        \item[]
+        \item A \textbf{pure strategy} is a tuple $(s_1, \ldots, s_n) \in [0,1]^n$ such that $s_1 + \cdots + s_n = 1$. Let $X$ be the set of pure strategies.
+        \item A pure strategy is \textbf{discrete} if there exists $i = 1, \ldots, n$ such that $s_i = 1$. A pure strategy is \textbf{continuous} if it is not discrete. Denote by $D \subset X$ the set of discrete pure strategies, $C \subset X$ the set of continuous pure strategies, and by $D_i \in X$ the discrete pure strategy $(0,\ldots,0,i,0,\ldots,0)$.
+        \item A \textbf{mixed strategy} is a probability measure $\mu$ on $X$.
     \end{itemize}
+\end{definition}
+
+Now let $\mu_1, \ldots, \mu_{mn}$ be the strategies of the $1, \ldots, mn$ robots.
+
+\begin{definition}[probability space]
+    Consider the probability space $(\Omega_0, P_0) \coloneqq (X^{mn}, \mu_1 \times \cdots \times \mu_{mn})$. Let $(\Omega, P)$ be the probability space obtained from $(\Omega_0, P_0)$ by replacing a point which corresponds to a tie between the robots by many points, one for each possible outcome of the tie.
+\end{definition}
+
+\begin{definition}[events]
+    Let $R \in \{R_1,\ldots,R_{mn}\}$ be a robot and $S \subset X$ be a set of pure strategies.
     \begin{IEEEeqnarray*}{rCls+x*}
-        \IEEEeqnarraymulticol{3}{l}{P(W(R_1)|D_1(R_1))}\\ \quad
-        & = & \frac{n}{p} P(W(R_1) \cap D_1(R_1))                                                                                       & \quad [\text{conditional prob.}]\\
-        & = & \frac{n}{p} P(W(R_1) \cap D_1(R_1) \cap \bigcup_{i=0}^{mn-1} F_i)                                                         & \quad [\text{union of $F_i = $ all}] \\
-        & = & \frac{n}{p} P(\bigcup_{i=0}^{mn-1} (W(R_1) \cap D_1(R_1) \cap F_i))                                                       & \quad [\text{De Morgan}]\\
-        & = & \frac{n}{p} \sum_{i=0}^{mn-1} P(W(R_1) \cap D_1(R_1) \cap F_i)                                                            & \quad [\text{disjoint events}]\\
-        & = & \frac{n}{p} \sum_{i=0}^{mn-1} P(D_1(R_1) \cap F_i) \cdot P(W(R_1) | D_1(R_1) \cap F_i)                                    & \quad [\text{conditional prob.}]\\
-        & = & \frac{n}{p} \sum_{i=0}^{mn-1} P(D_1(R_1)) \cdot P(F_i) \cdot P(W(R_1) | D_1(R_1) \cap F_i)                                & \quad [\text{independent events}]\\
-        & = & \sum_{i=0}^{mn-1} b(i, mn-1, p/n) \frac{1}{1+i} & \quad [\text{\textcolor{red}{wrong! see below}}] \\
+        W(R)   & \coloneqq & \{\omega \in \Omega \mid \text{at $\omega$, robot $R$ is one of the winners}\}, \\
+        W_i(R) & \coloneqq & \{\omega \in \Omega \mid \text{at $\omega$, robot $R$ wins before race number $i$}\}, \\
+        S(R)   & \coloneqq & \{\omega \in \Omega \mid \text{at $\omega$, robot $R$ is using a pure strategy in $S$}\}.
+    \end{IEEEeqnarray*}
+\end{definition}
+
+\begin{axiom}
+    \begin{itemize}
+        \item[]
+        \item The strategies $\mu_1, \ldots, \mu_{mn}$ correspond to a Nash equilibrium.
+        \item For any robot $R$, we have $P(D(R)) = p$ and $P(C(R)) = 1 - p$.
+    \end{itemize}
+\end{axiom}
+
+\begin{lemma}
+    \label{lem:nash eq}
+    Let $R$ be a robot and $S \subset X$ be a set of pure strategies such that $\mu_R(S) > 0$. Then $P(W(R)) = P(W(R) \mid S(R))$.
+\end{lemma}
+\begin{proof}
+    Assume by contradiction that $P(W(R)) \neq P(W(R) \mid S(R))$.
+
+    In the case where $P(W(R)) > P(W(R) \mid S(R))$, robot $R$ would be better off by never using the strategies in $S$, which contradicts the fact that we are in a Nash equilibrium.
+    
+    In the case where $P(W(R)) < P(W(R) \mid S(R))$, robot $R$ would be better off by always using the strategies in $S$, which contradicts the fact that we are in a Nash equilibrium.
+\end{proof}
+
+\begin{corollary}
+    \label{cor:nash eq}
+    If $R$ is a robot and $i \in \{1,\ldots,n\}$, then
+    \begin{IEEEeqnarray*}{rCls+x*}
+        P(W(R))
+        & = & P(W(R) \mid D_i(R)) \\
+        & = & P(W(R) \mid D(R)) \\
+        & = & P(W(R) \mid C(R)).
+    \end{IEEEeqnarray*}
+\end{corollary}
+
+\begin{lemma}
+    \label{lem:how many robots}
+    Let $E \subset \Omega$ be any event, $S_i$ be a strategy for $R_i$ (for each $i = 1,\ldots,mn$) and $F_i$ be the event
+    \begin{IEEEeqnarray*}{c+x*}
+        F_i \coloneqq \{\omega \in \Omega \mid \text{at $\omega$, $i = \# \{ j \in \{2, \ldots, mn\} \mid R_j \text{ uses strategy } S_j \}$}\},
+    \end{IEEEeqnarray*}
+    for each $i = 0, \ldots, mn-1$. Then $P(E \mid S_1(R_1)) = \sum_{i=0}^{mn-1} P(F_i) P(E \mid S_1(R_1) \cap F_i)$ (and analogously for robots other than $R_1$).
+\end{lemma}
+\begin{proof}
+    \begin{IEEEeqnarray*}{rCls+x*}
+        \IEEEeqnarraymulticol{3}{l}{P(E \mid S_1(R_1))}\\ \quad
+        & = & \frac{1}{P(S_1(R_1))} P(W(R_1) \cap S_1(R_1))                                                            & \quad [\text{conditional probability}]\\
+        & = & \frac{1}{P(S_1(R_1))} P\left(W(R_1) \cap S_1(R_1) \cap \bigcup_{i=0}^{mn-1} F_i \right)                  & \quad [\text{$\Omega = \bigcup_{i=0}^{mn-1} F_i$}] \\
+        & = & \frac{1}{P(S_1(R_1))} P\left(\bigcup_{i=0}^{mn-1} W(R_1) \cap S_1(R_1) \cap F_i \right)                  & \quad [\text{De Morgan}]\\
+        & = & \frac{1}{P(S_1(R_1))} \sum_{i=0}^{mn-1} P\left( W(R_1) \cap S_1(R_1) \cap F_i \right)                    & \quad [\text{disjoint events}]\\
+        & = & \sum_{i=0}^{mn-1} \frac{P(S_1(R_1) \cap F_i)}{P(S_1(R_1))} P\left( W(R_1) \mid S_1(R_1) \cap F_i \right) & \quad [\text{conditional probability}] \\
+        & = & \sum_{i=0}^{mn-1} P(F_i) P\left( W(R_1) \mid S_1(R_1) \cap F_i \right)                                   & \quad [\text{independent events}]. & \qedhere
+    \end{IEEEeqnarray*}
+\end{proof}
+
+\begin{lemma}
+    \label{lem:win race 1}
+    If $R$ is a robot, then $P(W_1(R) \mid D_1(R)) = \frac{1}{mp} \left(1 - \left(1 - \frac{p}{n}\right)^{mn}\right)$ (and analogously for other races other than the first).
+\end{lemma}
+\begin{proof}
+    Let $S_i = D_1$ and define $F_i$ as in \cref{lem:how many robots}.
+    \begin{IEEEeqnarray*}{rCls+x*}
+        \IEEEeqnarraymulticol{3}{l}{P(W_1(R_1) \mid D_1(R_1))}\\ \quad
+        & = & \sum_{i=0}^{mn-1} P(F_i) P(W_1(R_1) \mid S_1(R_1) \cap F_i) \\
+        & = & \sum_{i=0}^{mn-1} b(i, mn-1, p/n) \frac{1}{1+i}                                                                           & \quad \\
         & = & \sum_{i=0}^{mn-1} \binom{mn-1}{i} \left(\frac{p}{n}\right)^i \left(1 - \frac{p}{n}\right)^{mn-1-i} \frac{1}{1+i}          & \quad [\text{formula for $b$}] \\
         & = & \sum_{j=1}^{mn} \binom{mn-1}{j-1} \left(\frac{p}{n}\right)^{j-1} \left(1 - \frac{p}{n}\right)^{mn-j} \frac{1}{j}          & \quad [\text{$j = i + i$}]\\
         & = & \frac{n}{p} \frac{1}{mn} \sum_{j=1}^{mn} \binom{mn}{j} \left(\frac{p}{n}\right)^{j} \left(1 - \frac{p}{n}\right)^{mn-j} \\
         & = & \frac{1}{mp} \sum_{j=1}^{mn} b(j,mn,p/n)                                                                                  & \quad [\text{formula for $b$}]\\
         & = & \frac{1}{mp} \left(\sum_{j=0}^{mn} b(j,mn,p/n) - b(0,mn,p/n) \right) \\
-        & = & \frac{1}{mp} \left(1 - \left(1-\frac{p}{n}\right)^{mn} \right). & & \qedhere
+        & = & \frac{1}{mp} \left(1 - \left(1-\frac{p}{n}\right)^{mn} \right).                                                           &                                                    & \qedhere
     \end{IEEEeqnarray*}
 \end{proof}
 
-Joining all the lemmas, we have
-\begin{IEEEeqnarray*}{rCls+x*}
-    \IEEEeqnarraymulticol{3}{l}{\frac{1}{m} = \frac{1}{mp} \left(1 - \left(1 - \frac{p}{n}\right)^{mn}\right)}\\ \quad
-    & \Longleftrightarrow & 1 - p - \left(1 - \frac{p}{n}\right)^{mn} = 0 \\
-    & \Longleftrightarrow & 1 - p - \left(1 - \frac{p}{8}\right)^{24} = 0,
-\end{IEEEeqnarray*}
-which has solution $p = 0.95223967$.
-
-\begin{remark}
-    A summary of the solution is
-    \begin{IEEEeqnarray*}{rCls+x*}
-        \frac{1}{m}
-        & = & P(R_1 \text{wins, conditional on playing discrete race 1}) \\
-        & = & \frac{1}{mp} \left(1 - \left(1 - \frac{p}{n}\right)^{mn}\right).
+\begin{lemma}
+    \label{lem:prob winning bound}
+    If $R$ is a robot, then
+    \begin{IEEEeqnarray*}{c+x*}
+        P(W(R)) \geq \frac{1}{mp} \left(1 - \left(1 - \frac{p}{n}\right)^{mn}\right).
     \end{IEEEeqnarray*}
-    The second equality is a long computation. The first equality can be explained as follows: if I'm $R_1$ and everyone else is playing a Nash equilibrium, all plays which are part of my strategy should have the same probability of winning. Otherwise, I would simply always use the play which has the biggest probability of winning.
-\end{remark}
+\end{lemma}
+\begin{proof}
+    \begin{IEEEeqnarray*}{rCls+x*}
+        \IEEEeqnarraymulticol{3}{l}{P(W(R))}\\ \quad
+        & =    & \frac{n}{p} P(W(R) \cap D_1(R))                                 & \quad [\text{by \cref{cor:nash eq}}] \\
+        & \geq & \frac{n}{p} P(W_1(R) \cap D_1(R))                               & \quad \\
+        & =    & \frac{1}{mp} \left(1 - \left(1 - \frac{p}{n}\right)^{mn}\right) & \quad [\text{by \cref{lem:win race 1}}]. & \qedhere
+    \end{IEEEeqnarray*}
+\end{proof}
 
-\begin{remark}
-    The solution I got was $p = 0.95223967$. What is the probability that $R_1$ wins (conditional on having played discrete, race 1), if $p = 1$?
-    \begin{itemize}
-        \item On one hand, it is given by the formula:
-            \begin{IEEEeqnarray*}{rCls+x*}
-                P(R_1\text{ wins}|R_1\text{ plays discrete on race 1}) 
-                & = & \frac{1}{mp} \left(1 - \left(1 - \frac{p}{n}\right)^{mn}\right) \\
-                & = & \frac{1}{m} \left(1 - \left(1 - \frac{1}{n}\right)^{mn}\right).
-            \end{IEEEeqnarray*}
-        \item On the other hand, it feels like it should be $1/m$, because $R_1$ is playing discrete on race 1 and everyone else is also playing a discrete strategy. This feels like it should be symmetric.
-        \item However, if it were $p=1$, then we would find that the Nash equilibrium is everyone playing discrete, which we know is not true.
-        \item But, for example, if $m = 1$, then the probability above should be $1$, and it is not\ldots Maybe I missed a term in the sum or something like that.
-        \item The step marked red above is wrong because of the following. The probability of $R_1$ winning (conditional) is not equal to $1/(1 + i)$. This is because $R_1$ may lose the first race, but win a later race, provided that no one else had fuel in the later race. So, what I computed was the probability that $R_1$ wins on the first race (suggests recursion?)
-    \end{itemize}
-\end{remark}
+\begin{lemma}
+    \label{lem:p geq 0.9}
+    $p \geq 0.95223967$.
+\end{lemma}
+\begin{proof}
+    There exists a robot $R$ such that $P(W(R)) \leq 1/m$ (otherwise, every robot would have probability of winning $> 1/m$, which is not possible). Then,
+    \begin{IEEEeqnarray*}{l+x*}
+        \frac{1}{m} \geq P(W(R)) \geq \frac{1}{mp} \left(1 - \left(1 - \frac{p}{n}\right)^{mn}\right) \\
+        \quad \Longrightarrow \left(1 - \frac{p}{n}\right)^{mn} + p - 1 \geq 0 \\
+        \quad \Longrightarrow p \geq 0.95223967. & \qedhere
+    \end{IEEEeqnarray*}
+\end{proof}
 
 \end{document}

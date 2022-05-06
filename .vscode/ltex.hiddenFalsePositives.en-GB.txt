@@ -5,3 +5,5 @@
 {"rule":"ENGLISH_WORD_REPEAT_RULE","sentence":"^\\Qexercise Exercise definition Definition example Example remark Remark assumption Assumption\\E$"}
 {"rule":"UNIT_SPACE","sentence":"^\\QThe tournament directors choose a positive integer N, and then 3N robots are invited to compete in the trials, which are N races between all 3N robots.\\E$"}
 {"rule":"UNIT_SPACE","sentence":"^\\QThe tournament directors choose a positive integer N, and then 3N robots are invited to compete in the trials, which are N races between all 3N robots.\\E$"}
+{"rule":"MORFOLOGIK_RULE_EN_GB","sentence":"^\\Qabcdefghijklmnopqrstuvwxyz theorem Theorem proposition [theorem] Proposition lemma [theorem] Lemma corollary [theorem] Corollary conjecture [theorem] Conjecture\\E$"}
+{"rule":"ENGLISH_WORD_REPEAT_RULE","sentence":"^\\Qabcdefghijklmnopqrstuvwxyz theorem Theorem proposition [theorem] Proposition lemma [theorem] Lemma corollary [theorem] Corollary conjecture [theorem] Conjecture\\E$"}
