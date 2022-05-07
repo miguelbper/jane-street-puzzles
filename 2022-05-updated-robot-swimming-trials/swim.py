@@ -4,8 +4,12 @@ import numpy as np
 
 # find lower bound for p
 e = lambda p: 1 - p - (1 - p/8)**24
-p = fsolve(e, 1)
+p = fsolve(e, 1)[0]
 print(p)
+
+# find upper bound for p
+u = (1/(3*0.334578))**(1/23)
+print(u)
 
 # plot function of p
 # x = np.linspace(0.95223967,1,100)
