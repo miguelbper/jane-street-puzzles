@@ -56,135 +56,57 @@ We found (spoiler alert!) that inviting 24 robots to compete in 8 trial races (i
 
 Find $p$, the probability a robot using the Nash equilibrium strategy when competing at a Robot Updated Swimming Trial with $n=8$ devotes all of its fuel to a single race, to 6 significant digits.
 
-\begin{definition}[parameters of the problem]
-    \begin{IEEEeqnarray*}{rCls+x*}
-        n & \coloneqq & 8 = \text{number of races}, \\
-        m & \coloneqq & 3 = (\text{number of robots}) / (\text{number of races}), \\
-        p & \coloneqq & \text{probability that a robot uses a strategy which is discrete} \in (0,1).
-    \end{IEEEeqnarray*}
-\end{definition}
+\textbf{Solution:} Start by defining the following parameters for this problem:
+\begin{IEEEeqnarray*}{rCls+x*}
+    n & \coloneqq & 8 = \text{number of races}, \\
+    m & \coloneqq & 3 = (\text{number of robots}) / (\text{number of races}), \\
+    p & \coloneqq & \text{probability that a robot uses a strategy which is discrete} \in (0,1).
+\end{IEEEeqnarray*}
 
-\begin{definition}[strategies]
-    \begin{itemize}
-        \item[]
-        \item A \textbf{pure strategy} is a tuple $(s_1, \ldots, s_n) \in [0,1]^n$ such that $s_1 + \cdots + s_n = 1$. Let $X$ be the set of pure strategies.
-        \item A pure strategy is \textbf{discrete} if there exists $i = 1, \ldots, n$ such that $s_i = 1$. A pure strategy is \textbf{continuous} if it is not discrete. Denote by $D \subset X$ the set of discrete pure strategies, $C \subset X$ the set of continuous pure strategies, and by $D_i \in X$ the discrete pure strategy $(0,\ldots,0,i,0,\ldots,0)$.
-        \item A \textbf{mixed strategy} is a probability measure $\mu$ on $X$.
-    \end{itemize}
-\end{definition}
-
-Now let $\mu_1, \ldots, \mu_{mn}$ be the strategies of the $1, \ldots, mn$ robots.
-
-\begin{definition}[probability space]
-    Consider the probability space $(\Omega_0, P_0) \coloneqq (X^{mn}, \mu_1 \times \cdots \times \mu_{mn})$. Let $(\Omega, P)$ be the probability space obtained from $(\Omega_0, P_0)$ by replacing a point which corresponds to a tie between the robots by many points, one for each possible outcome of the tie.
-\end{definition}
-
-\begin{definition}[events]
-    Let $R \in \{R_1,\ldots,R_{mn}\}$ be a robot and $S \subset X$ be a set of pure strategies.
-    \begin{IEEEeqnarray*}{rCls+x*}
-        W(R)   & \coloneqq & \{\omega \in \Omega \mid \text{at $\omega$, robot $R$ is one of the winners}\}, \\
-        W_i(R) & \coloneqq & \{\omega \in \Omega \mid \text{at $\omega$, robot $R$ wins before race number $i$}\}, \\
-        S(R)   & \coloneqq & \{\omega \in \Omega \mid \text{at $\omega$, robot $R$ is using a pure strategy in $S$}\}.
-    \end{IEEEeqnarray*}
-\end{definition}
-
-\begin{axiom}
-    \begin{itemize}
-        \item[]
-        \item The strategies $\mu_1, \ldots, \mu_{mn}$ correspond to a Nash equilibrium.
-        \item For any robot $R$, we have $P(D(R)) = p$ and $P(C(R)) = 1 - p$.
-    \end{itemize}
-\end{axiom}
-
-\begin{lemma}
-    \label{lem:nash eq}
-    Let $R$ be a robot and $S \subset X$ be a set of pure strategies such that $\mu_R(S) > 0$. Then $P(W(R)) = P(W(R) \mid S(R))$.
-\end{lemma}
-\begin{proof}
-    Assume by contradiction that $P(W(R)) \neq P(W(R) \mid S(R))$.
-
-    In the case where $P(W(R)) > P(W(R) \mid S(R))$, robot $R$ would be better off by never using the strategies in $S$, which contradicts the fact that we are in a Nash equilibrium.
-    
-    In the case where $P(W(R)) < P(W(R) \mid S(R))$, robot $R$ would be better off by always using the strategies in $S$, which contradicts the fact that we are in a Nash equilibrium.
-\end{proof}
-
-\begin{corollary}
-    \label{cor:nash eq}
-    If $R$ is a robot and $i \in \{1,\ldots,n\}$, then
-    \begin{IEEEeqnarray*}{rCls+x*}
-        P(W(R))
-        & = & P(W(R) \mid D_i(R)) \\
-        & = & P(W(R) \mid D(R)) \\
-        & = & P(W(R) \mid C(R)).
-    \end{IEEEeqnarray*}
-\end{corollary}
-
-\begin{lemma}
-    \label{lem:how many robots}
-    Let $E \subset \Omega$ be any event, $S_i \subset X$ be a set of pure strategies for $R_i$ (for each $i = 1,\ldots,mn$) and $F_i$ be the event
-    \begin{IEEEeqnarray*}{c+x*}
-        F_i \coloneqq \{\omega \in \Omega \mid \text{at $\omega$, $i = \# \{ j \in \{2, \ldots, mn\} \mid R_j \text{ uses a strategy in } S_j \}$}\},
-    \end{IEEEeqnarray*}
-    for each $i = 0, \ldots, mn-1$. Then $P(E \mid S_1(R_1)) = \sum_{i=0}^{mn-1} P(F_i) P(E \mid S_1(R_1) \cap F_i)$ (and analogously for robots other than $R_1$).
-\end{lemma}
-\begin{proof}
-    \begin{IEEEeqnarray*}{rCls+x*}
-        \IEEEeqnarraymulticol{3}{l}{P(E \mid S_1(R_1))}\\ \quad
-        & = & \frac{1}{P(S_1(R_1))} P(W(R_1) \cap S_1(R_1))                                                            & \quad [\text{conditional probability}]\\
-        & = & \frac{1}{P(S_1(R_1))} P\left(W(R_1) \cap S_1(R_1) \cap \bigcup_{i=0}^{mn-1} F_i \right)                  & \quad [\text{$\Omega = \bigcup_{i=0}^{mn-1} F_i$}] \\
-        & = & \frac{1}{P(S_1(R_1))} P\left(\bigcup_{i=0}^{mn-1} W(R_1) \cap S_1(R_1) \cap F_i \right)                  & \quad [\text{De Morgan}]\\
-        & = & \frac{1}{P(S_1(R_1))} \sum_{i=0}^{mn-1} P\left( W(R_1) \cap S_1(R_1) \cap F_i \right)                    & \quad [\text{disjoint events}]\\
-        & = & \sum_{i=0}^{mn-1} \frac{P(S_1(R_1) \cap F_i)}{P(S_1(R_1))} P\left( W(R_1) \mid S_1(R_1) \cap F_i \right) & \quad [\text{conditional probability}] \\
-        & = & \sum_{i=0}^{mn-1} P(F_i) P\left( W(R_1) \mid S_1(R_1) \cap F_i \right)                                   & \quad [\text{independent events}]. & \qedhere
-    \end{IEEEeqnarray*}
-\end{proof}
-
-\begin{lemma}
-    \label{lem:win race 1}
-    If $R$ is a robot, then $P(W_1(R) \mid D_1(R)) = \frac{1}{mp} \left(1 - \left(1 - \frac{p}{n}\right)^{mn}\right)$ (and analogously for other races other than the first).
-\end{lemma}
-\begin{proof}
-    Let $S_i = D_1$ and define $F_i$ as in \cref{lem:how many robots}.
-    \begin{IEEEeqnarray*}{rCls+x*}
-        \IEEEeqnarraymulticol{3}{l}{P(W_1(R_1) \mid D_1(R_1))}\\ \quad
-        & = & \sum_{i=0}^{mn-1} P(F_i) P(W_1(R_1) \mid S_1(R_1) \cap F_i) \\
-        & = & \sum_{i=0}^{mn-1} b(i, mn-1, p/n) \frac{1}{1+i}                                                                           & \quad \\
-        & = & \sum_{i=0}^{mn-1} \binom{mn-1}{i} \left(\frac{p}{n}\right)^i \left(1 - \frac{p}{n}\right)^{mn-1-i} \frac{1}{1+i}          & \quad [\text{formula for $b$}] \\
-        & = & \sum_{j=1}^{mn} \binom{mn-1}{j-1} \left(\frac{p}{n}\right)^{j-1} \left(1 - \frac{p}{n}\right)^{mn-j} \frac{1}{j}          & \quad [\text{$j = i + i$}]\\
-        & = & \frac{n}{p} \frac{1}{mn} \sum_{j=1}^{mn} \binom{mn}{j} \left(\frac{p}{n}\right)^{j} \left(1 - \frac{p}{n}\right)^{mn-j} \\
-        & = & \frac{1}{mp} \sum_{j=1}^{mn} b(j,mn,p/n)                                                                                  & \quad [\text{formula for $b$}]\\
-        & = & \frac{1}{mp} \left(\sum_{j=0}^{mn} b(j,mn,p/n) - b(0,mn,p/n) \right) \\
-        & = & \frac{1}{mp} \left(1 - \left(1-\frac{p}{n}\right)^{mn} \right).                                                           &                                                    & \qedhere
-    \end{IEEEeqnarray*}
-\end{proof}
-
-\begin{lemma}
-    \label{lem:prob winning bound}
-    If $R$ is a robot, then
-    \begin{IEEEeqnarray*}{c+x*}
-        P(W(R)) \geq \frac{1}{mp} \left(1 - \left(1 - \frac{p}{n}\right)^{mn}\right).
-    \end{IEEEeqnarray*}
-\end{lemma}
-\begin{proof}
-    \begin{IEEEeqnarray*}{rCls+x*}
-        P(W(R))
-        & =    & P(W(R) \mid D_1(R))                                             & \quad [\text{by \cref{cor:nash eq}}] \\
-        & \geq & P(W_1(R) \mid D_1(R))                                           & \quad \\
-        & =    & \frac{1}{mp} \left(1 - \left(1 - \frac{p}{n}\right)^{mn}\right) & \quad [\text{by \cref{lem:win race 1}}]. & \qedhere
-    \end{IEEEeqnarray*}
-\end{proof}
-
-\begin{lemma}
-    \label{lem:p geq 0.9}
-    $p \geq 0.95223967$.
-\end{lemma}
-\begin{proof}
-    There exists a robot $R$ such that $P(W(R)) \leq 1/m$ (otherwise, every robot would have probability of winning $> 1/m$, which is not possible). Then,
-    \begin{IEEEeqnarray*}{l+x*}
-        \frac{1}{m} \geq P(W(R)) \geq \frac{1}{mp} \left(1 - \left(1 - \frac{p}{n}\right)^{mn}\right) \\
-        \quad \Longrightarrow \left(1 - \frac{p}{n}\right)^{mn} + p - 1 \geq 0 \\
-        \quad \Longrightarrow p \geq 0.95223967. & \qedhere
-    \end{IEEEeqnarray*}
-\end{proof}
+In the Nash equilibrium, the Robots play a discrete strategy with probability $p$. When they don't play a discrete strategy, they play uniformly randomly (this is a Nash equilibrium because no Robot can come up with a strategy that increases his chances of winning). Define the following events:
+\begin{IEEEeqnarray*}{rCls+x*}
+    W & \coloneqq & \text{robot 1 wins}, \\
+    W_{=1} & \coloneqq & \text{robot 1 wins on the first race}, \\
+    W_{>1} & \coloneqq & \text{robot 1 wins later than the first race}, \\
+    D      & \coloneqq & \text{robot 1 uses all the fuel on the first race}, \\
+    E_i    & \coloneqq & (i = \text{number of robots (other than robot 1) using all the fuel on the first race}), \\
+    F      & \coloneqq & \text{everyone (other than robot 1) uses a discrete strategy}.
+\end{IEEEeqnarray*}
+Now, notice that 
+\begin{IEEEeqnarray*}{rCls+x*}
+    1/m
+    & = & P(W) \\
+    & = & P(W \mid D) \\
+    & = & P(W_{=1} \mid D) + P(W_{>1} \mid D).
+\end{IEEEeqnarray*}
+Here, in the first equality we used that fact that every robot is using the same strategy and in the second equality we used the fact that we are in a Nash equilibrium. We compute $P(W_{=1} \mid D)$:
+\begin{IEEEeqnarray*}{rCls+x*}
+    P(W_{=1} \mid D)
+    & = & \sum_{i=0}^{mn-1} P(E_i) \cdot P(W_{=1} \mid D \cap E_i) \\
+    & = & \sum_{i=0}^{mn-1} \operatorname{binom\_pdf}\left(i, mn-1, \frac{p}{n}\right) \cdot \frac{1}{1 + i} \\
+    & = & \sum_{i=0}^{mn-1} \binom{mn-1}{i} \left(\frac{p}{n}\right)^{i} \left(1 - \frac{p}{n}\right)^{mn-1-i} \frac{1}{1 + i} \\
+    & = & \frac{1}{mn} \sum_{i=0}^{mn-1} \binom{mn}{i+1} \left(\frac{p}{n}\right)^{i} \left(1 - \frac{p}{n}\right)^{mn-1-i} \\
+    & = & \frac{1}{mp} \sum_{j=1}^{mn-1} \binom{mn}{j} \left(\frac{p}{n}\right)^{j} \left(1 - \frac{p}{n}\right)^{mn-j} \\
+    & = & \frac{1}{mp} \sum_{j=1}^{mn-1} \operatorname{binom\_pdf}\left(j, mn, \frac{p}{n}\right) \\
+    & = & \frac{1}{mp} \left(\sum_{j=0}^{mn-1} \operatorname{binom\_pdf}\left(j, mn, \frac{p}{n}\right) - \operatorname{binom\_pdf}\left(0, mn, \frac{p}{n} \right) \right) \\
+    & = & \frac{1}{mp} \left(1 - \left(1 - \frac{p}{n}\right)^{mn} \right).
+\end{IEEEeqnarray*} 
+We compute $P(W_{>1} \mid D)$:
+\begin{IEEEeqnarray*}{rCls+x*}
+    P(W_{>1} \mid D)
+    & = & P(F) \cdot P(W_{>1} \mid D \cap F) \\
+    & = & P(F) \cdot (P(W \mid D \cap F) - P(W_{=1} \mid D \cap F)) \\
+    & = & p^{mn-1} \left(\frac{1}{m} - \sum_{i=0}^{mn-1} \operatorname{binom\_pdf}\left(i, mn-1, \frac{1}{n}\right) \frac{1}{1+i} \right) \\
+    & = & p^{mn-1} \left(\frac{1}{m} - \frac{1}{m} \left(1 - \left(1 - \frac{1}{n}\right)^{mn} \right) \right) \\
+    & = & \frac{p^{mn}}{mp} \left(1 - \left(1 - \left(1 - \frac{1}{n}\right)^{mn} \right) \right) \\
+    & = & \frac{p^{mn}}{mp} \left(1 - \frac{1}{n}\right)^{mn}.
+\end{IEEEeqnarray*}
+Therefore,
+\begin{IEEEeqnarray*}{rCls+x*}
+    \frac{1}{m}
+    & = & \frac{1}{mp} \left(1 - \left(1 - \frac{p}{n}\right)^{mp} \right) + \frac{p^{mn}}{mn} \left(1 - \frac{1}{n}\right)^{mn} \\
+    & = & \frac{1}{mp} \left(1 - \left(1 - \frac{p}{n}\right)^{mn} + p^{mn} \left(1 - \frac{1}{n}\right)^{mn} \right),
+\end{IEEEeqnarray*}
+which implies that $p = 0.988838$.
 
 \end{document}
