@@ -1,9 +1,0 @@
-{"rule":"UPPERCASE_SENTENCE_START","sentence":"^\\Qwhere in the first equality we used De Morgan's laws, in the second we used the fact that the two events are disjoint, and in the third we used the definition of conditional probability.\\E$"}
-{"rule":"MORFOLOGIK_RULE_EN_GB","sentence":"^\\QThe metagame evolved and eventually settled into a Nash equilibrium in which a given competitor chooses the discrete strategy with a certain probability p, and otherwise elects for an allotment that distributes nonzero fuel to at least two races.\\E$"}
-{"rule":"MORFOLOGIK_RULE_EN_GB","sentence":"^\\Qabcdefghijklmnopqrstuvwxyz\\E$"}
-{"rule":"ENGLISH_WORD_REPEAT_RULE","sentence":"^\\Qtheorem Theorem proposition Proposition lemma Lemma corollary Corollary conjecture Conjecture\\E$"}
-{"rule":"ENGLISH_WORD_REPEAT_RULE","sentence":"^\\Qexercise Exercise definition Definition example Example remark Remark assumption Assumption\\E$"}
-{"rule":"UNIT_SPACE","sentence":"^\\QThe tournament directors choose a positive integer N, and then 3N robots are invited to compete in the trials, which are N races between all 3N robots.\\E$"}
-{"rule":"UNIT_SPACE","sentence":"^\\QThe tournament directors choose a positive integer N, and then 3N robots are invited to compete in the trials, which are N races between all 3N robots.\\E$"}
-{"rule":"MORFOLOGIK_RULE_EN_GB","sentence":"^\\Qabcdefghijklmnopqrstuvwxyz theorem Theorem proposition [theorem] Proposition lemma [theorem] Lemma corollary [theorem] Corollary conjecture [theorem] Conjecture\\E$"}
-{"rule":"ENGLISH_WORD_REPEAT_RULE","sentence":"^\\Qabcdefghijklmnopqrstuvwxyz theorem Theorem proposition [theorem] Proposition lemma [theorem] Lemma corollary [theorem] Corollary conjecture [theorem] Conjecture\\E$"}
