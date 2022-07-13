@@ -2,7 +2,6 @@ import numpy as np
 from numpy.linalg import matrix_power
 from scipy import linalg
 from math import ceil
-from fractions import Fraction
 
 # -------------------------------------------
 # 1. Compute expected number of steps in ball
@@ -58,18 +57,17 @@ print(f's = {s} => expected number of steps = {s + 1}')
 # and the last equality is a standard fact about Markov chains
 
 # For the purposes of computing Prob(start at 1, take s steps, end at 0), we may consider that the kitchen is finite 
-# and that the maximal distance of a hexagon to 0 is ceil((s + 1) / 2) - 1
+# and that the maximal distance of a hexagon to 0 is s
 # This is because if Andy were to go to a distance bigger than that, then he would not return to 0 in less than s steps
 
-n = ceil((s + 1) / 2) - 1
-l = np.concatenate((np.array([0, 1]), np.zeros(n - 1)))
+l = np.concatenate((np.array([0, 1]), np.zeros(s - 1)))
 
-P1 = np.concatenate((np.array([1]), np.zeros(n))).reshape(1, -1)
-P4 = np.concatenate((np.zeros(n), np.array([1]))).reshape(1, -1)
-P2 = np.concatenate((1/3 * np.eye(n - 1), np.zeros([n - 1, 2])), 1)
-P3 = np.concatenate((np.zeros([n - 1, 2]), 2/3 * np.eye(n - 1)), 1)
+P1 = np.concatenate((np.array([1]), np.zeros(s))).reshape(1, -1)
+P4 = np.concatenate((np.zeros(s), np.array([1]))).reshape(1, -1)
+P2 = np.concatenate((1/3 * np.eye(s - 1), np.zeros([s - 1, 2])), 1)
+P3 = np.concatenate((np.zeros([s - 1, 2]), 2/3 * np.eye(s - 1)), 1)
 P  = np.concatenate((P1, P2 + P3, P4))
 
 p = 1 - (l @ matrix_power(P, s))[0]
 print(f'p = {p:.7f}')
-# p = 0.5083203
+# p = 0.5083113
