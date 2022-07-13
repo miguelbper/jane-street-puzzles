@@ -20,7 +20,7 @@ P = np.array([[3, 0, 0, 0, 0, 0],
 
 # If k_i := E(time to hit 0 starting from i), then
 # k_0 = 0
-# k_i = 1 + sum_{j != i} P_{ij} k_j
+# k_i = 1 + sum_{j != 0} P_{ij} k_j
 
 # Define Q_{ij} = P_{ij} if i != 0 and j != 0, Q_{ij} = 0 otherwise 
 # Then the above system of equations is equivalent to
@@ -57,15 +57,16 @@ print(f's = {s} => expected number of steps = {s + 1}')
 # and the last equality is a standard fact about Markov chains
 
 # For the purposes of computing Prob(start at 1, take s steps, end at 0), we may consider that the kitchen is finite 
-# and that the maximal distance of a hexagon to 0 is s
-# This is because if Andy were to go to a distance bigger than that, then he would not return to 0 in less than s steps
+# and that the maximal distance of a hexagon to 0 is ceil(s / 2) + 1
+# This is because if Andy were to go to a distance geq than that, then he would not return to 0 in less than s steps
 
-l = np.concatenate((np.array([0, 1]), np.zeros(s - 1)))
+n = ceil(s / 2) + 1
+l = np.concatenate((np.array([0, 1]), np.zeros(n - 1)))
 
-P1 = np.concatenate((np.array([1]), np.zeros(s))).reshape(1, -1)
-P4 = np.concatenate((np.zeros(s), np.array([1]))).reshape(1, -1)
-P2 = np.concatenate((1/3 * np.eye(s - 1), np.zeros([s - 1, 2])), 1)
-P3 = np.concatenate((np.zeros([s - 1, 2]), 2/3 * np.eye(s - 1)), 1)
+P1 = np.concatenate((np.array([1]), np.zeros(n))).reshape(1, -1)
+P4 = np.concatenate((np.zeros(n), np.array([1]))).reshape(1, -1)
+P2 = np.concatenate((1/3 * np.eye(n - 1), np.zeros([n - 1, 2])), 1)
+P3 = np.concatenate((np.zeros([n - 1, 2]), 2/3 * np.eye(n - 1)), 1)
 P  = np.concatenate((P1, P2 + P3, P4))
 
 p = 1 - (l @ matrix_power(P, s))[0]
