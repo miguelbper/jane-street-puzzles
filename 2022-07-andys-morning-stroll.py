@@ -1,6 +1,3 @@
-from sympy import *
-import numpy as np
-from itertools import product
 from functools import cache
 
 # ======================================================================
