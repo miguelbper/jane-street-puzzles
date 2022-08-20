@@ -19,20 +19,25 @@ from scipy.optimize import fsolve
 def binom_pmf(i, n, p):
     return binomial(n, i) * p**i * (1 - p)**(n - i)
 
-def p_e(i, p):
+# prob_1(i, p) = P(Ei)
+def prob_1(i, p):
     return binom_pmf(i, 23, p)
 
-def p_fe(i, j):
+# prob_2(i, j) = P(Fj|Ei)
+def prob_2(i, j):
     return binomial(8, j) * stirling(i, j) * factorial(j) / 8**i
 
-def p_wcef(i, j):
+# prob_3(i, j) = P(W|C & Ei & Fj)
+def prob_3(i, j):
     return min(1, (8 - j)/(24 - i))
 
-def p_w(p):
-    return Float(sum(p_e(i, p) * sum(p_fe(i, j) * p_wcef(i, j) 
+# prob_w(p) = P(W)
+def prob_w(p):
+    return Float(sum(prob_1(i, p) * sum(prob_2(i, j) * prob_3(i, j) 
                      for j in range(0, 8)) for i in range(0, 24)))
 
-p = fsolve(lambda p: p_w(p) - 1/3, 1)
+# solve for p
+p = fsolve(lambda p: prob_w(p) - 1/3, 1)
 print('p = {:.6f}'.format(p[0]))
 
 # solution:
