@@ -1,14 +1,4 @@
-import enchant
-import numpy as np
 from pprint import pprint
-from collections import Counter
-from string import ascii_lowercase
-
-l_min = 4
-i_min = l_min - 1
-
-
-d = enchant.Dict("en_US")
 
 
 soup = [
@@ -42,9 +32,6 @@ translation = {
 }
 
 
-translation_mu = {'μ': 'mu'}
-
-
 def replace_dict(d, s):
     for k, v in d.items():
         if s.find(k) != -1:
@@ -59,6 +46,8 @@ def translate(d, xss):
 
 soup_translated = translate(translation, soup)
 pprint(soup_translated)
+
+
 # soup_translated = 
 # y t i c o i d a r y a w b u s
 # t e g d i r b n y l k o o r b
@@ -77,78 +66,44 @@ pprint(soup_translated)
 # s r a b a y y n e w μ s e u m
 
 
-# words = 
-# bronxyoo
-# chinatoon
-# laguardia
-# jfk
-# newμseum
-# hollandtunnel
-# lincolncenter
-# radiocity
-# brooklynbridge
-# centralpark
-# madisonsquare
-# coneyisland
-# grandcentral
-# koreatown
-# stonestreet
-# cloisters
-# highline
-# wallstreet
-# statueofliberty
-# yankeestadium
+# ======================================================================
+# Sol
+# ======================================================================
 
+# Answer: Little Italy
 
-soup_translated_mu = translate(translation_mu, soup_translated)
+# Explanation: do the following substitutions in the given grid:
 
+# z -> a -> f -> p -> n -> μ -> m -> c -> d.
 
-def sublists(xs: list[str]) -> list[list[str]]:
-    lists = []
-    for i in range(i_min, len(xs)):
-        for j in range(len(xs) - i):
-            lists.append(xs[j: j + i + 1])
-    return lists
+# After that, the following words show up in the grid:
 
+# - bronxyoo (bronx zoo)
+# - chinatoon (china town)
+# - laguardia
+# - jfk
+# - newμseum (new museum)
+# - hollandtunnel
+# - lincolncenter
+# - radiocity
+# - brooklynbridge
+# - centralpark
+# - madisonsquare
+# - coneyisland
+# - grandcentral
+# - koreatown
+# - stonestreet
+# - cloisters
+# - highline
+# - wallstreet
+# - statueofliberty
+# - yankeestadium
+# - taxi
+# - subway
+# - duanereade
 
-def columns(xss: list[list[str]]) -> list[list[str]]:
-    return list(map(list, zip(*xss)))
+# The letters in the grid which are not part of any word are (in order):
 
+# LITTLEITALrabayY
 
-def rotated(xss: list[list[str]]) -> list[list[str]]:
-    return list(map(list, zip(*reversed(xss))))
-
-
-def diags_0(xss: list[list[str]]) -> list[list[str]]:
-    o = len(xss) - 1
-    a = np.array(xss)
-    return [list(np.diagonal(a, offset=i)) for i in range(-o, o + 1)]
-
-
-def diags_1(xss: list[list[str]]) -> list[list[str]]:
-    return diags_0(rotated(xss))
-
-
-def is_word(xs: list[str]) -> bool:
-    word = ''.join(xs)
-    return d.check(word)
-
-
-def words_in_str(xs: list[str]) -> list[str]:
-    return [''.join(w) for w in sublists(xs) if is_word(w)]
-
-
-funcs = {
-    'rows': lambda xss: xss,
-    'columns': columns,
-    'diags_0': diags_0,
-    'diags_1': diags_1,
-    'rows_rev': lambda xss: [list(reversed(xs)) for xs in xss],
-    'columns_rev': lambda xss: [list(reversed(xs)) for xs in columns(xss)],
-    'diags_0_rev': lambda xss: [list(reversed(xs)) for xs in diags_0(xss)],
-    'diags_1_rev': lambda xss: [list(reversed(xs)) for xs in diags_1(xss)],
-}
-
-
-words = {k: [words_in_str(s) for s in f(soup_translated_mu)] for k, f in funcs.items()}
-pprint(words)
+# A substring of this is the answer, LITTLEITALY.
