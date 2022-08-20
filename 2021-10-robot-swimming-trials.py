@@ -3,10 +3,13 @@ from sympy.functions.combinatorial.numbers import stirling
 from sympy import Float
 
 # stirling(n, k) = number of partitions of {1,...,n} into k sets
-# probability that a robot playing uniform wins, if everyone else is playing discrete
-# = 1 - probability that it loses
-# = 1 - probability that every race is filled
-# = 1 - (number of ways of placing 3n-1 robots into n races, s.t. every race is filled) / (number of ways of placing 3n-1 robots into n races)
+
+# prob(robot playing uniform wins, everyone else plays discrete)
+# = 1 - prob(robot playing uniform loses, everyone else plays discrete)
+# = 1 - prob(every race is filled)
+# = 1 - # (ways of placing 3n-1 robots into n races, filling every race) 
+#       / # (ways of placing 3n-1 robots into n races)
+
 def p(n):
     return Float(1 - factorial(n) * stirling(3*n-1, n) / n**(3*n-1))
 

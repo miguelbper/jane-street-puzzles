@@ -29,7 +29,8 @@ def p_wcef(i, j):
     return min(1, (8 - j)/(24 - i))
 
 def p_w(p):
-    return Float(sum(p_e(i, p) * sum(p_fe(i, j) * p_wcef(i, j) for j in range(0, 8)) for i in range(0, 24)))
+    return Float(sum(p_e(i, p) * sum(p_fe(i, j) * p_wcef(i, j) 
+                     for j in range(0, 8)) for i in range(0, 24)))
 
 p = fsolve(lambda p: p_w(p) - 1/3, 1)
 print('p = {:.6f}'.format(p[0]))
