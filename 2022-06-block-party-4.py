@@ -1,51 +1,107 @@
+# ======================================================================
+# imports and definitions
+# ======================================================================
+
 import numpy as np
 from itertools import product
+from pysmt.shortcuts import And, Equals, Implies, Int, Not, Or, Solver, Symbol
+from pysmt.typing import INT
 
-# the following is the solution to this puzzle
-# this program just checks that the solution is correct
+# define grids
+n = None
+values = [[n, 3, n, n, n, 7, n, n, n, n],
+          [n, n, n, 4, n, n, n, n, n, n],
+          [n, n, n, n, n, n, n, n, 2, n],
+          [n, n, n, 1, n, n, n, n, n, n],
+          [6, n, 1, n, n, n, n, n, n, n],
+          [n, n, n, n, n, n, n, 3, n, 6],
+          [n, n, n, n, n, n, 2, n, n, n],
+          [n, 2, n, n, n, n, n, n, n, n],
+          [n, n, n, n, n, n, 6, n, n, n],
+          [n, n, n, n, 5, n, n, n, 2, n]]
 
-board = np.array([[4, 3,6, 5,3,7,4,9,6,5],
-                  [8,10,2, 4,1,1,2,3,8,2],
-                  [9, 2,3, 2,1,2,5,1,2,4],
-                  [5, 7,2, 1,2,6,3,1,1,3],
-                  [6, 3,1, 1,3,2,1,4,2,7],
-                  [1, 1,4, 5,1,1,1,3,5,6],
-                  [3, 1,2, 3,2,4,2,1,2,3],
-                  [4, 2,1, 1,1,1,3,1,4,9],
-                  [5, 8,3, 4,2,1,6,2,3,8],
-                  [7, 6,9,10,5,3,4,7,2,5]])
+region = [[ 0,  1,  1,  1,  2,  2,  2,  2,  2,  2],
+          [ 0,  0,  1,  1,  1,  2,  3,  3,  2,  2],
+          [ 0,  0,  4,  4,  5,  5,  6,  3,  7,  7],
+          [ 0,  0,  8,  4,  9,  6,  6,  6,  7,  7],
+          [ 0,  8,  8,  9,  9, 10, 11,  6,  6,  7],
+          [ 0, 12,  8, 13, 14, 10, 15, 15,  7,  7],
+          [ 0, 16, 17, 13, 13, 13, 15, 20, 20, 20],
+          [16, 16, 17, 18, 13, 19, 22, 21, 21, 22],
+          [16, 16, 16, 18, 18, 22, 22, 21, 21, 22],
+          [16, 16, 16, 16, 18, 18, 22, 22, 22, 22]]
 
+R = range(10)
+
+# helper functions
+def r(i, j):
+    ''' region i, j belongs to '''
+    return region[i][j]
+
+def s(r):
+    ''' number of elements in region k '''
+    return len([None for i, j in product(R, R) if region[i][j] == r])
+
+def dist(i, j, i_, j_):
+    return abs(i - i_) + abs(j - j_)
+
+# ======================================================================
+# initialize variables
+# ======================================================================
+
+x = [[Symbol(f'x{i}{j}', INT) for j in R] for i in R]
+
+
+# ======================================================================
+# constraints
+# ======================================================================
+
+
+# initial given values
+givens = And([
+    Equals(x[i][j], Int(values[i][j])) 
+    for i, j in product(R, R) 
+    if values[i][j] != None
+])
+
+
+# {x | x is in region k} < {1,...,N}.
+bounds = And([(1 <= x[i][j]) & (x[i][j] <= s(r(i, j))) 
+              for i, j in product(R, R)])
+
+
+# if x, y are in region k, in different cells then x != y
+distinct = True
+for (i, j), (i_, j_) in product(product(R, R), product(R, R)):
+    if r(i, j) == r(i_, j_) and (i, j) != (i_, j_):
+        distinct &= Not(Equals(x[i][j], x[i_][j_]))
+
+
+# nearest (wrt taxicab) k to a k is at distance k
+distances = True
+for (i, j) in product(R, R):
+    for k in range(1, s(r(i, j)) + 1):
+        le_k = []
+        eq_k = []
+        for (i_, j_) in product(R, R):
+            if abs(i - i_) + abs(j - j_) < k and (i, j) != (i_, j_):
+                le_k += [Not(Equals(x[i][j], x[i_][j_]))]
+            if abs(i - i_) + abs(j - j_) == k:
+                eq_k += [Equals(x[i][j], x[i_][j_])]
+        distances &= Implies(Equals(x[i][j], Int(k)), And(And(le_k), Or(eq_k)))
+
+
+# ======================================================================
+# solve
+# ======================================================================
+
+formula = givens & bounds & distinct & distances
+solver = Solver()
+solver.add_assertion(formula)
+if solver.solve():
+    A = [[solver.get_value(x[i][j]).constant_value() for j in R] for i in R]
+
+
+board = np.array(A)
 solution = sum(np.prod(board, axis = 1))
-print('solution = sum of products = {}'.format(solution))
-# solution:
-# sum of products = 24405360
-
-# define regions and parameters of the board
-region_map = np.array([[ 0, 1, 1, 1, 2, 2, 2, 2, 2, 2],
-                       [ 0, 0, 1, 1, 1, 2, 3, 3, 2, 2],
-                       [ 0, 0, 4, 4, 5, 5, 6, 3, 7, 7],
-                       [ 0, 0, 8, 4, 9, 6, 6, 6, 7, 7],
-                       [ 0, 8, 8, 9, 9,10,11, 6, 6, 7],
-                       [ 0,12, 8,16,22,10,21,21, 7, 7],
-                       [ 0,15,13,16,16,16,21,14,14,14],
-                       [15,15,13,17,16,18,19,20,20,19],
-                       [15,15,15,17,17,19,19,20,20,19],
-                       [15,15,15,15,17,17,19,19,19,19]])
-(x, y) = region_map.shape
-n_regions = np.amax(region_map) + 1
-regions = [[(j, k) for (j, k) in product(range(x), range(y)) if region_map[j,k] == i] for i in range(n_regions)]
-
-# check that every region is filled by the numbers 1,...,N
-for i in range(len(regions)):
-    numbers = [board[j, k] for (j,k) in regions[i]]
-    l = len(numbers)
-    correct = list(range(1, l+1)) == sorted(numbers)
-    print('It is {} that region {:2d} is 1,...,N'.format(correct, i))
-
-# check that every n is at distance n to the closest other n
-for (i,j) in product(range(x), range(y)):
-    n = board[i,j]
-    other_ns = [(k,l) for (k,l) in product(range(x), range(y)) if n == board[k,l] and (i,j) != (k,l)]
-    distances = [abs(i-k) + abs(j-l) for (k,l) in other_ns]
-    correct = n == min(distances)
-    print('For (i,j) = {}, n = {:2d} and min_distance = {:2d}. It is {} that n = min_distance'.format((i,j), n, min(distances), correct))
+print(f'sum of products = {solution},\n board = \n{board}')
