@@ -4,8 +4,9 @@
 
 import numpy as np
 from itertools import product
-from pysmt.shortcuts import And, Equals, Implies, Int, Not, Or, Solver, Symbol
 from pysmt.typing import INT
+from pysmt.shortcuts import (And, Equals, Implies, Int, Not, Or, Symbol, 
+    get_model)
 
 # define grids
 n = None
@@ -96,12 +97,9 @@ for (i, j) in product(R, R):
 # ======================================================================
 
 formula = givens & bounds & distinct & distances
-solver = Solver()
-solver.add_assertion(formula)
-if solver.solve():
-    A = [[solver.get_value(x[i][j]).constant_value() for j in R] for i in R]
-
+model = get_model(formula)
+A = [[model.get_value(x[i][j]).constant_value() for j in R] for i in R]
 
 board = np.array(A)
 solution = sum(np.prod(board, axis = 1))
-print(f'sum of products = {solution},\n board = \n{board}')
+print(f'sum of products = {solution},\nboard = \n{board}')
