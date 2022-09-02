@@ -78,8 +78,8 @@ pprint(soup_translated)
 
 # After that, the following words show up in the grid:
 
+# - yabars (zabars)
 # - bronxyoo (bronx zoo)
-# - chinatoon (china town)
 # - laguardia
 # - jfk
 # - newμseum (new museum)
@@ -102,8 +102,8 @@ pprint(soup_translated)
 # - subway
 # - duanereade
 
+# - chinatoon (china town, 24th entry)
+
 # The letters in the grid which are not part of any word are (in order):
 
-# LITTLEITALrabayY
-
-# A substring of this is the answer, LITTLEITALY.
+# LITTLEITALY
