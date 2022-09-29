@@ -1,2 +1,3 @@
-# jane-street
-My attempts at solving the jane street puzzles.
+# Jane Street puzzles
+
+My solutions to the Jane Street puzzles (see https://www.janestreet.com/puzzles/archive/). 
