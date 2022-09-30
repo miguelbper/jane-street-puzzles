@@ -4,17 +4,19 @@ from sympy.functions.combinatorial.numbers import stirling
 from sympy.functions.combinatorial.factorials import binomial
 from scipy.optimize import fsolve
 
-# Events:
-# W = I win
-# C = I play continuous
-# Ei = There are i robots other than me going discrete
-# Fj = The robots other than me which go discrete occupy j races
+'''
+Events:
+W = I win
+C = I play continuous
+Ei = There are i robots other than me going discrete
+Fj = The robots other than me which go discrete occupy j races
 
-# 1/3
-# = P(W)
-# = P(W|C)
-# = Sum_{i = 0 to 23} P(Ei) P(W|C & Ei)
-# = Sum_{i = 0 to 23} P(Ei) Sum_{j = 0 to 7} P(Fj|Ei) P(W|C & Ei & Fj)
+1/3
+= P(W)
+= P(W|C)
+= Sum_{i = 0 to 23} P(Ei) P(W|C & Ei)
+= Sum_{i = 0 to 23} P(Ei) Sum_{j = 0 to 7} P(Fj|Ei) P(W|C & Ei & Fj)
+'''
 
 def binom_pmf(i, n, p):
     return binomial(n, i) * p**i * (1 - p)**(n - i)
