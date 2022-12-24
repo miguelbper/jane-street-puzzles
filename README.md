@@ -5,6 +5,7 @@ My solutions to past Jane Street puzzles (see https://www.janestreet.com/puzzles
 Month | Puzzle | Solution
 -|-|-
 2022-11 | ['Pent-up' Frustration 2](https://www.janestreet.com/puzzles/pent-up-frustration-2-index/)               | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2022-11-pent-up-frustration-2.py)
+2022-10 | [The Marshy Mess](https://www.janestreet.com/puzzles/the-marshy-mess-index/)                             | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2022-10-the-marshy-mess.py)
 2022-08 | [New York Minute](https://www.janestreet.com/puzzles/new-york-minute-index/)                             | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2022-08-new-york-minute.py)
 2022-07 | [Andy's Morning Stroll](https://www.janestreet.com/puzzles/andys-morning-stroll-index/)                  | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2022-07-andys-morning-stroll.py)
 2022-06 | [Block Party 4](https://www.janestreet.com/puzzles/block-party-4-index/)                                 | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2022-06-block-party-4.py)
