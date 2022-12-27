@@ -13,6 +13,7 @@ Month | Puzzle | Solution
 2022-04 | [Almost Magic](https://www.janestreet.com/puzzles/almost-magic-index/)                                   | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2022-04-almost-magic.py)
 2021-12 | [Robot Archery](https://www.janestreet.com/puzzles/robot-archery-index/)                                 | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2021-12-robot-archery.py)
 2021-10 | [Robot Swimming Trials](https://www.janestreet.com/puzzles/robot-swimming-trials-index/)                 | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2021-10-robot-swimming-trials.py)
+2021-09 | [Knight Moves 4](https://www.janestreet.com/puzzles/knight-moves-4-index/)                               | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2021-09-knight-moves-4.py)
 2021-08 | [Robot Tug-of-War](https://www.janestreet.com/puzzles/robot-tug-of-war-index/)                           | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2021-08-robot-tug-of-war.py)
 2021-04 | [Bracketology 101](https://www.janestreet.com/puzzles/bracketology-101-index/)                           | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2021-04-bracketology-101.py)
 2021-01 | [Figurine Figuring](https://www.janestreet.com/puzzles/figurine-figuring-index/)                         | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2021-01-figurine-figuring.py)
