@@ -2,7 +2,6 @@
 # ----------------------------------------------------------------------
 from functools import partial
 from itertools import product
-from more_itertools import intersperse
 from pysmt.typing import INT
 from pysmt.shortcuts import Equals, Implies, Int, Not, Symbol, get_model, Plus
 from collections import defaultdict
