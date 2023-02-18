@@ -4,6 +4,7 @@ My solutions to past Jane Street puzzles (see https://www.janestreet.com/puzzles
 
 Month | Puzzle | Solution
 -|-|-
+2023-01 | [Lesses More](https://www.janestreet.com/puzzles/lesses-more-index/)                                     | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2023-01-lesses-more.py)
 2022-12 | [Die Agony](https://www.janestreet.com/puzzles/die-agony-index/)                                         | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2022-12-die-agony.py)
 2022-11 | ['Pent-up' Frustration 2](https://www.janestreet.com/puzzles/pent-up-frustration-2-index/)               | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2022-11-pent-up-frustration-2.py)
 2022-10 | [The Marshy Mess](https://www.janestreet.com/puzzles/the-marshy-mess-index/)                             | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2022-10-the-marshy-mess.py)
