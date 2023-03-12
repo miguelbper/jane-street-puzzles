@@ -8,7 +8,7 @@ Let
     D(u) = "The first draw of R1 is u"                  (event)
     p(x) = P(W(x))                                      (function of x)
 
-We will deduce an ODE for p(x), solve that ODE with pympy, and finally 
+We will deduce an ODE for p(x), solve that ODE with sympy, and finally 
 solve 1/2 = p(x).
 
 Integral equation:
