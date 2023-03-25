@@ -116,22 +116,25 @@ def expand(cm: Choices) -> list[Choices]:
     ''' Given a partially filled board, choose the cell with lowest num
     of possible values. Return list of copies of the board, where in the
     cell, we replace by each possible value. '''
-    for num_choices in range(2, 9):
-        # find cell c = c[i][j] such that count[c] == num_choices
-        for i, j in product(range(12), repeat=2):
-            c = cm[i][j]
-            if count[c] == num_choices:
-                # return list of copies of cm, but with cm[i][j]
-                # replaced by each possible value
-                ans = []
-                for x in range(8):
-                    if c & (1 << x):
-                        cm_new = deepcopy(cm)
-                        cm_new[i][j] = 1 << x
-                        ans.append(cm_new)
-                return ans
+    # find (a, b) such that count[cm[a][b]] is minimal
+    a, b = 0, 0
+    m = count[cm[a][b]]
+    for i, j in product(range(12), repeat=2):
+        if m <= 1 or (1 < count[cm[i][j]] < m):
+            a, b = i, j
+            m = count[cm[a][b]]
+        if m == 2:
+            break
+    
+    # return list of copies of cm, but replacing cm[a][b] by each value
+    ans = []
+    for x in range(8):
+        if cm[a][b] & (1 << x):
+            cm_new = deepcopy(cm)
+            cm_new[a][b] = 1 << x
+            ans.append(cm_new)
 
-    return []
+    return ans
 
 
 def prune(cm: Choices) -> Choices:
