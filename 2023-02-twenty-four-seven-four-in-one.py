@@ -54,11 +54,8 @@ for n in range(1, 1 << 8):
 
 # value[n] = location of first 1 in binary representation of n.
 value = [-1 for _ in range(1 << 8)]
-for n in range(1 << 8):
-    for i in range(8):
-        if n & (1 << i):
-            value[n] = i
-            break
+for n in range(1, 1 << 8):
+    value[n] = next(v for v in range(8) if n & (1 << v))
 
 
 # Conversion between board and choices
@@ -144,21 +141,22 @@ def prune(cm: Choices) -> Choices:
 
     # prune based on 2x2
     # ------------------------------------------------------------------
-    for i, j, corner in product(range(11), range(11), range(4)):
-        x = i + ((corner + 1) % 4 > 1)
-        y = j + (corner > 1)
+    for i, j in product(range(11), repeat=2):
+        for corner in range(4):
+            a = i + ((corner + 1) % 4 > 1)
+            b = j + (corner > 1)
 
-        # if all cells except (x, y) do not have a 0, 
-        # then cell (x, y) can't be > 0.
-        remove = True
-        for other_corner in range(4):
-            if other_corner != corner:
-                x_ = i + ((other_corner + 1) % 4 > 1)
-                y_ = j + (other_corner > 1)
-                remove &= not (ans[x_][y_] & 1)
+            # if all cells except (a, b) do not have a 0, 
+            # then cell (a, b) can't be > 0.
+            remove = True
+            for corner_ in range(4):
+                if corner_ != corner:
+                    a_ = i + ((corner_ + 1) % 4 > 1)
+                    b_ = j + (corner_ > 1)
+                    remove &= not (ans[a_][b_] & 1)
 
-        if remove:
-            ans[x][y] &= 1
+            if remove:
+                ans[a][b] &= 1
 
     
     # prune based on one 1, ..., seven 7
@@ -198,12 +196,12 @@ def prune(cm: Choices) -> Choices:
         for arr in arrs:
             cms = [ans[i][j] for (i, j) in arr]
             
-            nk0 = sum(value[c] == 0 for c in cms if count[c] == 1)
-            nk1 = sum(value[c] >= 1 for c in cms if count[c] == 1)
-            n = 4 - nk1
+            num_zeros = sum(value[c] == 0 for c in cms if count[c] == 1)
+            num_posit = sum(value[c] >= 1 for c in cms if count[c] == 1)
+            n = 4 - num_posit
             s = 20 - sum(value[c] for c in cms if count[c] == 1)
 
-            if not (nk0 <= 3 and nk1 <= 4) or (n == 0 and s != 0):
+            if not (num_zeros <= 3 and num_posit <= 4) or (n == 0 and s != 0):
                 return [[0 for _ in range(12)] for _ in range(12)]
             
             # loop over unknown cells
