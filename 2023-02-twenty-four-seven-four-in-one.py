@@ -136,102 +136,71 @@ def expand(cm: Choices) -> list[Choices]:
 
 def prune(cm: Choices) -> Choices:
     ''' Given partially filled board, use constraints of the problem to
-    remove numbers from the list of possibilities of each cell. Repeat 
-    until no new information is gained. '''
+    remove numbers from the list of possibilities of each cell. '''
     ans = deepcopy(cm)
-    prune_again = True
-    known_cells = sum(bool(cm[i][j]) for i, j in product(range(12), repeat=2))
 
-    while prune_again:
+    # prune based on 2x2
+    # ------------------------------------------------------------------
+    for i, j, corner in product(range(11), range(11), range(4)):
+        x = i + ((corner + 1) % 4 > 1)
+        y = j + (corner > 1)
 
-        # prune based on 2x2
-        # --------------------------------------------------------------
-        for i, j, corner in product(range(11), range(11), range(4)):
-            x = i + ((corner + 1) % 4 > 1)
-            y = j + (corner > 1)
+        # if all cells except (x, y) do not have a 0, 
+        # then cell (x, y) can't be > 0.
+        remove = True
+        for other_corner in range(4):
+            if other_corner != corner:
+                x_ = i + ((other_corner + 1) % 4 > 1)
+                y_ = j + (other_corner > 1)
+                remove &= not (ans[x_][y_] & 1)
 
-            # if all cells except (x, y) do not have a 0, 
-            # then cell (x, y) can't be > 0.
-            remove = True
-            for other_corner in range(4):
-                if other_corner != corner:
-                    x_ = i + ((other_corner + 1) % 4 > 1)
-                    y_ = j + (other_corner > 1)
-                    remove &= not (ans[x_][y_] & 1)
+        if remove:
+            ans[x][y] &= 1
 
-            if remove:
-                ans[x][y] &= 1
+    
+    # prune based on one 1, ..., seven 7
+    # ------------------------------------------------------------------
+    for grid in range(4):
+        i0 = 5 if ((grid + 1) % 4 > 1) else 0
+        i1 = 12 if ((grid + 1) % 4 > 1) else 7
+        j0 = 5 if grid % 4 > 1 else 0
+        j1 = 12 if grid % 4 > 1 else 7
 
-        
-        # prune based on one 1, ..., seven 7
-        # --------------------------------------------------------------
-        for grid in range(4):
-            i0 = 5 if ((grid + 1) % 4 > 1) else 0
-            i1 = 12 if ((grid + 1) % 4 > 1) else 7
-            j0 = 5 if grid % 4 > 1 else 0
-            j1 = 12 if grid % 4 > 1 else 7
+        coordinates = {x: [] for x in range(8)}
+        for i, j in product(range(i0, i1), range(j0, j1)):
+            if count[ans[i][j]] == 1:
+                coordinates[value[ans[i][j]]].append((i, j))
 
-            coordinates = {x: [] for x in range(8)}
-            for i, j in product(range(i0, i1), range(j0, j1)):
-                if count[ans[i][j]] == 1:
-                    coordinates[value[ans[i][j]]].append((i, j))
-
-            for x in range(1, 8):
-                # If there are x or more cells with only possibility x,
-                # x is not in the other cells
-                if len(coordinates[x]) >= x:
-                    for i, j in product(range(i0, i1), range(j0, j1)):
-                        if (i, j) not in coordinates[x][:x]:
-                            ans[i][j] &= (1 << x) ^ 255
+        for x in range(1, 8):
+            # If there are x or more cells with only possibility x,
+            # x is not in the other cells
+            if len(coordinates[x]) >= x:
+                for i, j in product(range(i0, i1), range(j0, j1)):
+                    if (i, j) not in coordinates[x][:x]:
+                        ans[i][j] &= (1 << x) ^ 255
 
 
-        # prune based on row/col sum = 20, 4 nums
-        # --------------------------------------------------------------
-        for grid in range(4):
-            i0 = 5 if ((grid + 1) % 4 > 1) else 0
-            i1 = 12 if ((grid + 1) % 4 > 1) else 7
-            j0 = 5 if grid % 4 > 1 else 0
-            j1 = 12 if grid % 4 > 1 else 7
+    # prune based on row/col sum = 20, 4 nums
+    # ------------------------------------------------------------------
+    for grid in range(4):
+        i0 = 5 if ((grid + 1) % 4 > 1) else 0
+        i1 = 12 if ((grid + 1) % 4 > 1) else 7
+        j0 = 5 if grid % 4 > 1 else 0
+        j1 = 12 if grid % 4 > 1 else 7
 
-            rows = [[(i, j) for j in range(j0, j1)] for i in range(i0, i1)]
-            cols = [[(i, j) for i in range(i0, i1)] for j in range(j0, j1)]
-            arrs = rows + cols
-
-            for arr in arrs:
-                cms = [ans[i][j] for (i, j) in arr]
-                
-                nk0 = sum(value[c] == 0 for c in cms if count[c] == 1)
-                nk1 = sum(value[c] >= 1 for c in cms if count[c] == 1)
-                n = 4 - nk1
-                s = 20 - sum(value[c] for c in cms if count[c] == 1)
-
-                if not (nk0 <= 3 and nk1 <= 4) or (n == 0 and s != 0):
-                    return [[0 for _ in range(12)] for _ in range(12)]
-                
-                # loop over unknown cells
-                for (i, j), c in zip(arr, cms):
-                    if count[c] > 1:
-                        # loop over x s.t. x is not part of partition
-                        for x in range(1, 8):
-                            if n and not (n - 1 <= s - x <= 7*(n - 1)):
-                                ans[i][j] &= (1 << x) ^ 255
-
-        
-        # prune based on bluenum sum
-        # --------------------------------------------------------------
-        rows = [(blue[0][i], [(i, j) for j in range(5, 7)]) for i in range(12)]
-        cols = [(blue[3][j], [(i, j) for i in range(5, 7)]) for j in range(12)]
+        rows = [[(i, j) for j in range(j0, j1)] for i in range(i0, i1)]
+        cols = [[(i, j) for i in range(i0, i1)] for j in range(j0, j1)]
         arrs = rows + cols
 
-        for bluenum, arr in arrs:
-            if bluenum <= 7:
-                continue
-                
+        for arr in arrs:
             cms = [ans[i][j] for (i, j) in arr]
-            n = sum(count[c] != 1 for c in cms)
-            s = 40 - bluenum - sum(value[c] for c in cms if count[c] == 1)
+            
+            nk0 = sum(value[c] == 0 for c in cms if count[c] == 1)
+            nk1 = sum(value[c] >= 1 for c in cms if count[c] == 1)
+            n = 4 - nk1
+            s = 20 - sum(value[c] for c in cms if count[c] == 1)
 
-            if n == 0 and s != 0:
+            if not (nk0 <= 3 and nk1 <= 4) or (n == 0 and s != 0):
                 return [[0 for _ in range(12)] for _ in range(12)]
             
             # loop over unknown cells
@@ -239,29 +208,50 @@ def prune(cm: Choices) -> Choices:
                 if count[c] > 1:
                     # loop over x s.t. x is not part of partition
                     for x in range(1, 8):
-                        if n and not (0 <= s - x <= 7*(n - 1)):
+                        if n and not (n - 1 <= s - x <= 7*(n - 1)):
                             ans[i][j] &= (1 << x) ^ 255
 
+    
+    # prune based on bluenum sum
+    # ------------------------------------------------------------------
+    rows = [(blue[0][i], [(i, j) for j in range(5, 7)]) for i in range(12)]
+    cols = [(blue[3][j], [(i, j) for i in range(5, 7)]) for j in range(12)]
+    arrs = rows + cols
 
-        # prune based on bluenum line of sight
-        # --------------------------------------------------------------
-        for side, a in product(range(4), range(12)):
-            bluenum = blue[side][a]
-            if 1 <= bluenum <= 7:
-                for b in range(12):
-                    i = a if not side % 2 else (b if side == 3 else 11 - b)
-                    j = a if side % 2 else (b if not side else 11 - b)
-                    if ans[i][j] != 1:
-                        # remove all except {0, bluenum} from ans[i][j]
-                        for x in range(1, 8):
-                            if x != bluenum:
-                                ans[i][j] &= (1 << x) ^ 255
-                        break
+    for bluenum, arr in arrs:
+        if bluenum <= 7:
+            continue
+            
+        cms = [ans[i][j] for (i, j) in arr]
+        n = sum(count[c] != 1 for c in cms)
+        s = 40 - bluenum - sum(value[c] for c in cms if count[c] == 1)
 
-        # Check if we should prune again
-        newkn_cells = sum(bool(cm[i][j]) for i in range(12) for j in range(12))
-        prune_again = known_cells != newkn_cells
-        known_cells = newkn_cells
+        if n == 0 and s != 0:
+            return [[0 for _ in range(12)] for _ in range(12)]
+        
+        # loop over unknown cells
+        for (i, j), c in zip(arr, cms):
+            if count[c] > 1:
+                # loop over x s.t. x is not part of partition
+                for x in range(1, 8):
+                    if n and not (0 <= s - x <= 7*(n - 1)):
+                        ans[i][j] &= (1 << x) ^ 255
+
+
+    # prune based on bluenum line of sight
+    # ------------------------------------------------------------------
+    for side, a in product(range(4), range(12)):
+        bluenum = blue[side][a]
+        if 1 <= bluenum <= 7:
+            for b in range(12):
+                i = a if not side % 2 else (b if side == 3 else 11 - b)
+                j = a if side % 2 else (b if not side else 11 - b)
+                if ans[i][j] != 1:
+                    # remove all except {0, bluenum} from ans[i][j]
+                    for x in range(1, 8):
+                        if x != bluenum:
+                            ans[i][j] &= (1 << x) ^ 255
+                    break
 
     return ans
 
@@ -275,7 +265,7 @@ t1 = time() - t0
 print(f'\nSolved in {t1:.2f} sec. Solution = ')
 pprint(sol)
 '''
-Solved in 1.56 sec. Solution =
+Solved in 1.50 sec. Solution =
     [0 5 0 6 0 3 6 0 0 0 7 4]
     [0 7 7 1 0 0 5 0 4 6 5 0]
     [0 0 0 7 5 3 5 0 6 0 6 0]
