@@ -9,6 +9,12 @@ from functools import reduce
 from operator import mul
 from itertools import product
 
+'''
+Blog post with detailed explanation of this solution:
+https://miguelbper.github.io/2023/03/22/js-2023-02-twenty-four-seven-four-in-one.html
+'''
+
+
 # Types
 # ----------------------------------------------------------------------
 

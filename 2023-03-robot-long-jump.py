@@ -2,6 +2,9 @@ from sympy import exp, diff, integrate, nsolve
 from sympy.abc import s, l, m
 
 '''
+Blog post with detailed explanation of this solution:
+https://miguelbper.github.io/2023/04/04/js-2023-03-robot-long-jump.html
+
 For a given robot, there is a number λ such that if the robot lands at x
 after the random [0, 1] draw, then:
 - if x < λ, then the robot decides to wait;
