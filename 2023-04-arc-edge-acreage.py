@@ -144,7 +144,11 @@ def perimeter(xss: list[list[int]]) -> int:
 
 def count(p: int) -> int:
     ''' Given a perimeter p, return the num of lists [s_0,...,s_{p-1}]
-    such that s_0 + ... + s_{p-1} = 0. '''
+    such that s_0 + ... + s_{p-1} = 0. 
+    
+    Remark: the possible values of the perimeter are {18, 20, 22, 24},
+    so this function could be just return comb(p, p // 2).
+    '''
     q, r = divmod(p, 2)
     return 0 if r else comb(p, q)
 
