@@ -4,6 +4,7 @@ My solutions to past Jane Street puzzles (see https://www.janestreet.com/puzzles
 
 Month | Puzzle | Solution
 -|-|-
+2023-06 | [Hooks 9](https://www.janestreet.com/puzzles/hooks-9-index/)                                               | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2023-06-hooks-9.py)
 2023-04 | [Arc-edge Acreage](https://www.janestreet.com/puzzles/arc-edge-acreage-index/)                             | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2023-04-arc-edge-acreage.py)
 2023-03 | [Robot Long Jump](https://www.janestreet.com/puzzles/robot-long-jump-index/)                               | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2023-03-robot-long-jump.py)
 2023-02 | [Twenty Four Seven (Four-in-One)](https://www.janestreet.com/puzzles/twenty-four-seven-four-in-one-index/) | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2023-02-twenty-four-seven-four-in-one.py)
