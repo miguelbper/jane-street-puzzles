@@ -24,3 +24,4 @@ Month | Puzzle | Solution
 2021-04 | [Bracketology 101](https://www.janestreet.com/puzzles/bracketology-101-index/)                             | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2021-04-bracketology-101.py)
 2021-01 | [Figurine Figuring](https://www.janestreet.com/puzzles/figurine-figuring-index/)                           | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2021-01-figurine-figuring.py)
 2020-10 | [Candy Collectors](https://www.janestreet.com/puzzles/candy-collectors-index/)                             | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2020-10-candy-collectors.py)
+2014-02 | [Hooks](https://www.janestreet.com/puzzles/hooks-index/)                                                   | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2014-02-hooks.py)
