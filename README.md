@@ -4,6 +4,7 @@ My solutions to past Jane Street puzzles (see https://www.janestreet.com/puzzles
 
 Month | Puzzle | Solution
 -|-|-
+2023-07 | [Choco Banana](https://www.janestreet.com/puzzles/choco-banana-index/)                                     | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2023-07-choco-banana.py)
 2023-06 | [Hooks 9](https://www.janestreet.com/puzzles/hooks-9-index/)                                               | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2023-06-hooks-9.py)
 2023-04 | [Arc-edge Acreage](https://www.janestreet.com/puzzles/arc-edge-acreage-index/)                             | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2023-04-arc-edge-acreage.py)
 2023-03 | [Robot Long Jump](https://www.janestreet.com/puzzles/robot-long-jump-index/)                               | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2023-03-robot-long-jump.py)
