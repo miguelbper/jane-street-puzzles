@@ -392,7 +392,7 @@ def printsol(xm: Grid) -> None:
     )
     plt.show()
 
-
+# 2 Possible choices:
 # 1. Run script starting from scratch (~30 min on my machine)
 starting_grid_slow = [[-1 for _ in range(n)] for _ in range(m)]
 
@@ -413,6 +413,7 @@ starting_grid_fast = [
     [B, B, W, W, B, B, B, B, B, B, W, u, u, u, u, B, W, W, B, B],
 ]
 
+# Choose the solution with faster runtime
 starting_grid = starting_grid_fast
 
 t0 = time()
