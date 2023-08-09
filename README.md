@@ -25,5 +25,7 @@ Month | Puzzle | Solution
 2021-04 | [Bracketology 101](https://www.janestreet.com/puzzles/bracketology-101-index/)                             | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2021-04-bracketology-101.py)
 2021-01 | [Figurine Figuring](https://www.janestreet.com/puzzles/figurine-figuring-index/)                           | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2021-01-figurine-figuring.py)
 2020-10 | [Candy Collectors](https://www.janestreet.com/puzzles/candy-collectors-index/)                             | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2020-10-candy-collectors.py)
+2019-09 | [Block Party 3](https://www.janestreet.com/puzzles/block-party-3-index/)                                   | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2019-09-block-party-3.py)
 2019-04 | [Remote Sudoku](https://www.janestreet.com/puzzles/remote-sudoku-index/)                                   | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2019-04-remote-sudoku.py)
+2017-11 | [Block Party](https://www.janestreet.com/puzzles/block-party-index/)                                       | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2017-11-block-party.py)
 2014-02 | [Hooks](https://www.janestreet.com/puzzles/hooks-index/)                                                   | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2014-02-hooks.py)
