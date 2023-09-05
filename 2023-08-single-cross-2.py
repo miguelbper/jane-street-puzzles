@@ -8,6 +8,9 @@ from sympy import integrate, symbols, cos, sin, pi, simplify, diff, solveset
 # Closed-form solution with SymPy
 # ----------------------------------------------------------------------
 '''
+Blog post with detailed explanation of this solution:
+https://miguelbper.github.io/2023/09/05/js-2023-08-single-cross-2.html
+
 Consider the lattice Z^3 in R^3.
 For a parameter D, consider the experiment of choosing x, y, z in [0,1],
 and a point in the sphere or radius D uniformly at random. Consider the 
@@ -152,46 +155,6 @@ def prob_one_crossing_mc(d_: float) -> float:
         count += 1 == num_crossings(d_, x, y, z, theta, phi)
         
     return count / NUM_EXPERIMENTS
-
-
-# Plots (temp)
-# ----------------------------------------------------------------------
-# NUM_POINTS = 100
-# EPS = 1/10
-
-# d0_ = float(d0.evalf())
-# p0_ = float(p0.evalf())
-
-# ds_mc = np.linspace(0, math.sqrt(3), NUM_POINTS)
-# ps_mc = np.array([prob_one_crossing_mc(a) for a in ds_mc])
-
-# ds_cl = np.linspace(0, 1, NUM_POINTS)
-# ps_cl = np.array([p.subs({d: a}) for a in ds_cl])
-
-# # xticks = [xt for xt in plt.xticks()[0].tolist() if abs(xt - d0_) > EPS] + [d0_]
-# # yticks = [yt for yt in plt.yticks()[0].tolist() if abs(yt - p0_) > EPS] + [p0_]
-# # plt.xticks(xticks)
-# # plt.yticks(yticks)
-
-# plt.plot(ds_mc, ps_mc, label='monte carlo')
-# # plt.plot(ds_cl, ps_cl, label='closed form')
-# # plt.scatter(d0_, p0_, color='red')
-# plt.xlabel('D')
-# plt.ylabel('P(N=1)')
-# plt.legend()
-# plt.grid(True)
-# plt.show()
-
-# plt.plot(ds_mc, ps_mc, label='monte carlo')
-# plt.plot(ds_cl, ps_cl, label='closed form')
-# # plt.scatter(d0_, p0_, color='red')
-# plt.xlabel('D')
-# plt.ylabel('P(N=1)')
-# plt.legend()
-# plt.grid(True)
-# plt.show()
-
-# exit()
 
 
 # Plots
