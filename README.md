@@ -4,6 +4,7 @@ My solutions to past Jane Street puzzles (see https://www.janestreet.com/puzzles
 
 Month | Puzzle | Solution
 -|-|-
+2023-08 | [Single-Cross 2](https://www.janestreet.com/puzzles/single-cross-2-index/)                                 | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2023-08-single-cross-2.py)
 2023-07 | [Choco Banana](https://www.janestreet.com/puzzles/choco-banana-index/)                                     | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2023-07-choco-banana.py)
 2023-06 | [Hooks 9](https://www.janestreet.com/puzzles/hooks-9-index/)                                               | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2023-06-hooks-9.py)
 2023-04 | [Arc-edge Acreage](https://www.janestreet.com/puzzles/arc-edge-acreage-index/)                             | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2023-04-arc-edge-acreage.py)
@@ -25,6 +26,7 @@ Month | Puzzle | Solution
 2021-04 | [Bracketology 101](https://www.janestreet.com/puzzles/bracketology-101-index/)                             | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2021-04-bracketology-101.py)
 2021-01 | [Figurine Figuring](https://www.janestreet.com/puzzles/figurine-figuring-index/)                           | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2021-01-figurine-figuring.py)
 2020-10 | [Candy Collectors](https://www.janestreet.com/puzzles/candy-collectors-index/)                             | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2020-10-candy-collectors.py)
+2020-02 | [Single-Cross](https://www.janestreet.com/puzzles/single-cross-index/)                                     | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2020-02-single-cross.py)
 2019-09 | [Block Party 3](https://www.janestreet.com/puzzles/block-party-3-index/)                                   | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2019-09-block-party-3.py)
 2019-04 | [Remote Sudoku](https://www.janestreet.com/puzzles/remote-sudoku-index/)                                   | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2019-04-remote-sudoku.py)
 2017-11 | [Block Party](https://www.janestreet.com/puzzles/block-party-index/)                                       | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2017-11-block-party.py)
