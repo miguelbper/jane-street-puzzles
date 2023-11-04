@@ -4,6 +4,7 @@ My solutions to past Jane Street puzzles (see https://www.janestreet.com/puzzles
 
 Month | Puzzle | Solution
 -|-|-
+2023-10 | [A Weird Tour](https://www.janestreet.com/puzzles/a-weird-tour-index/)                                     | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2023-10-a-weird-tour.py)
 2023-08 | [Single-Cross 2](https://www.janestreet.com/puzzles/single-cross-2-index/)                                 | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2023-08-single-cross-2.py)
 2023-07 | [Choco Banana](https://www.janestreet.com/puzzles/choco-banana-index/)                                     | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2023-07-choco-banana.py)
 2023-06 | [Hooks 9](https://www.janestreet.com/puzzles/hooks-9-index/)                                               | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2023-06-hooks-9.py)
