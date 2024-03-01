@@ -15,11 +15,11 @@ from tqdm import tqdm
 
 # Types
 # ----------------------------------------------------------------------
-Board = list[list[int]]                       # matrix containing board
-Choices = list[list[int]]                     # bitmask for possible x
-Orientation = int                             # orientation of the hook
-Number = int                                  # number in the hook
-HookConfig = list[tuple[Orientation, Number]] # hook configuration
+Board = list[list[int]]                        # matrix containing board
+Choices = list[list[int]]                      # bitmask for possible x
+Orientation = int                              # orientation of the hook
+Number = int                                   # number in the hook
+HookConfig = list[tuple[Orientation, Number]]  # hook configuration
 Square = tuple[int, int, int, int]
 
 
@@ -44,16 +44,19 @@ value = [-1 for _ in range(1 << m)]
 for i in range(1, 1 << m):
     value[i] = next(v for v in range(m) if i & (1 << v))
 
+
 # Conversion between board and choices
 def board(cm: Choices) -> Board:
     ''' Given matrix of choices, return matrix of values. '''
-    x = lambda c: value[c] if count[c] == 1 else -1
+    x = lambda c: value[c] if count[c] == 1 else -1  # noqa: E731
     return [[x(cm[i][j]) for j in range(n)] for i in range(n)]
+
 
 def choices(xm: Board) -> Choices:
     ''' Given matrix of values, return matrix of choices. '''
-    c = lambda x: (1 << m) - 1 if x == -1 else 1 << x
+    c = lambda x: (1 << m) - 1 if x == -1 else 1 << x  # noqa: E731
     return [[c(xm[i][j]) for j in range(n)] for i in range(n)]
+
 
 # Utility functions
 def transpose(xm: Board) -> Board:
@@ -72,11 +75,11 @@ def mygcd(xs: list[int]) -> int:
 # ----------------------------------------------------------------------
 
 def find_hooks(init_hook: HookConfig) -> list[HookConfig]:
-    ''' Return list of "admissible" hook configurations. A hook 
+    ''' Return list of "admissible" hook configurations. A hook
     configuration is admissible if
         (1) x[i] <= hook_len[i] for all i
         (2) For every row/col, it is possible to fill that row/col with
-            the numbers prescribed by the hook configuration s.t. the 
+            the numbers prescribed by the hook configuration s.t. the
             gcd constraint of the puzzle is satisfied.
     Computed using a backtracking algorithm. '''
     stack: list[HookConfig] = [init_hook]
@@ -111,7 +114,7 @@ def hook_matrix(hook: HookConfig) -> tuple[Board, Square]:
      [5, 9, 0, 0, 0, 0, 0, 7, 8],
      [5, 7, 7, 7, 7, 7, 7, 7, 8],
      [5, 8, 8, 8, 8, 8, 8, 8, 8]]
-    (i0, j0, i1, j1) = (2, 2, 7, 7)  
+    (i0, j0, i1, j1) = (2, 2, 7, 7)
     '''
     matrix = [[0 for _ in range(n)] for _ in range(n)]
     i0, j0, i1, j1 = 0, 0, n, n
@@ -141,7 +144,7 @@ def hook_matrix(hook: HookConfig) -> tuple[Board, Square]:
 def nums_subset(arr: list[int], s: int) -> list[int]:
     ''' Example:
     >>> arr = [5,9,6,4,3,1,2,7,8] #             596431279    | output:
-    >>> s = 182                   # (182)_10 = (010110110)_2 | 9,43,27 
+    >>> s = 182                   # (182)_10 = (010110110)_2 | 9,43,27
     >>> nums = nums_subset(arr, s)
     >>> print(nums)
     [27, 43, 9]
@@ -179,14 +182,14 @@ def valid_hook(hook: HookConfig) -> bool:
         all(check_arr(row_gcd[i], rows[i]) for i in filled_rows) and
         all(check_arr(col_gcd[j], cols[j]) for j in filled_cols)
     )
-    
+
     return ans
 
 
 def expand_hook(hook: HookConfig) -> list[HookConfig]:
-    ''' Add one hook to a given hook configuration. Output the list of 
+    ''' Add one hook to a given hook configuration. Output the list of
     all possible ways the extra hook can be added. '''
-    l = len(hook)
+    l = len(hook)  # noqa: E741
     used = [x for _, x in hook]
 
     # seen[x] == 1 <=> x in used
@@ -200,7 +203,7 @@ def expand_hook(hook: HookConfig) -> list[HookConfig]:
         unused = [y for y in range(n, 0, -1) if not seen[y] and y != x]
         nums = used + [x] + unused
         return all(nums[i] <= hook_len[i] for i in range(n))
-    
+
     smallest_valid = next(x for x in range(1, n+1) if not seen[x] and valid(x))
 
     xs = [x for x in range(smallest_valid, n + 1) if not seen[x]]
@@ -237,9 +240,13 @@ def expand(cm: Choices) -> list[Choices]:
     ''' Given a partially filled board, choose a cell (a, b) whose value
     is not yet filled. Return list of copies of the board, where in the
     cell, we replace by each possible value. '''
-    
+
     # If m == 2, then count[cm[i][j]] > 1 <=> cm[i][j] == 3
-    a, b = next(((i, j) for i, j in product(range(n), repeat=2) if cm[i][j] == 3))
+    a, b = next((
+        (i, j)
+        for i, j in product(range(n), repeat=2)
+        if cm[i][j] == 3
+    ))
 
     ans = []
     for x in range(m):
@@ -253,7 +260,7 @@ def expand(cm: Choices) -> list[Choices]:
 def prune(hook: HookConfig, cm: Choices) -> Choices:
     ''' Given partially filled board, use constraints of the problem to
     remove numbers from the list of possibilities of each cell. '''
-    inv = [[0 for _ in range(n)] for _ in range(n)] # invalid board
+    inv = [[0 for _ in range(n)] for _ in range(n)]  # invalid board
     ans = deepcopy(cm)
 
     # prune based on 2x2 rule
@@ -263,7 +270,7 @@ def prune(hook: HookConfig, cm: Choices) -> Choices:
             a = i + ((corner + 1) % 4 > 1)
             b = j + (corner > 1)
 
-            # if all cells except (a, b) do not have a 0, 
+            # if all cells except (a, b) do not have a 0,
             # then cell (a, b) can't be > 0.
             remove = True
             for corner_ in range(4):
@@ -300,13 +307,13 @@ def prune(hook: HookConfig, cm: Choices) -> Choices:
         for i, j in arr:
             coordinates[ans[i][j]].add((i, j))
 
-        num_ones = len(coordinates[2]) # 2 = (1 << 1) = 2**1
-        num_unkn = len(coordinates[3]) # If m == 2, then count[c] > 1 <=> c == 3
+        num_ones = len(coordinates[2])  # 2 = (1 << 1) = 2**1
+        num_unkn = len(coordinates[3])  # If m == 2, then count[c]>1 <=> c==3
         num_miss = x - num_ones
 
         if not (0 <= num_miss <= num_unkn):
             return inv
-        
+
         if num_miss in {0, num_unkn}:
             fill_with = int(bool(num_miss))
             for i, j in coordinates[3]:
@@ -326,7 +333,7 @@ def blocked(cm: Choices) -> bool:
 
 
 def connected(cm: Choices) -> bool:
-    ''' True iff there is a chance the partially filled board will lead 
+    ''' True iff there is a chance the partially filled board will lead
     to a connected board. '''
     mat = [[int(cm[i][j] != 1) for j in range(n)] for i in range(n)]
     _, num_components = label(mat)
@@ -334,23 +341,23 @@ def connected(cm: Choices) -> bool:
 
 
 def valid_gcd(hook: HookConfig, cm: Choices) -> bool:
-    ''' True if every row/col "might" satisfy the gcd property. 
+    ''' True if every row/col "might" satisfy the gcd property.
 
     Meaning of "might satisfy the gcd property":
-    1. Consider a partially filled row/col: 
+    1. Consider a partially filled row/col:
             arr = [5,?,0,4,3,0,2,?,8]
-    2. Extract the numbers which are with certainty in that row/col. This 
-       means that we split on 0s: 
+    2. Extract the numbers which are with certainty in that row/col. This
+       means that we split on 0s:
             [5, ?], [4, 3], [2, ?, 8]
-       and then remove lists with a '?': 
+       and then remove lists with a '?':
             nums = [43]
-    3. Then check that gcd(nums) is a multiple of given_gcd. If there 
+    3. Then check that gcd(nums) is a multiple of given_gcd. If there
        were no '?' originally, then gcd(nums) == given_gcd.
 
     '''
     xm = board(cm)
     mat, _ = hook_matrix(hook)
-    rows_aux = lambda i, j: xm[i][j] * (1 if xm[i][j] == -1 else mat[i][j])
+    rows_aux = lambda i, j: xm[i][j] * (1 if xm[i][j] == -1 else mat[i][j])  # noqa: E731, E501
     rows = [[rows_aux(i, j) for j in range(n)] for i in range(n)]
     cols = transpose(rows)
 
@@ -364,7 +371,7 @@ def valid_gcd(hook: HookConfig, cm: Choices) -> bool:
         all(check_arr(row_gcd[i], rows[i]) for i in range(n)) and
         all(check_arr(col_gcd[j], cols[j]) for j in range(n))
     )
-    
+
     return ans
 
 
@@ -410,13 +417,13 @@ t1 = time() - t0
 num_hooks = len(hooks)
 print(f'Found {num_hooks} hooks in {t1:.2f} sec.')
 
-''' 
+'''
 Note: trying every hook configuration takes a long time. To try only
 the hook configuration which leads to a solution, uncomment these lines
 '''
 # 1 (b) Define only the hook configuration which leads to a solution
-# hooks = [[(0,5), (2,8), (2,7), (0,9), (1,6), (0,4), (0,3), (2, 2), (0, 1)]]
-# num_hooks = len(hooks)
+hooks = [[(0, 5), (2, 8), (2, 7), (0, 9), (1, 6), (0, 4), (0, 3), (2, 2), (0, 1)]]  # noqa: E501
+num_hooks = len(hooks)
 
 # 2 For each hook configuration, try to solve the puzzle
 brd = [[0 for _ in range(n)] for _ in range(n)]
@@ -427,7 +434,7 @@ for i in tqdm(range(num_hooks)):
     xm = solution(hk)
     if xm:
         mat, _ = hook_matrix(hk)
-        aux = lambda i, j: xm[i][j] * (1 if xm[i][j] == -1 else mat[i][j])
+        aux = lambda i, j: xm[i][j] * (1 if xm[i][j] == -1 else mat[i][j])  # noqa: E731, E501
         brd = [[aux(i, j) for j in range(n)] for i in range(n)]
         sol = areas(brd)
         break
