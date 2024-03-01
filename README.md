@@ -1,9 +1,10 @@
 # Jane Street puzzles
 
-My solutions to past Jane Street puzzles (see https://www.janestreet.com/puzzles/archive/). 
+My solutions to past Jane Street puzzles (see https://www.janestreet.com/puzzles/archive/).
 
 Month | Puzzle | Solution
 -|-|-
+2024-02 | [Some Off Square](https://www.janestreet.com/puzzles/some-off-square-index/)                               | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2024-02-some-off-squares.py)
 2023-11 | [Knight Moves 5](https://www.janestreet.com/puzzles/knight-moves-5-index/)                                 | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2023-11-knight-moves-5.py)
 2023-10 | [A Weird Tour](https://www.janestreet.com/puzzles/a-weird-tour-index/)                                     | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2023-10-a-weird-tour.py)
 2023-08 | [Single-Cross 2](https://www.janestreet.com/puzzles/single-cross-2-index/)                                 | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2023-08-single-cross-2.py)
