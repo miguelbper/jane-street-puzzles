@@ -8,7 +8,7 @@ The vowels in 'A Weird Tour' are 'aeiou'. Moreover,
 - It says that '... swapped ends ... using ... methods of transport'
 - Each method of transport (bold/italic) has exactly two vowels
 
-This suggests that, we start at 'aeiou', and after taking a method of 
+This suggests that, we start at 'aeiou', and after taking a method of
 transport with vowels (v0, v1), we should swap v0 and v1 in the current
 order of the vowels.
 
@@ -17,16 +17,16 @@ in the corresponding order.
 '''
 
 transports = [
-    '', 
+    '',
     'plane',
-    'tour', 
-    'big bus', 
-    'subway', 
-    'tunnel', 
-    'train', 
-    'boat', 
-    'bike', 
-    'horse', 
+    'tour',
+    'big bus',
+    'subway',
+    'tunnel',
+    'train',
+    'boat',
+    'bike',
+    'horse',
     'limo',
 ]
 
@@ -84,32 +84,33 @@ print(tabulate(df, headers='keys', tablefmt='psql'))
 
 # Filling out the clues
 '''
-To fill out each answer, it is helpful to search for words in the 
+To fill out each answer, it is helpful to search for words in the
 dictionary whose vowels are exactly 'aeiou' in the given permutation.
 This can be done programatically and works for the clues whose answer is
 one word.
 '''
 
-regions = [             # num | clue             | num_words | permutation
-    'facetious'       , #   1 | Unserious        |         1 | aeiou      
-    'gregarious'      , #   2 | Social           |         1 | eaiou      
-    'reading up on'   , #   3 | Learning about   |         3 | eaiuo      
-    'exhaustion'      , #   4 | Weakness         |         1 | eauio      
-    ''                , #   5 | ???              |         1 | euaio      
-    'super mario'     , #   6 | Game series      |         2 | ueaio      
-    'lupe fiasco'     , #   7 | Superstar artist |         2 | ueiao      
-    'question mark'   , #   8 | Sign of doubt    |         2 | ueioa      
-    'businesswoman'   , #   9 | Exec             |         1 | uieoa      
-    'burst into tears', #  10 | Suddenly emote   |         3 | uioea      
-    'subcontinental'  , #  11 | South Asian      |         1 | uoiea      
+regions = [              # num | clue             | num_words | permutation
+    'facetious'       ,  #   1 | Unserious        |         1 | aeiou
+    'gregarious'      ,  #   2 | Social           |         1 | eaiou
+    'reading up on'   ,  #   3 | Learning about   |         3 | eaiuo
+    'exhaustion'      ,  #   4 | Weakness         |         1 | eauio
+    ''                ,  #   5 | ???              |         1 | euaio
+    'super mario'     ,  #   6 | Game series      |         2 | ueaio
+    'lupe fiasco'     ,  #   7 | Superstar artist |         2 | ueiao
+    'question mark'   ,  #   8 | Sign of doubt    |         2 | ueioa
+    'businesswoman'   ,  #   9 | Exec             |         1 | uieoa
+    'burst into tears',  #  10 | Suddenly emote   |         3 | uioea
+    'subcontinental'  ,  #  11 | South Asian      |         1 | uoiea
 ]
 
 df['regions'] = regions
 
 '''
-Now use the tuples acompanying each clue as indices to find letters in 
+Now use the tuples acompanying each clue as indices to find letters in
 the answer/region. Example: gregarious, [1, 6, 8] -> gro
 '''
+
 
 def get_letters(row: pd.DataFrame) -> str:
     w = ''.join(row['regions'].split())
@@ -119,7 +120,8 @@ def get_letters(row: pd.DataFrame) -> str:
         char = w[i - 1] if 0 < i <= len(w) else '_'
         ans.append(char)
     return ''.join(ans)
-    
+
+
 df['letters'] = df.apply(get_letters, axis=1)
 print(tabulate(df, headers='keys', tablefmt='psql'))
 '''
@@ -139,14 +141,14 @@ print(tabulate(df, headers='keys', tablefmt='psql'))
 |  11 | limo      | South Asian      |         1 | [9, 12]   | uoiea       | subcontinental   | nt      |
 +-----+-----------+------------------+-----------+-----------+-------------+------------------+---------+
 
-the letters spell out 'group element', which we can interpret as the 
+the letters spell out 'group element', which we can interpret as the
 clue for region 5.
 
 In math, for each set we can form the group of permutations of that set.
 This is a group whose elements are permutations. Therefore, the answer
 to clue no 5 is 'permutation'.
 
-This is also fitting if we take into account that in this puzzle we 
+This is also fitting if we take into account that in this puzzle we
 considered the permutations of the set {a, e, i, o, u}.
 
 Completed table with clues and regions:

@@ -15,8 +15,8 @@ x = [[Int(f'x{i}{j}') for j in range(n)] for i in range(n)]
 # Solver and constraints
 s = Solver()
 s += [Or(x[i][j] == 0, x[i][j] == max(i, j) + 1) for i, j in grid]
-s += [row_sum[i] == Sum([x[i][j] for j in range(n)])  for i in range(n)]
-s += [col_sum[j] == Sum([x[i][j] for i in range(n)])  for j in range(n)]
+s += [row_sum[i] == Sum([x[i][j] for j in range(n)]) for i in range(n)]
+s += [col_sum[j] == Sum([x[i][j] for i in range(n)]) for j in range(n)]
 s += [k**2 == Sum([x[i][j] for i, j in hook[k]]) for k in range(1, n+1)]
 
 # Solution

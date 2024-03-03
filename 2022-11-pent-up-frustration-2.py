@@ -36,6 +36,7 @@ A = np.array([
     [s,  c],
 ])
 
+
 def pentagon(side: int, x: Point, y: Point) -> Pentagon:
     '''Given points x and y, outputs pentagon with base (x, y).'''
     a: npt.NDArray[np.float64] = np.array(x)
@@ -48,7 +49,7 @@ def pentagon(side: int, x: Point, y: Point) -> Pentagon:
     e = tuple(e)
     d = tuple(d)
     c = tuple(c)
-    
+
     k = (-side) % 5
     ans = [x, y, c, d, e]
     rot = ans[k:] + ans[:k]
@@ -59,7 +60,7 @@ def add(last: int, side: int, polyform: Polyform) -> Optional[Polyform]:
     '''Attach a pentagon to the polyform. Return none if overlap.'''
     if side == last:
         return None
-    
+
     pent = polyform[-1]
     x = pent[(side + 1) % 5]
     y = pent[side]
@@ -71,7 +72,7 @@ def add(last: int, side: int, polyform: Polyform) -> Optional[Polyform]:
         pent1 = Polygon(pent)
         if pent0.intersects(pent1):
             return None
-    
+
     # polyform.append(new_pent)
     return polyform + [new_pent]
 
@@ -114,7 +115,6 @@ def best(t: float, k: int) -> Polyform:
     best_poly = []
     best_dist = np.inf
 
-
     def best_inner(last: int, n: int, polyform: Polyform) -> Polyform:
         nonlocal best_poly
         nonlocal best_dist
@@ -126,14 +126,15 @@ def best(t: float, k: int) -> Polyform:
 
         for side in range(5):
             add_poly = add(last, side, polyform)
-            if not add_poly: continue
+            if not add_poly:
+                continue
             p = best_inner(side, n - 1, add_poly)
             d = dist(p)
             if 10**(-6) < d < best_dist - 10**(-6):
                 best_poly = p
                 best_dist = d
                 print(f'd = {best_dist:.7f} (t = {time() - t0:7.4f} sec)')
-        
+
         return best_poly
 
     return best_inner(-1, k - 3, poly)

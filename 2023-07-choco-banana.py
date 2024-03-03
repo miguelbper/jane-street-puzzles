@@ -11,8 +11,8 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 # Types
-Grid = list[list[int]]    # matrix containing Grid
-Choices = list[list[int]] # bitmask for possible x
+Grid = list[list[int]]     # matrix containing Grid
+Choices = list[list[int]]  # bitmask for possible x
 
 # Input
 # ----------------------------------------------------------------------
@@ -48,20 +48,20 @@ grid = [
 # Bitmasks
 # ----------------------------------------------------------------------
 
-''' Problem: fill each cell with a number x <- {0,...,b-1} such that 
+''' Problem: fill each cell with a number x <- {0,...,b-1} such that
 every constraint is satisfied.
 
 At each stage of the algorithm, for each cell there is a set of numbers
 that could be in that cell. When the algorithm starts, that set will be
 {0,...,b-1}. Each subset S < {0,...,b-1} can be represented by a bitmask
-c = Σ_{x <- S} 2^x. 
+c = Σ_{x <- S} 2^x.
 '''
 
-m, n = len(grid), len(grid[0]) # shape of the grid
-b = 2                          # b = num_bits, x <- {0,...,b-1}
+m, n = len(grid), len(grid[0])  # shape of the grid
+b = 2                           # b = num_bits, x <- {0,...,b-1}
 bit = [(1 << x) for x in range(b)]
-B = 0 # black
-W = 1 # white
+B = 0  # black
+W = 1  # white
 
 # c &= remove[x] -> remove x from the bitmask c
 remove = [(1 << x) ^ ((1 << b) - 1) for x in range(b)]
@@ -79,11 +79,13 @@ value = [-1 for _ in range(1 << b)]
 for c in range(1, 1 << b):
     value[c] = next(v for v in range(b) if c & (1 << v))
 
+
 # Conversion between Grid and Choices
 def board(cm: Choices) -> Grid:
     ''' Given matrix of choices, return matrix of values. '''
     x = lambda c: value[c] if count[c] == 1 else -1
     return [[x(cm[i][j]) for j in range(n)] for i in range(m)]
+
 
 def choices(xm: Grid) -> Choices:
     ''' Given matrix of values, return matrix of choices. '''
@@ -124,9 +126,9 @@ def accept(cm: Choices) -> bool:
 
 def expand(cm: Choices) -> list[Choices]:
     ''' Start with a partially filled grid cm. Then
-        1. Find a number in a cell which is unfilled or which is black 
-           and incomplete. Fill grid with all possibilities of black 
-           rectangles, return those possibilities. If such a number 
+        1. Find a number in a cell which is unfilled or which is black
+           and incomplete. Fill grid with all possibilities of black
+           rectangles, return those possibilities. If such a number
            can't be found, then:
         2. Find an empty cell. Fill that cell with white or black.
     '''
@@ -227,12 +229,12 @@ def prune(cm: Choices) -> Optional[Choices]:
 
     neighborhood, complete = nbhds(cm, components, num_components)
 
-    # complete and ((Black, not rectangle) or (White, rectangle)) -> reject 
+    # complete and ((Black, not rectangle) or (White, rectangle)) -> reject
     for k in range(num_components):
         if count[colors[k]] == 1 and complete[k]:
             if value[colors[k]] == int(rectangle(coordinates[k])):
                 return None
-        
+
     # areas
     # num < area -> reject
     # num > area -> if complete, reject
@@ -256,7 +258,7 @@ def prune(cm: Choices) -> Optional[Choices]:
                         if not cm[i][j]:
                             return None
                     edited = True
-                        
+
     # Two numbers orth adjacent and different => colors are different
     # (o = 0) => 2 cells are vertical, (o = 1) => 2 cells are horizontal
     # (u = 0) => [(i0,j0) | (i1,j1)], (u = 1) => [(i1,j1) | (i0,j0)]
@@ -275,14 +277,14 @@ def prune(cm: Choices) -> Optional[Choices]:
                     edited |= (cm[i1][j1] != c)
                     if not cm[i1][j1]:
                         return None
-    
+
     # Diagonal is [black, black] => Opposite diagonal has equal values
     for i, j in product(range(m - 1), range(n - 1)):
         for o in range(4):
-            i0, j0 = i + ((o + 0 - 1) % 4 < 2), j + ((o + 0) % 4 > 1) # main
-            i1, j1 = i + ((o + 1 - 1) % 4 < 2), j + ((o + 1) % 4 > 1) # diag
-            i2, j2 = i + ((o + 2 - 1) % 4 < 2), j + ((o + 2) % 4 > 1) # op
-            i3, j3 = i + ((o + 3 - 1) % 4 < 2), j + ((o + 3) % 4 > 1) # diag
+            i0, j0 = i + ((o + 0 - 1) % 4 < 2), j + ((o + 0) % 4 > 1)  # main
+            i1, j1 = i + ((o + 1 - 1) % 4 < 2), j + ((o + 1) % 4 > 1)  # diag
+            i2, j2 = i + ((o + 2 - 1) % 4 < 2), j + ((o + 2) % 4 > 1)  # op
+            i3, j3 = i + ((o + 3 - 1) % 4 < 2), j + ((o + 3) % 4 > 1)  # diag
             if cm[i1][j1] == bit[B] and cm[i3][j3] == bit[B]:
                 if count[cm[i2][j2]] == 1:
                     c = cm[i0][j0]
@@ -370,27 +372,28 @@ def ccs(xm: list[list[int]]) -> tuple[list[list[int]], int]:
 # ----------------------------------------------------------------------
 
 def printsol(xm: Grid) -> None:
-    _, ax = plt.subplots(1, 1, figsize=(6,6))
+    _, ax = plt.subplots(1, 1, figsize=(6, 6))
     xm = np.array(xm)
     gm = np.array(grid).astype('int').astype('str')
-    gm[gm=='0'] = ''
+    gm[gm == '0'] = ''
     ax = sns.heatmap(
-        xm, 
-        annot=gm, 
-        cbar=False, 
-        fmt='', 
-        linewidths=0.1, 
-        linecolor='black', 
-        square=True, 
+        xm,
+        annot=gm,
+        cbar=False,
+        fmt='',
+        linewidths=0.1,
+        linecolor='black',
+        square=True,
         cmap=['black', 'white']
     )
     ax.tick_params(
-        left=False, 
-        labelleft=False, 
-        bottom=False, 
+        left=False,
+        labelleft=False,
+        bottom=False,
         labelbottom=False
     )
     plt.show()
+
 
 # 2 Possible choices:
 # 1. Run script starting from scratch (~30 min on my machine)

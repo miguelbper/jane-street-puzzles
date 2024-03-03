@@ -26,12 +26,12 @@ p = num/den, where
             child 5 has the most of candy 5
 
 
-To compute count, we will use generating functions. We will define a 
+To compute count, we will use generating functions. We will define a
 polynomial f1(a, b, c, d, e) where
     - a, b, c, d, e represent the 5 children
     - exponents represent how many of candy 1 each child has
 
-Let f1(a, b, c, d, e) be the polynomial whose coefficient of 
+Let f1(a, b, c, d, e) be the polynomial whose coefficient of
 a^i b^j c^k d^l e^m is
     - 0 if i + j + k + l + m != 5
     - 0 if i <= max{j, k, l, m}
@@ -42,7 +42,7 @@ a^i b^j c^k d^l e^m is
                k of candy 1 to child c
                l of candy 1 to child d
                m of candy 1 to child e
-    
+
 I.e., f1 is given by the formula implemented in code below.
 Define polys for the other types of candy f2, f3, f4, f5 analogously.
 
@@ -51,11 +51,13 @@ Then, count = coef of (abcde)^5 of f1*f2*f3*f4*f5
 
 
 def f(a, b, c, d, e):
-    return (  comb(5, 5) * a**5
-            + comb(5, 4) * a**4 * (b + c + d + e)
-            + comb(5, 3) * a**3 * ((b**2 + c**2 + d**2 + e**2)
-                                   + factorial(2) * (b*c + b*d + b*e + c*d + c*e + d*e))
-            + comb(5, 2) * a**2 * factorial(3) * (c*d*e + b*d*e + b*c*e + b*c*d))
+    T5 = comb(5, 5) * a**5
+    T4 = comb(5, 4) * a**4 * (b + c + d + e)
+    T3 = comb(5, 3) * a**3 * ((b**2 + c**2 + d**2 + e**2)
+                              + 2 * (b*c + b*d + b*e + c*d + c*e + d*e))
+    T2 = comb(5, 2) * a**2 * factorial(3) * (c*d*e + b*d*e + b*c*e + b*c*d)
+    return T5 + T4 + T3 + T2
+
 
 f1 = Poly(f(a, b, c, d, e))
 f2 = Poly(f(b, c, d, e, a))

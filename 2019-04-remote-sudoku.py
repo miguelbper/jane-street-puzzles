@@ -24,9 +24,10 @@ remote = []
 for i, j in product(range(9), repeat=2):
     dist = grid[i][j]
     if dist:
-        dirs = [(dist, 0), (-dist, 0), (0, dist), (0, -dist)]
-        coords = [(i + x, j + y) for x, y in dirs if 0 <= i + x < 9 and 0 <= j + y < 9]
-        remote.append((dist, coords))
+        direc = [(dist, 0), (-dist, 0), (0, dist), (0, -dist)]
+        neigh = [(i + di, j + dj) for di, dj in direc]
+        coord = [(i, j) for i, j in neigh if 0 <= i < 9 and 0 <= j < 9]
+        remote.append((dist, coord))
 
 # Define variables and solver
 X = [[Int(f'x{i}{j}') for j in range(9)] for i in range(9)]
@@ -43,7 +44,7 @@ s += [Or([X[i][j] == dist for i, j in coords]) for dist, coords in remote]
 if s.check() == sat:
     m = s.model()
     A = [[m.evaluate(X[i][j]).as_long() for j in range(9)] for i in range(9)]
-    ans = sum([A[i][j]**2 for i, j in product(range(9), repeat=2) if grid[i][j]])
+    ans = sum([A[i][j]**2 for i in range(9) for j in range(9) if grid[i][j]])
     print(f'{ans = }')
     print('grid = ')
     pprint(A)
@@ -52,7 +53,7 @@ else:
 
 '''
 ans = 1105
-grid = 
+grid =
 6 9 2  5 3 7  1 8 4
 1 3 7  8 4 2  5 6 9
 5 8 4  1 9 6  2 3 7

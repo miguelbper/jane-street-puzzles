@@ -30,8 +30,8 @@ col_gcd = [5, 1, 6, 1, 8, 1, 22, 7, 8]
 n = len(row_gcd)
 hook_len = [2*(n - i) - 1 for i in range(n)]
 
-m = 2
-remove = [(1 << x) ^ ((1 << m) - 1) for x in range(m)]
+m = 2  # m = number of different values that could be in a cell
+# bits & retain[x] = (new bitmask where everything except x is set to 0)
 retain = [1 << x for x in range(m)]
 
 # count[n] = number of 1s in binary representation of n.
@@ -48,13 +48,13 @@ for i in range(1, 1 << m):
 # Conversion between board and choices
 def board(cm: Choices) -> Board:
     ''' Given matrix of choices, return matrix of values. '''
-    x = lambda c: value[c] if count[c] == 1 else -1  # noqa: E731
+    x = lambda c: value[c] if count[c] == 1 else -1
     return [[x(cm[i][j]) for j in range(n)] for i in range(n)]
 
 
 def choices(xm: Board) -> Choices:
     ''' Given matrix of values, return matrix of choices. '''
-    c = lambda x: (1 << m) - 1 if x == -1 else 1 << x  # noqa: E731
+    c = lambda x: (1 << m) - 1 if x == -1 else 1 << x
     return [[c(xm[i][j]) for j in range(n)] for i in range(n)]
 
 
@@ -189,7 +189,7 @@ def valid_hook(hook: HookConfig) -> bool:
 def expand_hook(hook: HookConfig) -> list[HookConfig]:
     ''' Add one hook to a given hook configuration. Output the list of
     all possible ways the extra hook can be added. '''
-    l = len(hook)  # noqa: E741
+    l = len(hook)
     used = [x for _, x in hook]
 
     # seen[x] == 1 <=> x in used
@@ -357,7 +357,7 @@ def valid_gcd(hook: HookConfig, cm: Choices) -> bool:
     '''
     xm = board(cm)
     mat, _ = hook_matrix(hook)
-    rows_aux = lambda i, j: xm[i][j] * (1 if xm[i][j] == -1 else mat[i][j])  # noqa: E731, E501
+    rows_aux = lambda i, j: xm[i][j] * (1 if xm[i][j] == -1 else mat[i][j])
     rows = [[rows_aux(i, j) for j in range(n)] for i in range(n)]
     cols = transpose(rows)
 
@@ -422,7 +422,7 @@ Note: trying every hook configuration takes a long time. To try only
 the hook configuration which leads to a solution, uncomment these lines
 '''
 # 1 (b) Define only the hook configuration which leads to a solution
-hooks = [[(0, 5), (2, 8), (2, 7), (0, 9), (1, 6), (0, 4), (0, 3), (2, 2), (0, 1)]]  # noqa: E501
+hooks = [[(0, 5), (2, 8), (2, 7), (0, 9), (1, 6), (0, 4), (0, 3), (2, 2), (0, 1)]]
 num_hooks = len(hooks)
 
 # 2 For each hook configuration, try to solve the puzzle
@@ -434,8 +434,7 @@ for i in tqdm(range(num_hooks)):
     xm = solution(hk)
     if xm:
         mat, _ = hook_matrix(hk)
-        aux = lambda i, j: xm[i][j] * (1 if xm[i][j] == -1 else mat[i][j])  # noqa: E731, E501
-        brd = [[aux(i, j) for j in range(n)] for i in range(n)]
+        brd = [[xm[i][j] * mat[i][j] for j in range(n)] for i in range(n)]
         sol = areas(brd)
         break
 

@@ -49,11 +49,12 @@ s += [Distinct([X[i][j] for i, j in coords[k]]) for k in range(r)]
 
 for i, j in I:
     for x in range(1, n_cells[regs[i][j]] + 1):
+        inside = lambda i, j: 0 <= i < n and 0 <= j < n
         drs = [(x, 0), (-x, 0), (0, x), (0, -x)]
-        crd = [(i + a, j + b) for a, b in drs if 0 <= i + a < n and 0 <= j + b < n]
+        crd = [(i + a, j + b) for a, b in drs if inside(i + a, j + b)]
         col = [(i + a, j) for a in range(-x + 1, x) if a and 0 <= i + a < n]
         row = [(i, j + b) for b in range(-x + 1, x) if b and 0 <= j + b < n]
-        
+
         c1 = Or([X[i_][j_] == x for i_, j_ in crd])
         c2 = And([X[i_][j_] != x for i_, j_ in row + col])
         s += Implies(X[i][j] == x, And(c1, c2))
@@ -80,7 +81,7 @@ else:
 
 '''
 ans = 6092
-grid = 
+grid =
     4 7 8 1 1 1 3 1 7
     1 1 2 7 2 6 1 1 3
     5 3 6 4 3 5 2 4 6

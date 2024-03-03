@@ -52,7 +52,7 @@ while N:
 
     a, b, c, d = x
     p, q, u, v = r(*n(*x))
-    print(f'N = {N:2d}, max(x) = {max(x):2d}, M = {M:2d}, ' 
+    print(f'N = {N:2d}, max(x) = {max(x):2d}, M = {M:2d}, '
           + f'x = ({a}, {b:d}, {c:2d}, {d:2d}), '
           + f'r.n(x) = ({p}, {q:d}, {u:2d}, {v:2d})')
     N = max(0, max(x) - 1)
@@ -82,7 +82,7 @@ Notice that:
 We solve the problem assuming that the properties 1 and 2 above are true
 in general.
 
-Let 
+Let
     x_{M+1} = (a, b, c, d) = (0, b, c, d)
     x_M     = (p, q, u, v) = (0, q, u, v)
 
@@ -95,8 +95,8 @@ Then,
         = (0, c - 2*b, d - c - b, d - b) / k,
     where k = gcd(0, c - 2*b, d - c - b, d - b)
 
-    => 
-    
+    =>
+
     |b|    k  | -1 -1 1 | |q|
     |c| = ___ |  0 -2 2 | |u|
     |d|    2  | -1 -1 3 | |v|
@@ -129,7 +129,7 @@ while max(x) <= N:
 
     x = (0, b, c, d)
     M += 1
-    
+
 print(f'\nans = {ans[0]};{ans[1]};{ans[2]};{ans[3]}'
       + f'    =>    M = f(ans) = {f(*ans)}')
 '''

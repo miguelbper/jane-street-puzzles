@@ -1,3 +1,5 @@
+from ortools.sat.python import cp_model
+
 # ======================================================================
 # Solution 1: iterate to find numbers making all squares magic
 # ======================================================================
@@ -10,8 +12,8 @@ r s n
 l t m
 
 If the square is magic, then o, p, q, r, s are given in terms of l, m, n
-by the equations in the function cells below. Moreover, 
-t = -4*g + 2*m + 3*f 
+by the equations in the function cells below. Moreover,
+t = -4*g + 2*m + 3*f
 '''
 def cells(l, m, n):
     o = -2*l +   m + 2*n
@@ -26,9 +28,9 @@ def cells(l, m, n):
 Consider the full grid
 0 ? ? ? 0 0
 0 ? ? x ? ?
-? y b a ? ? 
+? y b a ? ?
 ? ? c d z ?
-? ? w ? ? 0 
+? ? w ? ? 0
 0 0 ? ? ? 0
 
 By the equations above, if we know x, y, w, z, a, b, c, d then we know
@@ -42,7 +44,7 @@ to a, b, c, d:
 We can solve this system and obtain x, y, w, z in terms of a, b, c, d.
 The solution is the function xywz below.
 
-Using modular arithmetic, it is possible to show that x, y, w, z are 
+Using modular arithmetic, it is possible to show that x, y, w, z are
 integers iff (d - 22*a - 6*b - 8*c) % 35 == 0.
 '''
 def xywz(a, b, c, d):
@@ -64,7 +66,7 @@ cells_ind = {
 
 '''
 Now we have equations for every cell of the grid in terms of a, b, c, d.
-Let s = sum of every cell and k = a + b + c + d. 
+Let s = sum of every cell and k = a + b + c + d.
 It is possible to show that s = 7*k.
 We will loop through all possible values of k, a, b, c, d in the
 generator gen() below. By symmetry, we may assume a = min(a, b, c, d).
@@ -74,7 +76,7 @@ def gen():
     for k in range(58, 158):
         # a = k - b - c - d <= k - 2 - 3 - 4 = k - 9
         for a in range(1, k - 8):
-            # b = k - a - c - d <= k - a - (a+1) - (a+2) = k - 3*(a+1) 
+            # b = k - a - c - d <= k - a - (a+1) - (a+2) = k - 3*(a+1)
             for b in range(a + 1, k - 3*(a + 1) + 1):
                 # c = k - a - b - d <= k - a - b - (a+1) = k - 2*a - b-1
                 for c in range(a + 1, k - 2*a - b):
@@ -117,7 +119,7 @@ for k, a, b, c, d in gen():
         if len(l) == len(set(l)):
             print(f'solution = {l}\nsum = {7 * k}')
             break
-# solution = [39, 3, 24, 7, 22, 37, 45, 11, 23, 20, 41, 5, 31, 57, 46, 
+# solution = [39, 3, 24, 7, 22, 37, 45, 11, 23, 20, 41, 5, 31, 57, 46,
 #             28, 10, 51, 17, 25, 15, 36, 33, 26, 19, 35, 1, 42]
 # sum = 749
 
@@ -126,21 +128,20 @@ for k, a, b, c, d in gen():
 # Solution 2: Use OR-Tools to do constraint optimization
 # ======================================================================
 print('\nSolution 2: lowest sum with all squares almost magic')
-
-from ortools.sat.python import cp_model
-
 SQUARES = ['u', 'l', 'd', 'r']
 
 sq = {}
-sq['u'] = [[ 0, 1, 2],[ 3, 4, 5],[ 9,10,11]]
-sq['r'] = [[ 5, 6, 7],[11,12,13],[17,18,19]]
-sq['l'] = [[ 8, 9,10],[14,15,16],[20,21,22]]
-sq['d'] = [[16,17,18],[22,23,24],[25,26,27]]
+sq['u'] = [[ 0,  1,  2], [ 3,  4,  5], [ 9, 10, 11]]
+sq['r'] = [[ 5,  6,  7], [11, 12, 13], [17, 18, 19]]
+sq['l'] = [[ 8,  9, 10], [14, 15, 16], [20, 21, 22]]
+sq['d'] = [[16, 17, 18], [22, 23, 24], [25, 26, 27]]
+
 
 def eqs(sq):
     cols = [[sq[i][j] for i in range(3)] for j in range(3)]
     diag = [[sq[0][0], sq[1][1], sq[2][2]], [sq[0][2], sq[1][1], sq[2][0]]]
     return sq + cols + diag
+
 
 # define model
 model = cp_model.CpModel()
@@ -182,6 +183,6 @@ print('solution = {}'.format([solver.Value(i) for i in x.values()]))
 print('sum = {}'.format(sum([solver.Value(i) for i in x.values()])))
 
 # solution found:
-# solution = [14, 17, 3, 1, 11, 22, 40, 8, 10, 19, 5, 9, 23, 37, 6, 12, 
+# solution = [14, 17, 3, 1, 11, 22, 40, 8, 10, 19, 5, 9, 23, 37, 6, 12,
 #             16, 39, 7, 24, 18, 4, 13, 21, 29, 34, 2, 26]
 # sum = 470

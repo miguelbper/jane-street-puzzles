@@ -11,7 +11,7 @@ from sympy import integrate, symbols, cos, sin, pi, acos
 '''
 Consider the lattice Z^2 in R^2.
 For a parameter D, consider the experiment of choosing x, y in [0, 1],
-theta in [0, 2 pi] uniformly at random. Consider the line segment with 
+theta in [0, 2 pi] uniformly at random. Consider the line segment with
 one endpoint (x, y), angle theta and length D. Define random variables
     N  = num times the segment crosses a side of a square
     Nx = num times the segment crosses a vertical side of a square
@@ -20,46 +20,46 @@ one endpoint (x, y), angle theta and length D. Define random variables
 We wish to compute P(N=1) for each D, and find D which maximizes P(N=1).
 
 Fact: We may assume D < sqrt(2).
-Explanation: If D = sqrt(2) then P(N>=1) = 1. Also, P(N>=2) is 
+Explanation: If D = sqrt(2) then P(N>=1) = 1. Also, P(N>=2) is
 nondecreasing in D for D >= sqrt(2).
 
 Fact: We may assume that theta in [0, pi/4].
-Explanation: by symmetry, the two experiments (theta in [0, pi/4] and 
+Explanation: by symmetry, the two experiments (theta in [0, pi/4] and
 theta in [0, 2 pi]) give the same distribution for N.
 
 
 We now solve this problem in R^1 (we will later reduce to this case).
 For a parameter L (length of a segment), choose x in [0, 1] uniformly at
-random. Define 
+random. Define
     N = num crossings
       = # {n in Z | x < n <= x + L}
       = # {1,...,floor(x + L)}
       = floor(x + L)
-Let delta = L - floor(L). The previous computation implies that the 
-distribution of N is 
+Let delta = L - floor(L). The previous computation implies that the
+distribution of N is
     P(N = floor(L))     = 1 - delta
     P(N = floor(L) + 1) = delta
 
-    
+
 We compute P(N=1):
 P(N=1) = P(Nx=1, Ny=0) + P(Nx=0, Ny=1)
        = (4/π) * ∫_0^{π/4} (P(Nx=1, Ny=0|θ) + P(Nx=0, Ny=1|θ)) dθ
        = (4/π) * ∫_0^{π/4} (P(Nx=1|θ) P(Ny=0|θ) + P(Nx=0|θ) P(Ny=1|θ)) dθ
-Here, in the first equality we used N = Nx + Ny, in the second we used 
+Here, in the first equality we used N = Nx + Ny, in the second we used
 the law of total probability, and in the third we used the fact that for
-a fixed theta, Nx=i and Ny=j are independent. 
+a fixed theta, Nx=i and Ny=j are independent.
 
 We now compute P(Nx=i|θ) and P(Ny=j|θ) using the previous 1d result. For
 this, let
     Lx = D cos(θ)
     Ly = D sin(θ)
 
-    
+
 Case 1: D <= 1
 P(N=1) = (4/π) * ∫_0^{π/4} (P(Nx=1|θ) P(Ny=0|θ) + P(Nx=0|θ) P(Ny=1|θ)) dθ
        = (4/π) * ∫_0^{π/4} (Lx (1 - Ly) + (1 - Lx) Ly) dθ
 
-       
+
 Case 2: 1 <= D <= sqrt(2)
 Define θ_D = arccos(1/D).
 
@@ -89,8 +89,10 @@ print(f'p2 = {p2}')
 # p1 = 2*d*(2 - d)/pi
 # p2 = 2*(2*d**2 - 4*d*sqrt(1 - 1/d**2) - 4*d + 4*acos(1/d) + 3)/pi
 
+
 def prob_one_crossing_cl(d_: float) -> float:
     return p1.subs({d: d_}) if d_ <= 1 else p2.subs({d: d_})
+
 
 # The plot below shows that P(N=1) attains its max when d = 1.
 p_max = p1.subs({d: 1})
@@ -130,7 +132,7 @@ def prob_one_crossing_mc(d_: float) -> float:
 
         # compute num_crossings
         count += 1 == num_crossings(d_, x, y, theta)
-        
+
     return count / NUM_EXPERIMENTS
 
 

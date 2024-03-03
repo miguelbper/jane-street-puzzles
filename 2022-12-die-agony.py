@@ -23,7 +23,7 @@ grid = [
     [  0,  77,  32, 403, 337, 452],
 ]
 
-m= len(grid)
+m = len(grid)
 
 n0 = 0
 x0 = m - 1
@@ -45,7 +45,7 @@ def final(state: State) -> bool:
 def tilt(dir: Coords, die: Die) -> Die:
     top, bottom, up, down, left, right = die
 
-    if dir == ( 0, 1): # tilt up
+    if dir == (0, 1):   # tilt up
         return (
             down,
             up,
@@ -54,7 +54,7 @@ def tilt(dir: Coords, die: Die) -> Die:
             left,
             right,
         )
-    if dir == ( 0,-1): # tilt down
+    if dir == (0, -1):  # tilt down
         return (
             up,
             down,
@@ -63,7 +63,7 @@ def tilt(dir: Coords, die: Die) -> Die:
             left,
             right,
         )
-    if dir == (-1, 0): # tilt left
+    if dir == (-1, 0):  # tilt left
         return (
             right,
             left,
@@ -72,7 +72,7 @@ def tilt(dir: Coords, die: Die) -> Die:
             top,
             bottom,
         )
-    if dir == ( 1, 0): # tilt right
+    if dir == (1, 0):   # tilt right
         return (
             left,
             right,
@@ -94,7 +94,7 @@ def move(direction: Coords, state: State) -> Optional[State]:
     y_ = y + b
     c_ = (x_, y_)
     vis_ = vis + [c_]
-    
+
     if not (0 <= x_ < m and 0 <= y_ < m):
         return None
 
@@ -118,8 +118,8 @@ def move(direction: Coords, state: State) -> Optional[State]:
 def next(state: State) -> list[State]:
     # given state, return list of possible states after 1 move
     ans = []
-    dirs = [( 0, 1), ( 0,-1), (-1, 0), ( 1, 0)]
-    
+    dirs = [(0, 1), (0, -1), (-1, 0), (1, 0)]
+
     for d in dirs:
         new_state = move(d, state)
         if new_state:
@@ -164,6 +164,8 @@ def print_state(state: State):
 
     '''
     print(output)
+
+
 print_state(final_state)
 print(f'answer = {ans}')
 
@@ -172,10 +174,10 @@ final state:
 n = 32,
 c = (0, 5),
 d = (7, 9, -3, 9, 5, -9),
-v = [(5, 0), (4, 0), (4, 1), (4, 2), (5, 2), (5, 1), (4, 1), (3, 1), 
-     (2, 1), (1, 1), (0, 1), (0, 2), (1, 2), (1, 1), (1, 0), (2, 0), 
-     (2, 1), (2, 2), (3, 2), (3, 3), (4, 3), (5, 3), (5, 4), (5, 5), 
-     (4, 5), (3, 5), (3, 4), (3, 3), (2, 3), (1, 3), (1, 4), (1, 5), 
+v = [(5, 0), (4, 0), (4, 1), (4, 2), (5, 2), (5, 1), (4, 1), (3, 1),
+     (2, 1), (1, 1), (0, 1), (0, 2), (1, 2), (1, 1), (1, 0), (2, 0),
+     (2, 1), (2, 2), (3, 2), (3, 3), (4, 3), (5, 3), (5, 4), (5, 5),
+     (4, 5), (3, 5), (3, 4), (3, 3), (2, 3), (1, 3), (1, 4), (1, 5),
      (0, 5)].
 
 answer = 1935

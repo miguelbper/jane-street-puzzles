@@ -2,7 +2,7 @@ import math
 from random import uniform
 import matplotlib.pyplot as plt
 import numpy as np
-from sympy import integrate, symbols, cos, sin, pi, simplify, diff, solveset
+from sympy import integrate, symbols, cos, sin, pi, diff, solveset
 
 
 # Closed-form solution with SymPy
@@ -13,8 +13,8 @@ https://miguelbper.github.io/2023/09/05/js-2023-08-single-cross-2.html
 
 Consider the lattice Z^3 in R^3.
 For a parameter D, consider the experiment of choosing x, y, z in [0,1],
-and a point in the sphere or radius D uniformly at random. Consider the 
-line segment with endpoints (x, y), and the chosen point in the sphere. 
+and a point in the sphere or radius D uniformly at random. Consider the
+line segment with endpoints (x, y), and the chosen point in the sphere.
 Define random variables
     N  = num times the segment crosses a side of a cube
     Nx = num times the segment crosses a side of a cube along the x axis
@@ -24,25 +24,25 @@ Define random variables
 We wish to compute P(N=1) for each D, and find D which maximizes P(N=1).
 
 Fact: We may assume D < sqrt(3).
-Explanation: If D = sqrt(3) then P(N>=1) = 1. Also, P(N>=2) is 
+Explanation: If D = sqrt(3) then P(N>=1) = 1. Also, P(N>=2) is
 nondecreasing in D for D >= sqrt(3).
 
 Consider spherical coordinates theta in [0, 2pi] and phi in [0, pi].
 
 Fact: We may assume that theta in [0, pi/4] and phi in [0, pi/2].
-Explanation: by symmetry, the two possibilities give the same 
+Explanation: by symmetry, the two possibilities give the same
 distribution for N.
 
 
 We now solve this problem in R^1 (we will later reduce to this case).
 For a parameter L (length of a segment), choose x in [0, 1] uniformly at
-random. Define 
+random. Define
     N = num crossings
       = # {n in Z | x < n <= x + L}
       = # {1,...,floor(x + L)}
       = floor(x + L)
-Let delta = L - floor(L). The previous computation implies that the 
-distribution of N is 
+Let delta = L - floor(L). The previous computation implies that the
+distribution of N is
     P(N = floor(L))     = 1 - delta
     P(N = floor(L) + 1) = delta
 
@@ -56,11 +56,11 @@ occurs for D < 1. So, it suffices to compute P(N=1) for D<=1. Let
 We compute P(N=1):
 
 P(N=1) = P(Nx=1, Ny=0, Nz=0) + P(Nx=0, Ny=1, Nz=0) + P(Nx=0, Ny=0, Nz=1)
-       
+
        =   (4/π) * ∫_0^{π/4} ∫_0^{π/2} P(Nx=1, Ny=0, Nz=0 | θ,𝜑) sin(𝜑) d𝜑 dθ
          + (4/π) * ∫_0^{π/4} ∫_0^{π/2} P(Nx=0, Ny=1, Nz=0 | θ,𝜑) sin(𝜑) d𝜑 dθ
          + (4/π) * ∫_0^{π/4} ∫_0^{π/2} P(Nx=0, Ny=0, Nz=1 | θ,𝜑) sin(𝜑) d𝜑 dθ
-       
+
        =   (4/π) * ∫_0^{π/4} ∫_0^{π/2} P(Nx=1|θ,𝜑) P(Ny=0|θ,𝜑) P(Nz=0|θ,𝜑) sin(𝜑) d𝜑 dθ
          + (4/π) * ∫_0^{π/4} ∫_0^{π/2} P(Nx=0|θ,𝜑) P(Ny=1|θ,𝜑) P(Nz=0|θ,𝜑) sin(𝜑) d𝜑 dθ
          + (4/π) * ∫_0^{π/4} ∫_0^{π/2} P(Nx=0|θ,𝜑) P(Ny=0|θ,𝜑) P(Nz=1|θ,𝜑) sin(𝜑) d𝜑 dθ
@@ -68,9 +68,9 @@ P(N=1) = P(Nx=1, Ny=0, Nz=0) + P(Nx=0, Ny=1, Nz=0) + P(Nx=0, Ny=0, Nz=1)
        =   (4/π) * ∫_0^{π/4} ∫_0^{π/2} Lx (1-Ly) (1-Lz) sin(𝜑) d𝜑 dθ
          + (4/π) * ∫_0^{π/4} ∫_0^{π/2} (1-Lx) Ly (1-Lz) sin(𝜑) d𝜑 dθ
          + (4/π) * ∫_0^{π/4} ∫_0^{π/2} (1-Lx) (1-Ly) Lz sin(𝜑) d𝜑 dθ
-       
-Here, in the first equality we used N = Nx + Ny + Nz, in the second we 
-used the law of total probability, in the third we used the fact that 
+
+Here, in the first equality we used N = Nx + Ny + Nz, in the second we
+used the law of total probability, in the third we used the fact that
 for fixed θ,𝜑, the events {Nx=i, Ny=j, Nz=k} are independent, and in the
 fourth we used the computation in R^1 from above (with D <= 1).
 '''
@@ -81,7 +81,7 @@ lx = d * cos(th) * sin(ph)
 ly = d * sin(th) * sin(ph)
 lz = d * cos(ph)
 
-IX = lx * (1 - ly) * (1 - lz) 
+IX = lx * (1 - ly) * (1 - lz)
 IY = (1 - lx) * ly * (1 - lz)
 IZ = (1 - lx) * (1 - ly) * lz
 I = IX + IY + IZ
@@ -102,7 +102,7 @@ print(f"p'(d) = 0 => d0 = {d0} = {d0.evalf():.10f}")
 p0 = p.subs({d: d0}).simplify()
 print(f'p(d0) = {p0} = {p0.evalf():.10f}')
 print(f'ans   = ({d0.evalf():.10f}, {p0.evalf():.10f})')
-# p(d0) = -2048/(243*pi) - sqrt(256 - 54*pi)/9 + 128*sqrt(256 - 54*pi)/(243*pi) + 8/3 
+# p(d0) = -2048/(243*pi) - sqrt(256 - 54*pi)/9 + 128*sqrt(256 - 54*pi)/(243*pi) + 8/3
 #       = 0.5095346021
 # ans   = (0.7452572091, 0.5095346021)
 
@@ -120,10 +120,10 @@ def num_crossings_1d(l: float, x: float) -> int:
 
 
 def num_crossings(
-    d_: float, 
-    x: float, 
+    d_: float,
+    x: float,
     y: float,
-    z: float, 
+    z: float,
     theta: float,
     phi: float,
 ) -> int:
@@ -153,7 +153,7 @@ def prob_one_crossing_mc(d_: float) -> float:
 
         # compute num_crossings
         count += 1 == num_crossings(d_, x, y, z, theta, phi)
-        
+
     return count / NUM_EXPERIMENTS
 
 

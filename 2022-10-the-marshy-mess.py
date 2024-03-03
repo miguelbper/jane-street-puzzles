@@ -33,7 +33,7 @@ def valid(islands: Islands, i: Island, j: Island) -> bool:
     # i < j
     if i >= j:
         return False
-    
+
     # i, j are aligned
     xi, yi, _ = islands[i]
     xj, yj, _ = islands[j]
@@ -67,7 +67,7 @@ def solve(islands: Islands) -> Optional[HashiSol]:
     # Constraints
     # ------------------------------------------------------------------
     formula = True
-    
+
     # bound for y
     formula &= (0 <= y) & (y < n)
 
@@ -87,11 +87,11 @@ def solve(islands: Islands) -> Optional[HashiSol]:
 
     # bridges don't cross
     for i, j, k, l in product(R, R, R, R):
-        if not (is_valid(i, j) and is_valid(k, l)): 
+        if not (is_valid(i, j) and is_valid(k, l)):
             continue
         if i == k and j == l:
             continue
-        
+
         # check that the bridges cross
         xi, yi, _ = islands[i]
         xj, yj, _ = islands[j]
@@ -102,7 +102,7 @@ def solve(islands: Islands) -> Optional[HashiSol]:
 
         if not (vert_ij ^ vert_kl):
             continue
-        
+
         cx = min(xk, xl) < xi < max(xk, xl)
         cy = min(yi, yj) < yk < max(yi, yj)
         if vert_ij and not (cx and cy):
@@ -159,11 +159,11 @@ def print_hashi(grid: Grid) -> str:
                 X[x][yi] = '|' if bridges == 1 else '║'
 
     B = defaultdict(int, A.items())
-    num_wrong = islands[Y][2] 
+    num_wrong = islands[Y][2]
     num_right = sum(B[x, Y] + B[Y, x] for x in range(len(islands)))
 
     output0 = [
-        f'\nSolution of Hashi puzzle',
+        '\nSolution of Hashi puzzle',
         f'ind_wrong = {Y}',
         f'num_wrong = {num_wrong}',
         f'num_right = {num_right}',
@@ -261,11 +261,11 @@ ind_wrong = 7
 num_wrong = 2
 num_right = 5
 4===========5 - 3 - - - - - 4 - 1
-║           ║   |           ║    
-║           ║   2           ║    
-║           ║   |           ║    
-6===2=======5   5=======4   ║    
-║   |       |   ║       ║   ║    
+║           ║   |           ║
+║           ║   2           ║
+║           ║   |           ║
+6===2=======5   5=======4   ║
+║   |       |   ║       ║   ║
 ║   3       |   ║       ║   6===4
 ║   ║       |   ║       ║   ║   ║
 ║   6=======3   ║       ║   ║   ║
@@ -283,9 +283,9 @@ num_right = 4
 ║   4   ║           ║   1   |   |
 ║   ║   ║           ║   |   |   |
 3   2   4=======4===4   |   5===3
-|                       |   ║    
-5===4   4===3 - - - 5===1   ║    
-║   ║   ║           ║   |   ║    
+|                       |   ║
+5===4   4===3 - - - 5===1   ║
+║   ║   ║           ║   |   ║
 ║   ║   ║           6===4 - 5===4
 ║   ║   ║           ║           ║
 6===6   ║           ║           ║
@@ -299,7 +299,7 @@ num_right = 3
 4===4   2       2   4=======4 - 2
 ║   ║   ║       ║   ║       |   |
 ║   4   ║       ║   4       |   1
-║   ║   ║       ║   ║       |    
+║   ║   ║       ║   ║       |
 4===7 - 6===4   ║   ║       5===4
     ║   |   ║   ║   ║       ║   ║
     ║   5   ║   ║   ║       4   ║
@@ -331,8 +331,8 @@ num_right = 1
 
 
 Solution:
-The bridges spell the words: 
-    0. PROB 
+The bridges spell the words:
+    0. PROB
     1. NO ACES
     2. GIVEN
     3. SHAPE
@@ -341,9 +341,9 @@ Shape = Right numbers = 5431
 
 Question: what is P(bridge hand with shape 5431 has 0 aces)?
 
-Ans: A shape of 5431 means that the hand has 
-    - 5 cards of suit 0, 
-    - 4 cards of suit 1, 
+Ans: A shape of 5431 means that the hand has
+    - 5 cards of suit 0,
+    - 4 cards of suit 1,
     - 3 cards of suit 2,
     - 1 cards of suit 3.
 

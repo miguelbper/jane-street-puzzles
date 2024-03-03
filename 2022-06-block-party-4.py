@@ -5,8 +5,8 @@
 import numpy as np
 from itertools import product
 from pysmt.typing import INT
-from pysmt.shortcuts import (And, Equals, Implies, Int, Not, Or, Symbol, 
-    get_model)
+from pysmt.shortcuts import (And, Equals, Implies, Int, Not, Or, Symbol,
+                             get_model)
 
 # define grids
 n = None
@@ -34,22 +34,25 @@ region = [[ 0,  1,  1,  1,  2,  2,  2,  2,  2,  2],
 
 R = range(10)
 
+
 # helper functions
 def r(i, j):
     ''' region i, j belongs to '''
     return region[i][j]
 
+
 def s(r):
     ''' number of elements in region k '''
     return len([None for i, j in product(R, R) if region[i][j] == r])
 
+
 def dist(i, j, i_, j_):
     return abs(i - i_) + abs(j - j_)
+
 
 # ======================================================================
 # initialize variables
 # ======================================================================
-
 x = [[Symbol(f'x{i}{j}', INT) for j in R] for i in R]
 
 
@@ -60,14 +63,14 @@ x = [[Symbol(f'x{i}{j}', INT) for j in R] for i in R]
 
 # initial given values
 givens = And([
-    Equals(x[i][j], Int(values[i][j])) 
-    for i, j in product(R, R) 
-    if values[i][j] != None
+    Equals(x[i][j], Int(values[i][j]))
+    for i, j in product(R, R)
+    if values[i][j] is not None
 ])
 
 
 # {x | x is in region k} < {1,...,N}.
-bounds = And([(1 <= x[i][j]) & (x[i][j] <= s(r(i, j))) 
+bounds = And([(1 <= x[i][j]) & (x[i][j] <= s(r(i, j)))
               for i, j in product(R, R)])
 
 
@@ -101,5 +104,5 @@ model = get_model(formula)
 A = [[model.get_value(x[i][j]).constant_value() for j in R] for i in R]
 
 board = np.array(A)
-solution = sum(np.prod(board, axis = 1))
+solution = sum(np.prod(board, axis=1))
 print(f'sum of products = {solution},\nboard = \n{board}')

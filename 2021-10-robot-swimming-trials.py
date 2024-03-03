@@ -8,15 +8,17 @@ stirling(n, k) = number of partitions of {1,...,n} into k sets
 prob(robot playing uniform wins, everyone else plays discrete)
 = 1 - prob(robot playing uniform loses, everyone else plays discrete)
 = 1 - prob(every race is filled)
-= 1 - # (ways of placing 3n-1 robots into n races, filling every race) 
+= 1 - # (ways of placing 3n-1 robots into n races, filling every race)
       / # (ways of placing 3n-1 robots into n races)
 '''
+
 
 def p(n):
     return Float(1 - factorial(n) * stirling(3*n-1, n) / n**(3*n-1))
 
+
 # print values
-for n in range(1,100):
+for n in range(1, 100):
     print('n = {}, p = {:.6f}'.format(n, p(n)))
     if p(n) > 1/3:
         break

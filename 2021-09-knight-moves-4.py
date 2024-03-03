@@ -2,7 +2,7 @@
 Let
     m = side of the square grid = 10
     k = number of regions = 17
-    
+
     n = number of steps the knight takes
     s = sum of every number in the grid
     r = sum of the numbers in a region of the grid
@@ -12,9 +12,9 @@ Then,
     s = 17 * r
     n <= 100
     r >= (12 + 5 + 8 + 2) + (11 + 13) = 51
-    
+
 Lem. r <= 2*n - 3.
-Pf. Consider a region with two squares. The biggest sum that region can 
+Pf. Consider a region with two squares. The biggest sum that region can
 have is n + (n - 3) = 2*n - 3.
 
 Lem. If r is even, then r <= n.
@@ -106,17 +106,15 @@ while stack:
     grid, coor, step = state
     a, b = coor
     reg_sum = [sum(grid[i][j] for i, j in coords[l]) for l in range(k)]
-    
 
     # If state is solution, break
     # ------------------------------------------------------------------
     if step == n and all(r == reg_sum[l] for l in range(k)):
         break
 
-
     # If state is blocked, continue
     # ------------------------------------------------------------------
-    
+
     # if grid has a duplicate, block
     seen = set()
     flag = False
@@ -149,7 +147,6 @@ while stack:
     if flag:
         continue
 
-
     # Compute new states and add them to the stack
     # ------------------------------------------------------------------
     for x, y in directions:
@@ -162,7 +159,6 @@ while stack:
         new_grid = deepcopy(grid)
         new_grid[x][y] = step + 1
         stack.append((new_grid, (x, y), step + 1))
-
 
 
 # Output

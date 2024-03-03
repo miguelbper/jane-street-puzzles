@@ -14,30 +14,30 @@ def count(n: int) -> int:
 
 
 def prob(seed: int, players: list[int]) -> float:
-    ''' Given a list of players and (the index of) a seed, compute the 
+    ''' Given a list of players and (the index of) a seed, compute the
     probability of seed being the winner of the tournament.
-    
+
     '''
 
     @cache
     def prob_dp(state: int) -> float:
-        ''' Probability of seed being the winner of the tournament, given 
-        that we are in a current state. Here, 
-        
+        ''' Probability of seed being the winner of the tournament, given
+        that we are in a current state. Here,
+
             n = number of players
             s = number of subsets of players = 2**n
-            state = a number in {0,...,s-1} representing a subset of 
+            state = a number in {0,...,s-1} representing a subset of
                 players (ith digit of state in bin = 1 iff i in subset)
-        
+
         '''
-        
-        if not state & (1 << seed): # if seed not in state
+
+        if not state & (1 << seed):  # if seed not in state
             return 0
-        if state == (1 << seed):    # if seed is the only player
+        if state == (1 << seed):     # if seed is the only player
             return 1
 
         m = count(state)      # num players left
-        g = m // 2            # num games 
+        g = m // 2            # num games
         t = 1 << g            # num outcomes
         curr_players = [k for k in range(n) if state & (1 << k)]
 
@@ -45,17 +45,17 @@ def prob(seed: int, players: list[int]) -> float:
         # compute ans using law of total probability
         # for each outcome, compute prob of that outcome happening
         #                   compute new_state if that outcome happens
-        for i in range(t):     # loop over outcomes 
-            
+        for i in range(t):     # loop over outcomes
+
             new_prob = 1
             new_stat = state
-            for j in range(g): # loop over games
-                p1 = curr_players[2*j]            # player 1 of game j
-                p2 = curr_players[2*j + 1]        # player 2 of game j
-                winr = p2 if i & (1 << j) else p1 # winner of p1 vs p2
-                losr = p1 if i & (1 << j) else p2 # loser  of p1 vs p2
-                X = players[winr]                 # seed nr of winner
-                Y = players[losr]                 # seed nr of loser
+            for j in range(g):  # loop over games
+                p1 = curr_players[2*j]             # player 1 of game j
+                p2 = curr_players[2*j + 1]         # player 2 of game j
+                winr = p2 if i & (1 << j) else p1  # winner of p1 vs p2
+                losr = p1 if i & (1 << j) else p2  # loser  of p1 vs p2
+                X = players[winr]                  # seed nr of winner
+                Y = players[losr]                  # seed nr of loser
                 new_prob *= Y / (X + Y)
                 new_stat ^= 1 << losr
 
@@ -67,7 +67,7 @@ def prob(seed: int, players: list[int]) -> float:
     s = 1 << n
     return prob_dp(s - 1)
 
-    
+
 # computations
 # ----------------------------------------------------------------------
 
@@ -92,7 +92,7 @@ for i in range(16):
     for j in range(i):
         swapped = list(players)
         swapped[i], swapped[j] = swapped[j], swapped[i]
-        
+
         k = swapped.index(2)
         p = prob(k, swapped)
 
@@ -101,12 +101,12 @@ for i in range(16):
             i_max = i
             j_max = j
 
-        print(f'swap seeds: {players[i]:2d} and {players[j]:2d}' \
+        print(f'swap seeds: {players[i]:2d} and {players[j]:2d}'
               f'    =>    P(2 wins) = {p:.8f}')
 
 p_inc = p_max - p0
 output = f'''\nbest swap:
-    seed_1 = {players[i_max]} and seed_2 = {players[j_max]} 
+    seed_1 = {players[i_max]} and seed_2 = {players[j_max]}
     P( 2 wins) = {p0:.8f} (before swap)
     P( 2 wins) = {p_max:.8f} (after swap)
     P_increase = {p_inc:.8f}

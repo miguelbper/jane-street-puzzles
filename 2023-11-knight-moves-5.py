@@ -16,14 +16,14 @@ from copy import deepcopy
 # ])
 
 Z = Matrix([
-    [9, 8 , 10, 12, 11, 8 , 10, 17], # 8 
-    [7, 9 , 11, 9 , 10, 12, 14, 12], # 7
-    [4, 7 , 5 , 8 , 8 , 6 , 13, 10], # 6
-    [4, 10, 7 , 9 , 6 , 8 , 7 , 9 ], # 5
-    [2, 6 , 4 , 2 , 5 , 9 , 8 , 11], # 4
-    [0, 3 , 1 , 4 , 2 , 7 , 10, 7 ], # 3
-    [1, 2 , 0 , 1 , 2 , 5 , 7 , 6 ], # 2
-    [0, 2 , 4 , 3 , 5 , 6 , 2 , 4 ], # 1
+    [9, 8 , 10, 12, 11, 8 , 10, 17],  # 8
+    [7, 9 , 11, 9 , 10, 12, 14, 12],  # 7
+    [4, 7 , 5 , 8 , 8 , 6 , 13, 10],  # 6
+    [4, 10, 7 , 9 , 6 , 8 , 7 , 9 ],  # 5
+    [2, 6 , 4 , 2 , 5 , 9 , 8 , 11],  # 4
+    [0, 3 , 1 , 4 , 2 , 7 , 10, 7 ],  # 3
+    [1, 2 , 0 , 1 , 2 , 5 , 7 , 6 ],  # 2
+    [0, 2 , 4 , 3 , 5 , 6 , 2 , 4 ],  # 1
     #a  b   c   d   e   f   g   h
 ])
 m = Z.shape[0]
@@ -55,8 +55,8 @@ def to_tuple(crd: Coord) -> tuple[int, int]:
 
 
 def jump(state: State, move: Move) -> Optional[State]:
-    ''' Given current state and a move, compute the next state. If the 
-    move is not legal, return None. 
+    ''' Given current state and a move, compute the next state. If the
+    move is not legal, return None.
     '''
     # parse state
     Z, V, xy, t = state
@@ -77,12 +77,12 @@ def jump(state: State, move: Move) -> Optional[State]:
     Z_ = Z + dZ * dt / n
 
     # check if move is legal
-    dx = abs(x_ - x) 
+    dx = abs(x_ - x)
     dy = abs(y_ - y)
     dz = abs(Z_[x_, y_] - Z_[x, y])
     if {dx, dy, dz} != {0, 1, 2} or V[x_, y_] >= 3:
         return None
-    
+
     V_ = deepcopy(V)
     V_[x_, y_] += 1
     return (Z_, V_, xy_, t_)
@@ -95,7 +95,7 @@ def verify(initial_state: State, moves: list[Move]) -> bool:
         state = jump(state, move)
         if not state:
             return False
-    
+
     # get final state
     Z, V, xy, t = state
     x, y = to_tuple(xy)

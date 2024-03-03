@@ -8,7 +8,7 @@ Let
     D(u) = "The first draw of R1 is u"                  (event)
     p(x) = P(W(x))                                      (function of x)
 
-We will deduce an ODE for p(x), solve that ODE with sympy, and finally 
+We will deduce an ODE for p(x), solve that ODE with sympy, and finally
 solve 1/2 = p(x).
 
 Integral equation:
@@ -30,7 +30,7 @@ ODE (take derivative of integal equation):
 
 Boundary conditions:
     p(1/2) = 1              (by the integral equation)
-    p'(-1/2) = p(1/2) = 1   (by the ODE + 1st boundary condition) 
+    p'(-1/2) = p(1/2) = 1   (by the ODE + 1st boundary condition)
 '''
 # define symbols
 p = symbols('p', cls=Function)
@@ -41,8 +41,8 @@ eq = Eq(p(x).diff(x, x), - p(x))
 
 # define initial conditions
 ics = {
-    p(Fraction(1,2)): 1, 
-    p(x).diff(x).subs(x, -Fraction(1,2)): 1,
+    p(Fraction(1, 2)): 1,
+    p(x).diff(x).subs(x, -Fraction(1, 2)): 1,
 }
 
 # solve ODE
@@ -52,7 +52,7 @@ print(f'p(x) = {p}')
 '''
 p(x) = sin(x + pi/4)/sin(1/2 + pi/4)
 
-Therefore, 
+Therefore,
 p(x) = 1/2
 => sin(x + pi/4)/sin(1/2 + pi/4) = 1/2
 => sin(x + pi/4) = sin(1/2 + pi/4)/2

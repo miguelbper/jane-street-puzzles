@@ -18,25 +18,31 @@ Fj = The robots other than me which go discrete occupy j races
 = Sum_{i = 0 to 23} P(Ei) Sum_{j = 0 to 7} P(Fj|Ei) P(W|C & Ei & Fj)
 '''
 
+
 def binom_pmf(i, n, p):
     return binomial(n, i) * p**i * (1 - p)**(n - i)
+
 
 # prob_1(i, p) = P(Ei)
 def prob_1(i, p):
     return binom_pmf(i, 23, p)
 
+
 # prob_2(i, j) = P(Fj|Ei)
 def prob_2(i, j):
     return binomial(8, j) * stirling(i, j) * factorial(j) / 8**i
+
 
 # prob_3(i, j) = P(W|C & Ei & Fj)
 def prob_3(i, j):
     return min(1, (8 - j)/(24 - i))
 
+
 # prob_w(p) = P(W)
 def prob_w(p):
-    return Float(sum(prob_1(i, p) * sum(prob_2(i, j) * prob_3(i, j) 
+    return Float(sum(prob_1(i, p) * sum(prob_2(i, j) * prob_3(i, j)
                      for j in range(0, 8)) for i in range(0, 24)))
+
 
 # solve for p
 p = fsolve(lambda p: prob_w(p) - 1/3, 1)

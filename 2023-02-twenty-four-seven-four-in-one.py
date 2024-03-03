@@ -18,8 +18,8 @@ https://miguelbper.github.io/2023/03/22/js-2023-02-twenty-four-seven-four-in-one
 # Types
 # ----------------------------------------------------------------------
 
-Board = list[list[int]]   # matrix containing board
-Choices = list[list[int]] # bitmask for possible values
+Board = list[list[int]]    # matrix containing board
+Choices = list[list[int]]  # bitmask for possible values
 
 
 # Data
@@ -42,10 +42,10 @@ matrix = [
 ]
 
 blue = [
-    [5,  7,  7, 33, 29, 2, 40, 28, n, n, 36, n], # row
-    [6,  n,  n,  4,  n, n,  n,  n, n, n,  n, 5], # col rev
-    [4,  n,  n,  1,  n, n,  n,  n, n, n,  n, 7], # row rev
-    [6, 36, 30, 34, 27, 3, 40, 27, n, n,  7, n], # col
+    [5,  7,  7, 33, 29, 2, 40, 28, n, n, 36, n],  # row
+    [6,  n,  n,  4,  n, n,  n,  n, n, n,  n, 5],  # col rev
+    [4,  n,  n,  1,  n, n,  n,  n, n, n,  n, 7],  # row rev
+    [6, 36, 30, 34, 27, 3, 40, 27, n, n,  7, n],  # col
 ]
 
 
@@ -108,7 +108,7 @@ def blocked(cm: Choices) -> bool:
 
 
 def connected(cm: Choices) -> bool:
-    ''' True iff there is a chance the partially filled board will lead 
+    ''' True iff there is a chance the partially filled board will lead
     to a connected board. '''
     mat = [[int(cm[i][j] != 1) for j in range(12)] for i in range(12)]
     _, num_components = label(mat)
@@ -128,7 +128,7 @@ def expand(cm: Choices) -> list[Choices]:
             m = count[cm[a][b]]
         if m == 2:
             break
-    
+
     # return list of copies of cm, but replacing cm[a][b] by each value
     ans = []
     for x in range(8):
@@ -152,7 +152,7 @@ def prune(cm: Choices) -> Choices:
             a = i + ((corner + 1) % 4 > 1)
             b = j + (corner > 1)
 
-            # if all cells except (a, b) do not have a 0, 
+            # if all cells except (a, b) do not have a 0,
             # then cell (a, b) can't be > 0.
             remove = True
             for corner_ in range(4):
@@ -164,7 +164,6 @@ def prune(cm: Choices) -> Choices:
             if remove:
                 ans[a][b] &= 1
 
-    
     # prune based on one 1, ..., seven 7
     # ------------------------------------------------------------------
     for grid in range(4):
@@ -186,7 +185,6 @@ def prune(cm: Choices) -> Choices:
                     if (i, j) not in coordinates[x][:x]:
                         ans[i][j] &= (1 << x) ^ 255
 
-
     # prune based on row/col sum = 20, 4 nums
     # ------------------------------------------------------------------
     for grid in range(4):
@@ -201,7 +199,7 @@ def prune(cm: Choices) -> Choices:
 
         for arr in arrs:
             cms = [ans[i][j] for (i, j) in arr]
-            
+
             num_zeros = sum(value[c] == 0 for c in cms if count[c] == 1)
             num_posit = sum(value[c] >= 1 for c in cms if count[c] == 1)
             n = 4 - num_posit
@@ -209,7 +207,7 @@ def prune(cm: Choices) -> Choices:
 
             if not (num_zeros <= 3 and num_posit <= 4) or (n == 0 and s != 0):
                 return [[0 for _ in range(12)] for _ in range(12)]
-            
+
             # loop over unknown cells
             for (i, j), c in zip(arr, cms):
                 if count[c] > 1:
@@ -218,7 +216,6 @@ def prune(cm: Choices) -> Choices:
                         if n and not (n - 1 <= s - x <= 7*(n - 1)):
                             ans[i][j] &= (1 << x) ^ 255
 
-    
     # prune based on bluenum sum
     # ------------------------------------------------------------------
     rows = [(blue[0][i], [(i, j) for j in range(5, 7)]) for i in range(12)]
@@ -228,14 +225,14 @@ def prune(cm: Choices) -> Choices:
     for bluenum, arr in arrs:
         if bluenum <= 7:
             continue
-            
+
         cms = [ans[i][j] for (i, j) in arr]
         n = sum(count[c] != 1 for c in cms)
         s = 40 - bluenum - sum(value[c] for c in cms if count[c] == 1)
 
         if n == 0 and s != 0:
             return [[0 for _ in range(12)] for _ in range(12)]
-        
+
         # loop over unknown cells
         for (i, j), c in zip(arr, cms):
             if count[c] > 1:
@@ -243,7 +240,6 @@ def prune(cm: Choices) -> Choices:
                 for x in range(1, 8):
                     if n and not (0 <= s - x <= 7*(n - 1)):
                         ans[i][j] &= (1 << x) ^ 255
-
 
     # prune based on bluenum line of sight
     # ------------------------------------------------------------------
@@ -298,5 +294,5 @@ def areas(xm: Board) -> int:
     return int(reduce(mul, area))
 
 
-print(f'\nans = {areas(sol)}') # type: ignore
+print(f'\nans = {areas(sol)}')  # type: ignore
 # ans = 74649600

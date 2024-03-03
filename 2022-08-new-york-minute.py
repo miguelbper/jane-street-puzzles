@@ -16,19 +16,19 @@ soup = [
     ['t', 't', 'z', 'l', 'm', 'o', 'p', 'e', 'y', 'i', 's', 'l', 'z', 'p', 'c'],
     ['z', 'e', 'r', 'z', 'u', 'q', 's', 'p', 'o', 's', 'i', 'c', 'z', 'μ', 'i'],
     ['t', 'l', 'e', 'p', 'p', 'u', 't', 'c', 'p', 'z', 'l', 'l', 'o', 'h', 'u'],
-    ['s', 'r', 'z', 'b', 'z', 'y', 'y', 'p', 'e', 'w', 'n', 's', 'e', 'u', 'μ']
+    ['s', 'r', 'z', 'b', 'z', 'y', 'y', 'p', 'e', 'w', 'n', 's', 'e', 'u', 'μ'],
 ]
 
 
 translation = {
-    'c': 'd', # 3. yankeestaciuμ -> yankeestadium
-    'm': 'c', # 4. radiomity -> radiocity
-    'μ': 'm', # 3. yankeestaciuμ -> yankeestadium
-    'n': 'μ', # 5. newnseum -> newμseum (newmuseum)
-    'p': 'n', # 1. koreztowp -> koreatown
-    'f': 'p', # 6. centralfark -> centralpark
-    'a': 'f', # 2. statueoaliberty -> statueofliberty
-    'z': 'a', # 1. koreztowp -> koreatown 
+    'c': 'd',  # 3. yankeestaciuμ -> yankeestadium
+    'm': 'c',  # 4. radiomity -> radiocity
+    'μ': 'm',  # 3. yankeestaciuμ -> yankeestadium
+    'n': 'μ',  # 5. newnseum -> newμseum (newmuseum)
+    'p': 'n',  # 1. koreztowp -> koreatown
+    'f': 'p',  # 6. centralfark -> centralpark
+    'a': 'f',  # 2. statueoaliberty -> statueofliberty
+    'z': 'a',  # 1. koreztowp -> koreatown
 }
 
 
@@ -48,7 +48,7 @@ soup_translated = translate(translation, soup)
 pprint(soup_translated)
 
 '''
-soup_translated = 
+soup_translated =
 y t i c o i d a r y a w b u s
 t e g d i r b n y l k o o r b
 r e t n e c n l o c n i l a y
