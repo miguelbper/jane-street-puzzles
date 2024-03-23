@@ -2,7 +2,7 @@ from itertools import product
 from functools import reduce
 from operator import mul
 from typing import Optional
-from z3 import Solver, Int, And, Or, Not, Implies, Sum, PbEq, sat, BoolRef
+from z3 import Solver, Int, And, Or, Not, Sum, PbEq, sat, BoolRef
 from scipy.ndimage import label, sum_labels
 from pprint import pprint
 from codetiming import Timer
