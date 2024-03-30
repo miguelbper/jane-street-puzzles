@@ -1,60 +1,74 @@
-from ortools.sat.python import cp_model
-
-SQUARES = ['u', 'l', 'd', 'r']
-
-sq = {}
-sq['u'] = [[ 0,  1,  2], [ 3,  4,  5], [ 9, 10, 11]]
-sq['r'] = [[ 5,  6,  7], [11, 12, 13], [17, 18, 19]]
-sq['l'] = [[ 8,  9, 10], [14, 15, 16], [20, 21, 22]]
-sq['d'] = [[16, 17, 18], [22, 23, 24], [25, 26, 27]]
+from z3 import IntVector, Optimize, And, Distinct, sat
+import numpy as np
+from codetiming import Timer
 
 
-def eqs(sq):
-    cols = [[sq[i][j] for i in range(3)] for j in range(3)]
-    diag = [[sq[0][0], sq[1][1], sq[2][2]], [sq[0][2], sq[1][1], sq[2][0]]]
-    return sq + cols + diag
+def square(i: int, j: int) -> np.ndarray:
+    '''Return a boolean matrix with True in [i:i+3, j:j+3].'''
+    sq = np.full((6, 6), False)
+    sq[i:i+3, j:j+3] = True
+    return sq
+
+corners = [(0, 1), (2, 0), (3, 2), (1, 3)]
+grid = np.logical_or.reduce([square(i, j) for i, j in corners])
 
 
-# define model
-model = cp_model.CpModel()
+# Variables, optimizer & objective
+# ----------------------------------------------------------------------
+X = np.array(IntVector('x', 6**2)).reshape((6, 6))
+s = Optimize()
+s.minimize(sum(X.flat))
 
-# define variables
-x = {j: model.NewIntVar(1, 60, 'x[%i]' % j) for j in range(28)}
-s = {
-    k: {
-        e: model.NewIntVar(1, 180, 's[{}][{}]'.format(k, e)) for e in range(8)
-    } for k in SQUARES
-}
-ma = {k: model.NewIntVar(1, 180, 'ma[{}]'.format(k)) for k in SQUARES}
-mi = {k: model.NewIntVar(1, 180, 'mi[{}]'.format(k)) for k in SQUARES}
 
-# add goal: we want the sum of the entries to be minimal
-model.Minimize(cp_model.LinearExpr.Sum(x.values()))
+# Constraints
+# ----------------------------------------------------------------------
 
-# add constraints
-# every number should be different
-model.AddAllDifferent(list(x.values()))
+# Range for the variables
+s += [x >= 1 for x in X[grid]]
+s += [x == 0 for x in X[~grid]]
 
-# every square k should be almost magic
-for k in SQUARES:
-    model.Add(ma[k] - mi[k] <= 1)
-    model.AddMaxEquality(ma[k], s[k].values())
-    model.AddMinEquality(mi[k], s[k].values())
-    for i in range(8):
-        vars = dict((j, x[j]) for j in eqs(sq[k])[i]).values()
-        model.Add(cp_model.LinearExpr.Sum(vars) == s[k][i])
+# Numbers in grid should be distinct
+s += Distinct(*X[grid])
 
-# solve the problem
-# Lowest sum is 470. If that sol is not found, try increasing max_time.
-solver = cp_model.CpSolver()
-solver.parameters.max_time_in_seconds = 15
-solver.Solve(model)
+# Each square is almost magic
+for i, j in corners:
+    X_sq = X[i:i+3, j:j+3]
+    rows = list(np.sum(X_sq, axis=1))
+    cols = list(np.sum(X_sq, axis=0))
+    diag = [np.trace(X_sq), np.trace(np.fliplr(X_sq))]
+    sums = np.array(rows + cols + diag).reshape(-1, 1)
+    diff = np.triu(sums - sums.T)
+    diff = diff[~(diff == 0)]
+    s += [And(-1 <= d, d <= 1) for d in diff]
 
-# print the solution
-print('solution = {}'.format([solver.Value(i) for i in x.values()]))
-print('sum = {}'.format(sum([solver.Value(i) for i in x.values()])))
+# Break symmetry, so that solution is unique (=> faster)
+s += X[3, 3] < X[2, 2]
+s += X[3, 3] < X[2, 3]
+s += X[3, 3] < X[3, 2]
 
-# solution found:
-# solution = [14, 17, 3, 1, 11, 22, 40, 8, 10, 19, 5, 9, 23, 37, 6, 12,
-#             16, 39, 7, 24, 18, 4, 13, 21, 29, 34, 2, 26]
-# sum = 470
+# Solve
+# ----------------------------------------------------------------------
+with Timer():
+    sat_ = s.check()
+
+if sat_ == sat:
+    m = s.model()
+    xm = np.vectorize(lambda x: m.evaluate(x).as_long())(X)
+    ans = list(xm[grid].flat)
+    print(f'sum = {np.sum(xm)}')
+    print(f'ans = {ans}')
+    print('xm = \n', xm)
+else:
+    print('No solution')
+'''
+Elapsed time: 161.2319 seconds
+sum = 470
+ans = [26, 2, 34, 29, 21, 13, 4, 18, 24, 7, 39, 16, 12, 6, 37, 23, 9, 5, 19, 10, 8, 40, 22, 11, 1, 3, 17, 14]
+xm =
+[[ 0 26  2 34  0  0]
+ [ 0 29 21 13  4 18]
+ [24  7 39 16 12  6]
+ [37 23  9  5 19 10]
+ [ 8 40 22 11  1  0]
+ [ 0  0  3 17 14  0]]
+'''
