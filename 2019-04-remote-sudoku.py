@@ -1,6 +1,6 @@
-from pprint import pprint
-from z3 import Int, Solver, Distinct, sat, And, Or
+from z3 import Solver, Distinct, sat, And, Or, IntVector
 from itertools import product
+import numpy as np
 
 grid = [
     [2, 0, 0, 0, 7, 1, 8, 3, 6],
@@ -14,11 +14,15 @@ grid = [
     [7, 2, 7, 3, 1, 0, 0, 0, 3],
 ]
 
-# squares[k] = [(i, j) | (i, j) is in kth 3x3 square]
-squares = [[] for _ in range(9)]
-for k in range(9):
+
+def square(k: int) -> np.ndarray:
+    '''Return a boolean matrix with True in the kth square.'''
     i, j = divmod(k, 3)
-    squares[k].extend(product(range(3*i, 3*i + 3), range(3*j, 3*j + 3)))
+    i0, j0 = 3*i, 3*j
+    i1, j1 = i0 + 3, j0 + 3
+    sq = np.full((9, 9), False)
+    sq[i0:i1, j0:j1] = True
+    return sq
 
 remote = []
 for i, j in product(range(9), repeat=2):
@@ -30,27 +34,24 @@ for i, j in product(range(9), repeat=2):
         remote.append((dist, coord))
 
 # Define variables and solver
-X = [[Int(f'x{i}{j}') for j in range(9)] for i in range(9)]
+X = np.array(IntVector('x', 9**2)).reshape(9, 9)
 s = Solver()
 
 # Add constraints to the solver
-s += [And(1 <= X[i][j], X[i][j] <= 9) for i in range(9) for j in range(9)]
-s += [Distinct([X[i][j] for j in range(9)]) for i in range(9)]
-s += [Distinct([X[i][j] for i in range(9)]) for j in range(9)]
-s += [Distinct([X[i][j] for i, j in squares[k]]) for k in range(9)]
-s += [Or([X[i][j] == dist for i, j in coords]) for dist, coords in remote]
+s += [And(1 <= x, x <= 9) for x in X.flat]
+s += [Distinct(*X[i, :]) for i in range(9)]
+s += [Distinct(*X[:, j]) for j in range(9)]
+s += [Distinct(*X[square(k)]) for k in range(9)]
+s += [Or([X[i, j] == dist for i, j in coords]) for dist, coords in remote]
 
 # Solve the problem
 if s.check() == sat:
     m = s.model()
-    A = [[m.evaluate(X[i][j]).as_long() for j in range(9)] for i in range(9)]
-    ans = sum([A[i][j]**2 for i in range(9) for j in range(9) if grid[i][j]])
-    print(f'{ans = }')
-    print('grid = ')
-    pprint(A)
+    xm = np.vectorize(lambda x: m.evaluate(x).as_long())(X)
+    ans = np.sum(xm**2 * np.where(grid, 1, 0))
+    print(f'{ans = }\n', 'xm = \n', xm)
 else:
     print('no solution')
-
 '''
 ans = 1105
 grid =
