@@ -31,7 +31,7 @@ Month | Puzzle | Solution
 2021-04 | [Bracketology 101](https://www.janestreet.com/puzzles/bracketology-101-index/)                             | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2021-04-bracketology-101.py)
 2021-02 | [Hooks 7](https://www.janestreet.com/puzzles/hooks-7-index/)                                               | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2021-02-hooks-7.py)
 2021-01 | [Figurine Figuring](https://www.janestreet.com/puzzles/figurine-figuring-index/)                           | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2021-01-figurine-figuring.py)
-2020-12 | [Twenty Four Seven 2-by-2 #2](https://www.janestreet.com/puzzles/twenty-four-seven-2-by-2-2-index/)        | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2020-12-twenty-four-seven-2-by-2-#2.py)
+2020-12 | [Twenty Four Seven 2-by-2 #2](https://www.janestreet.com/puzzles/twenty-four-seven-2-by-2-2-index/)        | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2020-12-twenty-four-seven-2-by-2-2.py)
 2020-10 | [Candy Collectors](https://www.janestreet.com/puzzles/candy-collectors-index/)                             | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2020-10-candy-collectors.py)
 2020-02 | [Single-Cross](https://www.janestreet.com/puzzles/single-cross-index/)                                     | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2020-02-single-cross.py)
 2019-09 | [Block Party 3](https://www.janestreet.com/puzzles/block-party-3-index/)                                   | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2019-09-block-party-3.py)
