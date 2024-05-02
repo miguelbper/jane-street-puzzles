@@ -4,6 +4,7 @@ My solutions to past Jane Street puzzles (see https://www.janestreet.com/puzzles
 
 Month | Puzzle | Solution
 -|-|-
+2024-04 | [Robot Capture-the-Flag](https://www.janestreet.com/puzzles/robot-capture-the-flag-index/)                 | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2024-04-robot-capture-the-flag.py)
 2024-03 | [Hooks 10](https://www.janestreet.com/puzzles/hooks-10-index/)                                             | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2024-03-hooks-10.py)
 2024-02 | [Some Off Square](https://www.janestreet.com/puzzles/some-off-square-index/)                               | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2024-02-some-off-squares.py)
 2023-11 | [Knight Moves 5](https://www.janestreet.com/puzzles/knight-moves-5-index/)                                 | [link](https://github.com/miguelbper/jane-street-puzzles/blob/main/2023-11-knight-moves-5.py)
