@@ -45,7 +45,7 @@ def link(year: int, month: int) -> str:
     if not files:
         return ''
     file = files[0]
-    return f'[{done}]({github_link}{file})'
+    return f'[{done}]({github_link}{year}/{file})'
 
 def row(year: int) -> str:
     return f'| {year} | ' + ' | '.join([link(year, month) for month in months]) + ' |'
