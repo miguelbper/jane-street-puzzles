@@ -20,8 +20,8 @@ ignored = '➖'
 # ----------------------------------------------------------------------
 
 hardcoded_values = {
-    '2023-12': ignored,
-    '2024-01': ignored,
+    '2023-12': ignored,  # hall of mirrors 2
+    '2024-01': ignored,  # some f squares
 
 }
 
