@@ -20,4 +20,4 @@ My solutions to past Jane Street puzzles (see https://www.janestreet.com/puzzles
 |--------|-------------|
 | ✔    | Solved      |
 | ➖ | Solved without code, or code not required $\Longrightarrow$ not included in repo |
-|           | Unsolved / Haven't gotten to it yet |
+|           | Unsolved / Haven't got to it yet |

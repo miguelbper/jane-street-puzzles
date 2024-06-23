@@ -65,7 +65,7 @@ markdown += '\n\n| Icon | Description |\n'
 markdown += '|--------|-------------|\n'
 markdown += f'| {done}    | Solved      |\n'
 markdown += f'| {ignored} | Solved without code, or code not required $\Longrightarrow$ not included in repo |\n'
-markdown += f'|           | Unsolved / Haven\'t gotten to it yet |\n'
+markdown += f'|           | Unsolved / Haven\'t got to it yet |\n'
 
 
 # Write to README.md
