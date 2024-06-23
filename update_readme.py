@@ -21,8 +21,6 @@ ignored = '➖'
 
 hardcoded_values = {
     '2023-12': ignored,  # hall of mirrors 2
-    '2024-01': ignored,  # some f squares
-
 }
 
 
@@ -57,10 +55,6 @@ markdown += table
 
 # Legend
 # ----------------------------------------------------------------------
-# markdown += '\n\n**Legend:**\n'
-# Legend
-# ----------------------------------------------------------------------
-
 markdown += '\n\n| Icon | Description |\n'
 markdown += '|--------|-------------|\n'
 markdown += f'| {done}    | Solved      |\n'
