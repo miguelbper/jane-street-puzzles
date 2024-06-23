@@ -5,7 +5,7 @@ My solutions to past Jane Street puzzles (see https://www.janestreet.com/puzzles
 |      |  1 |  2 |  3 |  4 |  5 |  6 |  7 |  8 |  9 | 10 | 11 | 12 |
 |------|----|----|----|----|----|----|----|----|----|----|----|----|
 | 2014 | [✔](https://github.com/miguelbper/jane-street-puzzles/blob/main/2014/2014-01-sum-of-squares.py) | [✔](https://github.com/miguelbper/jane-street-puzzles/blob/main/2014/2014-02-hooks.py) |  |  |  |  |  |  |  |  |  |  |
-| 2015 |  |  |  |  |  |  |  | [✔](https://github.com/miguelbper/jane-street-puzzles/blob/main/2015/2015-08-number-cross.py) |  |  |  |  |
+| 2015 |  |  |  |  |  |  |  | [✔](https://github.com/miguelbper/jane-street-puzzles/blob/main/2015/2015-08-number-cross-2.py) |  |  |  |  |
 | 2016 |  |  |  |  | [✔](https://github.com/miguelbper/jane-street-puzzles/blob/main/2016/2016-05-hooks-2.py) |  |  |  |  |  |  |  |
 | 2017 |  |  |  |  |  |  |  |  |  |  | [✔](https://github.com/miguelbper/jane-street-puzzles/blob/main/2017/2017-11-block-party.py) |  |
 | 2018 |  | [✔](https://github.com/miguelbper/jane-street-puzzles/blob/main/2018/2018-02-hooks-3.py) |  |  |  | [✔](https://github.com/miguelbper/jane-street-puzzles/blob/main/2018/2018-06-twenty-four-seven.py) |  |  |  |  |  |  |
