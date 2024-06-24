@@ -14,6 +14,7 @@ markdown += 'My solutions to past Jane Street puzzles (see https://www.janestree
 # ----------------------------------------------------------------------
 done = '✔'
 ignored = '➖'
+no_puzzle = '⚫'
 
 
 # Hardcoded values of table
@@ -21,6 +22,7 @@ ignored = '➖'
 
 hardcoded_values = {
     '2023-12': ignored,  # hall of mirrors 2
+    '2020-03': no_puzzle,
 }
 
 
@@ -57,9 +59,10 @@ markdown += table
 # ----------------------------------------------------------------------
 markdown += '\n\n| Icon | Description |\n'
 markdown += '|--------|-------------|\n'
-markdown += f'| {done}    | Solved      |\n'
-markdown += f'| {ignored} | Solved without code, or code not required $\Longrightarrow$ not included in repo |\n'
-markdown += f'|           | Unsolved / Haven\'t got to it yet |\n'
+markdown += f'| {done}      | Solved      |\n'
+markdown += f'| {ignored}   | Solved without code, or code not required $\Longrightarrow$ not included in repo |\n'
+markdown += f'| {no_puzzle} | No puzzle for that month |\n'
+markdown += f'|             | Unsolved / Haven\'t got to it yet |\n'
 
 
 # Write to README.md
