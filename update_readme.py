@@ -12,17 +12,16 @@ markdown += 'My solutions to past Jane Street puzzles (see https://www.janestree
 
 # Emojis
 # ----------------------------------------------------------------------
-done = '✔'
-ignored = '➖'
-no_puzzle = '⚫'
+check = '✔'
+cross = '❌'
 
 
 # Hardcoded values of table
 # ----------------------------------------------------------------------
 
 hardcoded_values = {
-    '2023-12': ignored,  # hall of mirrors 2
-    '2020-03': no_puzzle,
+    '2023-12': cross,  # hall of mirrors 2
+    '2020-03': cross,
 }
 
 
@@ -30,7 +29,7 @@ hardcoded_values = {
 # ----------------------------------------------------------------------
 
 current_dir = os.getcwd()
-years = [int(f) for f in os.listdir(current_dir) if f.isnumeric()]
+years = list(sorted(int(f) for f in os.listdir(current_dir) if f.isnumeric()))
 months = list(range(1, 13))
 github_link = 'https://github.com/miguelbper/jane-street-puzzles/blob/main/'
 
@@ -45,7 +44,7 @@ def link(year: int, month: int) -> str:
     if not files:
         return ''
     file = files[0]
-    return f'[{done}]({github_link}{year}/{file})'
+    return f'[{check}]({github_link}{year}/{file})'
 
 def row(year: int) -> str:
     return f'| {year} | ' + ' | '.join([link(year, month) for month in months]) + ' |'
@@ -59,9 +58,8 @@ markdown += table
 # ----------------------------------------------------------------------
 markdown += '\n\n| Icon | Description |\n'
 markdown += '|--------|-------------|\n'
-markdown += f'| {done}      | Solved      |\n'
-markdown += f'| {ignored}   | Solved without code, or code not required $\Longrightarrow$ not included in repo |\n'
-markdown += f'| {no_puzzle} | No puzzle for that month |\n'
+markdown += f'| {check}      | Solved      |\n'
+markdown += f'| {cross}   | No puzzle / solved without code / code not required $\\Longrightarrow$ not included in repo |\n'
 markdown += f'|             | Unsolved / Haven\'t got to it yet |\n'
 
 
