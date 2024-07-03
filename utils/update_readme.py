@@ -28,8 +28,8 @@ hardcoded_values = {
 # Table
 # ----------------------------------------------------------------------
 
-current_dir = os.getcwd()
-years = list(sorted(int(f) for f in os.listdir(current_dir) if f.isnumeric()))
+main_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+years = list(sorted(int(f) for f in os.listdir(main_path) if f.isnumeric()))
 months = list(range(1, 13))
 github_link = 'https://github.com/miguelbper/jane-street-puzzles/blob/main/'
 
@@ -39,7 +39,7 @@ separator = '|------' + '|----' * 12 + '|'
 def link(year: int, month: int) -> str:
     if f'{year}-{month:02d}' in hardcoded_values:
         return hardcoded_values[f'{year}-{month:02d}']
-    year_dir = os.path.join(current_dir, str(year))
+    year_dir = os.path.join(main_path, str(year))
     files = [f for f in os.listdir(year_dir) if f.startswith(f'{year}-{month:02d}')]
     if not files:
         return ''
@@ -58,9 +58,9 @@ markdown += table
 # ----------------------------------------------------------------------
 markdown += '\n\n| Icon | Description |\n'
 markdown += '|--------|-------------|\n'
-markdown += f'| {check}      | Solved      |\n'
-markdown += f'| {cross}   | No puzzle / solved without code / code not required $\\Longrightarrow$ not included in repo |\n'
-markdown += f'|             | Unsolved / Haven\'t got to it yet |\n'
+markdown += f'| {check} | Solved |\n'
+markdown += f'| {cross} | No puzzle / solved without code / code not required $\\Longrightarrow$ not included in repo |\n'
+markdown += f'|         | Unsolved / Haven\'t got to it yet |\n'
 
 
 # Write to README.md

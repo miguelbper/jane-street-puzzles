@@ -7,8 +7,8 @@ import os
 
 
 # Get list of english words
-script_path = os.path.dirname(os.path.abspath(__file__))
-words_path = os.path.join(script_path, 'words.txt')
+main_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+words_path = os.path.join(main_path, 'utils', 'words.txt')
 with open(words_path) as f:
     words = f.read().splitlines()
 

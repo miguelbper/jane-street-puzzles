@@ -18,6 +18,6 @@ My solutions to past Jane Street puzzles (see https://www.janestreet.com/puzzles
 
 | Icon | Description |
 |--------|-------------|
-| ✔      | Solved      |
-| ❌   | No puzzle / solved without code / code not required $\Longrightarrow$ not included in repo |
-|             | Unsolved / Haven't got to it yet |
+| ✔ | Solved |
+| ❌ | No puzzle / solved without code / code not required $\Longrightarrow$ not included in repo |
+|         | Unsolved / Haven't got to it yet |
