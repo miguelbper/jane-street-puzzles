@@ -58,7 +58,7 @@ markdown += table
 # ----------------------------------------------------------------------
 markdown += '\n\n| Icon | Description |\n'
 markdown += '|--------|-------------|\n'
-markdown += f'| {check} | Solved |\n'
+markdown += f'| {check} | Solved / solution included in repo |\n'
 markdown += f'| {cross} | No puzzle / solved without code / code not required $\\Longrightarrow$ not included in repo |\n'
 markdown += f'|         | Unsolved / Haven\'t got to it yet |\n'
 
