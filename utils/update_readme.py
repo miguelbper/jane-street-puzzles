@@ -13,16 +13,6 @@ markdown += 'My solutions to past Jane Street puzzles (see https://www.janestree
 # Emojis
 # ----------------------------------------------------------------------
 check = '✔'
-cross = '❌'
-
-
-# Hardcoded values of table
-# ----------------------------------------------------------------------
-
-hardcoded_values = {
-    '2023-12': cross,  # hall of mirrors 2
-    '2020-03': cross,
-}
 
 
 # Table
@@ -37,8 +27,6 @@ header = '|      | ' + ' | '.join([f'{m:2d}' for m in months]) + ' |'
 separator = '|------' + '|----' * 12 + '|'
 
 def link(year: int, month: int) -> str:
-    if f'{year}-{month:02d}' in hardcoded_values:
-        return hardcoded_values[f'{year}-{month:02d}']
     year_dir = os.path.join(main_path, str(year))
     files = [f for f in os.listdir(year_dir) if f.startswith(f'{year}-{month:02d}')]
     if not files:
@@ -52,15 +40,6 @@ def row(year: int) -> str:
 rows = '\n'.join(map(row, years))
 table = header + '\n' + separator + '\n' + rows
 markdown += table
-
-
-# Legend
-# ----------------------------------------------------------------------
-markdown += '\n\n| Icon | Description |\n'
-markdown += '|--------|-------------|\n'
-markdown += f'| {check} | Solved / solution included in repo |\n'
-markdown += f'| {cross} | No puzzle / solved without code / code not required $\\Longrightarrow$ not included in repo |\n'
-markdown += f'|         | Unsolved / Haven\'t got to it yet |\n'
 
 
 # Write to README.md
