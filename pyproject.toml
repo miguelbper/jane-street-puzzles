@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "jane-street-puzzles"
+version = "0.0.0"
+description = "My solutions to past Jane Street puzzles."
+authors = ["Miguel Pereira <miguel.b.per@gmail.com>"]
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.10"
+numpy = "<2"
+sympy = "*"
+scipy = "*"
+pandas = "*"
+tqdm = "*"
+matplotlib = "*"
+seaborn = "*"
+tabulate = "*"
+z3-solver = "*"
+codetiming = "*"
+shapely = "*"
+PySMT = "*"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
