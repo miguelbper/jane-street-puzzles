@@ -20,6 +20,7 @@ z3-solver = "*"
 codetiming = "*"
 shapely = "*"
 PySMT = "*"
+toolz = "^0.12.1"
 
 [build-system]
 requires = ["poetry-core"]
