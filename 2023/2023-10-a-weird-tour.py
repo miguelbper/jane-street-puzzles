@@ -1,8 +1,5 @@
-import pandas as pd
-from tabulate import tabulate
+"""The vowels in 'A Weird Tour' are 'aeiou'. Moreover,
 
-'''
-The vowels in 'A Weird Tour' are 'aeiou'. Moreover,
 - The puzzle mentions '120 regions with gradually shifting dialects'.
 - Notice that there are 5! = 120 ways to sort 'aeiou'
 - It says that '... swapped ends ... using ... methods of transport'
@@ -14,35 +11,39 @@ order of the vowels.
 
 For each clue, we wish to find an answer/region with the 5 vowels aeiou
 in the corresponding order.
-'''
+"""
+
+# ruff: noqa: E501
+import pandas as pd
+from tabulate import tabulate
 
 transports = [
-    '',
-    'plane',
-    'tour',
-    'big bus',
-    'subway',
-    'tunnel',
-    'train',
-    'boat',
-    'bike',
-    'horse',
-    'limo',
+    "",
+    "plane",
+    "tour",
+    "big bus",
+    "subway",
+    "tunnel",
+    "train",
+    "boat",
+    "bike",
+    "horse",
+    "limo",
 ]
 
 orders = []
 
-order = ['a', 'e', 'i', 'o', 'u']
-orders.append(''.join(order))
+order = ["a", "e", "i", "o", "u"]
+orders.append("".join(order))
 
 for w in transports[1:]:
-    vowels = [c for c in w if c in 'aeiou']
+    vowels = [c for c in w if c in "aeiou"]
     v0, v1 = tuple(vowels)
     i0, i1 = order.index(v0), order.index(v1)
     order[i0], order[i1] = order[i1], order[i0]
-    orders.append(''.join(order))
+    orders.append("".join(order))
     print(f'{w = :<7}, vowels = {"".join(vowels)}, order = {"".join(order)}')
-'''
+"""
 w = plane  , vowels = ae, order = eaiou
 w = tour   , vowels = ou, order = eaiuo
 w = big bus, vowels = iu, order = eauio
@@ -53,8 +54,9 @@ w = boat   , vowels = oa, order = ueioa
 w = bike   , vowels = ie, order = uieoa
 w = horse  , vowels = oe, order = uioea
 w = limo   , vowels = io, order = uoiea
-'''
+"""
 
+# fmt: off
 df = pd.DataFrame({
     'num'        : [1          , 2       , 3               , 4         , 5       , 6            , 7                 , 8              , 9     , 10              , 11           ],
     'transport'  : transports,
@@ -63,8 +65,9 @@ df = pd.DataFrame({
     'tuple'      : [[]         , [1,6,8] , [8,9]           , []        , []      , [4]          , [1]               , [3]            , [11]  , [11]            , [9, 12]      ],
     'permutation': orders,
 })
-print(tabulate(df, headers='keys', tablefmt='psql'))
-'''
+# fmt: on
+print(tabulate(df, headers="keys", tablefmt="psql"))
+"""
 +-----+-------------+------------------+-----------+-----------+-------------+
 | num | transport   | clue             | num_words | tuple     | permutation |
 +-----+-------------+------------------+-----------+-----------+-------------|
@@ -80,16 +83,17 @@ print(tabulate(df, headers='keys', tablefmt='psql'))
 |  10 | horse       | Suddenly emote   |         3 | [11]      | uioea       |
 |  11 | limo        | South Asian      |         1 | [9, 12]   | uoiea       |
 +-----+-------------+------------------+-----------+-----------+-------------+
-'''
+"""
 
 # Filling out the clues
-'''
+"""
 To fill out each answer, it is helpful to search for words in the
 dictionary whose vowels are exactly 'aeiou' in the given permutation.
 This can be done programatically and works for the clues whose answer is
 one word.
-'''
+"""
 
+# fmt: off
 regions = [              # num | clue             | num_words | permutation
     'facetious'       ,  #   1 | Unserious        |         1 | aeiou
     'gregarious'      ,  #   2 | Social           |         1 | eaiou
@@ -103,28 +107,29 @@ regions = [              # num | clue             | num_words | permutation
     'burst into tears',  #  10 | Suddenly emote   |         3 | uioea
     'subcontinental'  ,  #  11 | South Asian      |         1 | uoiea
 ]
+# fmt: on
 
-df['regions'] = regions
+df["regions"] = regions
+"""Now use the tuples acompanying each clue as indices to find letters in the
+answer/region.
 
-'''
-Now use the tuples acompanying each clue as indices to find letters in
-the answer/region. Example: gregarious, [1, 6, 8] -> gro
-'''
+Example: gregarious, [1, 6, 8] -> gro
+"""
 
 
 def get_letters(row: pd.DataFrame) -> str:
-    w = ''.join(row['regions'].split())
-    t = row['tuple']
+    w = "".join(row["regions"].split())
+    t = row["tuple"]
     ans = []
     for i in t:
-        char = w[i - 1] if 0 < i <= len(w) else '_'
+        char = w[i - 1] if 0 < i <= len(w) else "_"
         ans.append(char)
-    return ''.join(ans)
+    return "".join(ans)
 
 
-df['letters'] = df.apply(get_letters, axis=1)
-print(tabulate(df, headers='keys', tablefmt='psql'))
-'''
+df["letters"] = df.apply(get_letters, axis=1)
+print(tabulate(df, headers="keys", tablefmt="psql"))
+"""
 +-----+-----------+------------------+-----------+-----------+-------------+------------------+---------+
 | num | transport | clue             | num_words | tuple     | permutation | regions          | letters |
 +-----+-----------+------------------+-----------+-----------+-------------+------------------+---------|
@@ -167,4 +172,4 @@ Completed table with clues and regions:
 |  10 | horse     | Suddenly emote   |         3 | [11]      | uioea       | burst into tears | e       |
 |  11 | limo      | South Asian      |         1 | [9, 12]   | uoiea       | subcontinental   | nt      |
 +-----+-----------+------------------+-----------+-----------+-------------+------------------+---------+
-'''
+"""

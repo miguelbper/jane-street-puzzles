@@ -1,7 +1,4 @@
-from sympy import exp, diff, integrate, nsolve
-from sympy.abc import s, l, m
-
-'''
+"""
 Blog post with detailed explanation of this solution:
 https://miguelbper.github.io/2023/04/04/js-2023-03-robot-long-jump.html
 
@@ -54,12 +51,15 @@ It is possible to show that h_{λ,s} is given by:
     h1 = (s - λ)**2 / 2                                       if λ<s<1
     h2 = 1/2 (1 - λ)(2s - λ - 1)                              if 1<s<1+λ
     h3 = (s - 1 - λ)(2 - s) + (2 - s)^2/2 + (1 - λ)(s - 1)    if 1+λ<s<2
-'''
+"""
+
+from sympy import diff, exp, integrate, nsolve
+from sympy.abc import l, m, s
 
 h0 = 0
-h1 = (s - l)**2 / 2
-h2 = (1 - l) * (2*s - l - 1) / 2
-h3 = (s - 1 - l)*(2 - s) + (2 - s)**2/2 + (1 - l)*(s - 1)
+h1 = (s - l) ** 2 / 2
+h2 = (1 - l) * (2 * s - l - 1) / 2
+h3 = (s - 1 - l) * (2 - s) + (2 - s) ** 2 / 2 + (1 - l) * (s - 1)
 
 # Cumulative distribution function
 F0 = 1 + (h0 + l - 1) * exp(l)
@@ -72,11 +72,8 @@ f0 = diff(F0, s)
 f1 = diff(F1, s)
 f2 = diff(F2, s)
 f3 = diff(F3, s)
-
-
-'''
-Now we wish to compute the optimal strategy for each robot. Define
-    p(λ, μ) := P(R1 wins | R1 plays λ and R2 plays μ).
+"""Now we wish to compute the optimal strategy for each robot. Define p(λ, μ)
+:= P(R1 wins | R1 plays λ and R2 plays μ).
 
 By the law of total probability,
     p(λ, μ)
@@ -117,19 +114,16 @@ know p(λ, μ) and q(λ, μ) in the case λ < μ.
       + ∫_{  1}^{λ+1} f2_λ(x) (F2_μ(x) - F0_μ(μ)) dx
       + ∫_{λ+1}^{μ+1} f3_λ(x) (F2_μ(x) - F0_μ(μ)) dx
       + ∫_{μ+1}^{  2} f3_λ(x) (F3_μ(x) - F0_μ(μ)) dx
-'''
-I0 = integrate(f1 * (F0.subs({l: m}) - F0.subs({l: m, s: m})), (s,   l,   m))
-I1 = integrate(f1 * (F1.subs({l: m}) - F0.subs({l: m, s: m})), (s,   m,   1))
-I2 = integrate(f2 * (F2.subs({l: m}) - F0.subs({l: m, s: m})), (s,   1, l+1))
-I3 = integrate(f3 * (F2.subs({l: m}) - F0.subs({l: m, s: m})), (s, l+1, m+1))
-I4 = integrate(f3 * (F3.subs({l: m}) - F0.subs({l: m, s: m})), (s, m+1,   2))
+"""
+I0 = integrate(f1 * (F0.subs({l: m}) - F0.subs({l: m, s: m})), (s, l, m))
+I1 = integrate(f1 * (F1.subs({l: m}) - F0.subs({l: m, s: m})), (s, m, 1))
+I2 = integrate(f2 * (F2.subs({l: m}) - F0.subs({l: m, s: m})), (s, 1, l + 1))
+I3 = integrate(f3 * (F2.subs({l: m}) - F0.subs({l: m, s: m})), (s, l + 1, m + 1))
+I4 = integrate(f3 * (F3.subs({l: m}) - F0.subs({l: m, s: m})), (s, m + 1, 2))
 q = I0 + I1 + I2 + I3 + I4  # type: ignore
-p = ((1 - F0)*(F0.subs({l: m})) + q) / (1 - F0 * F0.subs({l: m}))
-
-
-'''
-We now compute the Nash equilibrium of this game, as well as the answer
-to the original question.
+p = ((1 - F0) * (F0.subs({l: m})) + q) / (1 - F0 * F0.subs({l: m}))
+"""We now compute the Nash equilibrium of this game, as well as the answer to
+the original question.
 
 Fact: The optimal strategies (λ0, μ0) are such that ∇p(λ0, μ0) = 0.
 Explanation: If ∇p(λ0, μ0) != 0, it would be possible for one of the
@@ -144,11 +138,11 @@ Explanation: by the two facts above.
 
 We can solve (∂/∂λ p)(λ0, λ0) = 0 to find λ0. The answer to the puzzle
 is F0_λ0(0).
-'''
+"""
 dp = diff(p, l).subs({m: l})
 l0 = nsolve(dp, 0.5, prec=50)
 ans = F0.subs({l: l0})
-print(f'λ0                = {l0:.9f}')
-print(f'P(Robot scores 0) = {ans:.9f}')
+print(f"λ0                = {l0:.9f}")
+print(f"P(Robot scores 0) = {ans:.9f}")
 # λ0                = 0.416195355
 # P(Robot scores 0) = 0.114845886

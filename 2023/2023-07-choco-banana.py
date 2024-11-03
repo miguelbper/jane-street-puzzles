@@ -1,24 +1,24 @@
 # Imports
 # ----------------------------------------------------------------------
-from typing import Optional
 from copy import deepcopy
-from pprint import pprint
 from itertools import product
 from math import prod
+from pprint import pprint
 from time import time
+
+import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
-import matplotlib.pyplot as plt
 
 # Types
-Grid = list[list[int]]     # matrix containing Grid
+Grid = list[list[int]]  # matrix containing Grid
 Choices = list[list[int]]  # bitmask for possible x
 
 # Input
 # ----------------------------------------------------------------------
 
+# fmt: off
 z = 0
-
 grid = [
     [ 6,  6,  z,  z,  z,  z,  z,  z,  z,  z,  z,  z,  z,  z,  z,  z,  z,  z,  6,  6],
     [ 6,  z,  z,  z,  z,  z,  z,  z,  z,  8, 12,  z,  z,  z,  z,  z,  z,  z,  z,  6],
@@ -33,6 +33,7 @@ grid = [
     [ 4,  z,  z,  z,  z,  z,  z,  z,  z, 12,  8,  z,  z,  z,  z,  z,  z,  z,  z,  4],
     [ 4,  4,  z,  z,  z,  z,  z,  z,  z,  z,  z,  z,  z,  z,  z,  z,  z,  z,  4,  4],
 ]
+# fmt: on
 
 # grid = [
 #     [z, 6, z, z, z, z, z],
@@ -47,18 +48,17 @@ grid = [
 
 # Bitmasks
 # ----------------------------------------------------------------------
-
-''' Problem: fill each cell with a number x <- {0,...,b-1} such that
+""" Problem: fill each cell with a number x <- {0,...,b-1} such that
 every constraint is satisfied.
 
 At each stage of the algorithm, for each cell there is a set of numbers
 that could be in that cell. When the algorithm starts, that set will be
 {0,...,b-1}. Each subset S < {0,...,b-1} can be represented by a bitmask
 c = Σ_{x <- S} 2^x.
-'''
+"""
 
 m, n = len(grid), len(grid[0])  # shape of the grid
-b = 2                           # b = num_bits, x <- {0,...,b-1}
+b = 2  # b = num_bits, x <- {0,...,b-1}
 bit = [(1 << x) for x in range(b)]
 B = 0  # black
 W = 1  # white
@@ -82,13 +82,13 @@ for c in range(1, 1 << b):
 
 # Conversion between Grid and Choices
 def board(cm: Choices) -> Grid:
-    ''' Given matrix of choices, return matrix of values. '''
+    """Given matrix of choices, return matrix of values."""
     x = lambda c: value[c] if count[c] == 1 else -1
     return [[x(cm[i][j]) for j in range(n)] for i in range(m)]
 
 
 def choices(xm: Grid) -> Choices:
-    ''' Given matrix of values, return matrix of choices. '''
+    """Given matrix of values, return matrix of choices."""
     c = lambda x: (1 << b) - 1 if x == -1 else 1 << x
     return [[c(xm[i][j]) for j in range(n)] for i in range(m)]
 
@@ -105,9 +105,13 @@ nums.sort(key=lambda t: t[2] * len(divisors[t[2]]))
 # Algorithm
 # ----------------------------------------------------------------------
 
-def solution(xm: Grid) -> Optional[Grid]:
-    ''' Main function of backtracking algorithm. Given initial grid xm,
-    compute filled grid. Return None if no solution exists. '''
+
+def solution(xm: Grid) -> Grid | None:
+    """Main function of backtracking algorithm.
+
+    Given initial grid xm, compute filled grid. Return None if no
+    solution exists.
+    """
     stack = [choices(xm)]
     while stack:
         cm = prune(stack.pop())
@@ -120,18 +124,20 @@ def solution(xm: Grid) -> Optional[Grid]:
 
 
 def accept(cm: Choices) -> bool:
-    ''' True iff the grid is completely filled. '''
+    """True iff the grid is completely filled."""
     return all(count[cm[i][j]] == 1 for i, j in product(range(m), range(n)))
 
 
 def expand(cm: Choices) -> list[Choices]:
-    ''' Start with a partially filled grid cm. Then
-        1. Find a number in a cell which is unfilled or which is black
-           and incomplete. Fill grid with all possibilities of black
-           rectangles, return those possibilities. If such a number
-           can't be found, then:
-        2. Find an empty cell. Fill that cell with white or black.
-    '''
+    """Start with a partially filled grid cm.
+
+    Then
+    1. Find a number in a cell which is unfilled or which is black
+       and incomplete. Fill grid with all possibilities of black
+       rectangles, return those possibilities. If such a number
+       can't be found, then:
+    2. Find an empty cell. Fill that cell with white or black.
+    """
 
     components, num_components = ccs(cm)
     _, complete = nbhds(cm, components, num_components)
@@ -171,10 +177,10 @@ def expand(cm: Choices) -> list[Choices]:
                         continue
 
                     # fill cm_new neighborhood of the rectangle with white
-                    nbhd_u = [(i0 - 1, j_    ) for j_ in range(j0, j1)]
-                    nbhd_d = [(i1    , j_    ) for j_ in range(j0, j1)]
-                    nbhd_l = [(i_    , j0 - 1) for i_ in range(i0, i1)]
-                    nbhd_r = [(i_    , j1    ) for i_ in range(i0, i1)]
+                    nbhd_u = [(i0 - 1, j_) for j_ in range(j0, j1)]
+                    nbhd_d = [(i1, j_) for j_ in range(j0, j1)]
+                    nbhd_l = [(i_, j0 - 1) for i_ in range(i0, i1)]
+                    nbhd_r = [(i_, j1) for i_ in range(i0, i1)]
                     nbhd = nbhd_u + nbhd_d + nbhd_l + nbhd_r
 
                     stopped = False
@@ -203,9 +209,9 @@ def expand(cm: Choices) -> list[Choices]:
     return ans
 
 
-def prune(cm: Choices) -> Optional[Choices]:
-    ''' Given partially filled grid, use constraints of the problem to
-    remove numbers from the list of possibilities of each cell. '''
+def prune(cm: Choices) -> Choices | None:
+    """Given partially filled grid, use constraints of the problem to remove
+    numbers from the list of possibilities of each cell."""
     cm = deepcopy(cm)
     edited = False
 
@@ -231,9 +237,12 @@ def prune(cm: Choices) -> Optional[Choices]:
 
     # complete and ((Black, not rectangle) or (White, rectangle)) -> reject
     for k in range(num_components):
-        if count[colors[k]] == 1 and complete[k]:
-            if value[colors[k]] == int(rectangle(coordinates[k])):
-                return None
+        if (
+            count[colors[k]] == 1
+            and complete[k]
+            and value[colors[k]] == int(rectangle(coordinates[k]))
+        ):
+            return None
 
     # areas
     # num < area -> reject
@@ -270,13 +279,12 @@ def prune(cm: Choices) -> Optional[Choices]:
             j1 = j0 + o * (-1 if u else 1)
             n0 = grid[i0][j0]
             n1 = grid[i1][j1]
-            if n0 and n1 and n0 != n1:
-                if count[cm[i0][j0]] == 1:
-                    c = cm[i1][j1]
-                    cm[i1][j1] &= remove[value[cm[i0][j0]]]
-                    edited |= (cm[i1][j1] != c)
-                    if not cm[i1][j1]:
-                        return None
+            if n0 and n1 and n0 != n1 and count[cm[i0][j0]] == 1:
+                c = cm[i1][j1]
+                cm[i1][j1] &= remove[value[cm[i0][j0]]]
+                edited |= cm[i1][j1] != c
+                if not cm[i1][j1]:
+                    return None
 
     # Diagonal is [black, black] => Opposite diagonal has equal values
     for i, j in product(range(m - 1), range(n - 1)):
@@ -285,18 +293,19 @@ def prune(cm: Choices) -> Optional[Choices]:
             i1, j1 = i + ((o + 1 - 1) % 4 < 2), j + ((o + 1) % 4 > 1)  # diag
             i2, j2 = i + ((o + 2 - 1) % 4 < 2), j + ((o + 2) % 4 > 1)  # op
             i3, j3 = i + ((o + 3 - 1) % 4 < 2), j + ((o + 3) % 4 > 1)  # diag
-            if cm[i1][j1] == bit[B] and cm[i3][j3] == bit[B]:
-                if count[cm[i2][j2]] == 1:
-                    c = cm[i0][j0]
-                    cm[i0][j0] &= remove_except[value[cm[i2][j2]]]
-                    edited |= (cm[i0][j0] != c)
-                    if not cm[i0][j0]:
-                        return None
+            if cm[i1][j1] == bit[B] and cm[i3][j3] == bit[B] and count[cm[i2][j2]] == 1:
+                c = cm[i0][j0]
+                cm[i0][j0] &= remove_except[value[cm[i2][j2]]]
+                edited |= cm[i0][j0] != c
+                if not cm[i0][j0]:
+                    return None
 
     return prune(cm) if edited else cm
 
 
-def nbhds(cm: Grid, components: list[list[int]], num_components: int) -> tuple[
+def nbhds(
+    cm: Grid, components: list[list[int]], num_components: int
+) -> tuple[
     list[list[tuple[int, int]]],
     list[int],
 ]:
@@ -321,8 +330,8 @@ def nbhds(cm: Grid, components: list[list[int]], num_components: int) -> tuple[
 
 
 def rectangle(arr: list[tuple[int, int]]) -> bool:
-    ''' Given sorted list of coordinates, return True if and only if the
-    coordinates are a rectangle. '''
+    """Given sorted list of coordinates, return True if and only if the
+    coordinates are a rectangle."""
     if not arr:
         return True
     i0, j0 = arr[0]
@@ -338,7 +347,7 @@ def rectangle(arr: list[tuple[int, int]]) -> bool:
 
 
 def ccs(xm: list[list[int]]) -> tuple[list[list[int]], int]:
-    ''' Use a DFS to compute the connected components of the grid. '''
+    """Use a DFS to compute the connected components of the grid."""
     direc = [(1, 0), (-1, 0), (0, 1), (0, -1)]
     comps = [[0 for _ in range(n)] for _ in range(m)]
     n_ccs = 0
@@ -371,27 +380,23 @@ def ccs(xm: list[list[int]]) -> tuple[list[list[int]], int]:
 # Solve the puzzle
 # ----------------------------------------------------------------------
 
+
 def printsol(xm: Grid) -> None:
     _, ax = plt.subplots(1, 1, figsize=(6, 6))
     xm = np.array(xm)
-    gm = np.array(grid).astype('int').astype('str')
-    gm[gm == '0'] = ''
+    gm = np.array(grid).astype("int").astype("str")
+    gm[gm == "0"] = ""
     ax = sns.heatmap(
         xm,
         annot=gm,
         cbar=False,
-        fmt='',
+        fmt="",
         linewidths=0.1,
-        linecolor='black',
+        linecolor="black",
         square=True,
-        cmap=['black', 'white']
+        cmap=["black", "white"],
     )
-    ax.tick_params(
-        left=False,
-        labelleft=False,
-        bottom=False,
-        labelbottom=False
-    )
+    ax.tick_params(left=False, labelleft=False, bottom=False, labelbottom=False)
     plt.show()
 
 
@@ -423,8 +428,8 @@ t0 = time()
 sol = solution(starting_grid)
 ans = prod(sum(sol[i][j] for j in range(n)) for i in range(m))
 t1 = time() - t0
-print(f'Found solution in {t1 / 60:.2f} min.')
-print(f'{ans = }')
-print('sol = ')
+print(f"Found solution in {t1 / 60:.2f} min.")
+print(f"{ans = }")
+print("sol = ")
 pprint(sol)
 printsol(sol)

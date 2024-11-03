@@ -1,13 +1,4 @@
-import math
-from random import uniform
-import matplotlib.pyplot as plt
-import numpy as np
-from sympy import integrate, symbols, cos, sin, pi, diff, solveset
-
-
-# Closed-form solution with SymPy
-# ----------------------------------------------------------------------
-'''
+"""
 Blog post with detailed explanation of this solution:
 https://miguelbper.github.io/2023/09/05/js-2023-08-single-cross-2.html
 
@@ -73,9 +64,19 @@ Here, in the first equality we used N = Nx + Ny + Nz, in the second we
 used the law of total probability, in the third we used the fact that
 for fixed θ,𝜑, the events {Nx=i, Ny=j, Nz=k} are independent, and in the
 fourth we used the computation in R^1 from above (with D <= 1).
-'''
+"""
 
-d, th, ph = symbols('d th ph')
+import math
+from random import uniform
+
+import matplotlib.pyplot as plt
+import numpy as np
+from sympy import cos, diff, integrate, pi, sin, solveset, symbols
+
+# Closed-form solution with SymPy
+# ----------------------------------------------------------------------
+
+d, th, ph = symbols("d th ph")
 
 lx = d * cos(th) * sin(ph)
 ly = d * sin(th) * sin(ph)
@@ -86,9 +87,9 @@ IY = (1 - lx) * ly * (1 - lz)
 IZ = (1 - lx) * (1 - ly) * lz
 I = IX + IY + IZ
 
-p = (4/pi) * integrate(integrate(I * sin(ph), (ph, 0, pi/2)), (th, 0, pi/4))
+p = (4 / pi) * integrate(integrate(I * sin(ph), (ph, 0, pi / 2)), (th, 0, pi / 4))
 p = p.simplify()
-print(f'p(d)  = {p}')
+print(f"p(d)  = {p}")
 # p(d)  = d*(3*d**2 - 16*d + 6*pi)/(4*pi)
 
 pdv = diff(p, d).simplify()
@@ -100,8 +101,8 @@ print(f"p'(d) = 0 => d0 = {d0} = {d0.evalf():.10f}")
 # p'(d) = 0 => d0 = -sqrt(2)*sqrt(128 - 27*pi)/9 + 16/9 = 0.7452572091
 
 p0 = p.subs({d: d0}).simplify()
-print(f'p(d0) = {p0} = {p0.evalf():.10f}')
-print(f'ans   = ({d0.evalf():.10f}, {p0.evalf():.10f})')
+print(f"p(d0) = {p0} = {p0.evalf():.10f}")
+print(f"ans   = ({d0.evalf():.10f}, {p0.evalf():.10f})")
 # p(d0) = -2048/(243*pi) - sqrt(256 - 54*pi)/9 + 128*sqrt(256 - 54*pi)/(243*pi) + 8/3
 #       = 0.5095346021
 # ans   = (0.7452572091, 0.5095346021)
@@ -149,10 +150,10 @@ def prob_one_crossing_mc(d_: float) -> float:
         u = uniform(0, 1)
         v = uniform(0, 1)
         theta = 2 * math.pi * u
-        phi = math.acos(2*v - 1)
+        phi = math.acos(2 * v - 1)
 
         # compute num_crossings
-        count += 1 == num_crossings(d_, x, y, z, theta, phi)
+        count += num_crossings(d_, x, y, z, theta, phi) == 1
 
     return count / NUM_EXPERIMENTS
 
@@ -160,23 +161,23 @@ def prob_one_crossing_mc(d_: float) -> float:
 # Plots
 # ----------------------------------------------------------------------
 NUM_POINTS = 100
-EPS = 1/10
+EPS = 1 / 10
 
 d0_ = float(d0.evalf())
 p0_ = float(p0.evalf())
 
 ds_mc = np.linspace(0, math.sqrt(3), NUM_POINTS)
 ps_mc = np.array([prob_one_crossing_mc(a) for a in ds_mc])
-plt.plot(ds_mc, ps_mc, label='monte carlo')
+plt.plot(ds_mc, ps_mc, label="monte carlo")
 
 ds_cl = np.linspace(0, 1, NUM_POINTS)
 ps_cl = np.array([p.subs({d: a}) for a in ds_cl])
-plt.plot(ds_cl, ps_cl, label='closed form')
+plt.plot(ds_cl, ps_cl, label="closed form")
 
-plt.scatter(d0_, p0_, color='red')
+plt.scatter(d0_, p0_, color="red")
 
-plt.xlabel('D')
-plt.ylabel('P(N=1)')
+plt.xlabel("D")
+plt.ylabel("P(N=1)")
 plt.legend()
 plt.grid(True)
 plt.show()
