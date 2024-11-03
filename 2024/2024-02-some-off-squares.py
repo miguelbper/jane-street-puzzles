@@ -1,7 +1,4 @@
-from sympy import integrate, pi
-from sympy.abc import x, y
-
-'''
+"""
 Let E be the event that the circle is contained in the square. We wish
 to find ans = 1 - P(E). Denote by C = (X, Y) the center of the circle (a
 random variable).
@@ -24,21 +21,24 @@ red point and vice-versa.
 
 The set of points that would lead to the circle being inside the square
 is a circle with center (x, y) and radius r = Lx / 2.
-'''
+"""
 
-Lx = 2*(1 - x)           # width of rectangle
-Ly = 2*(1 - y)           # heigth of rectangle
-r = Lx / 2               # radius of circle
+from sympy import integrate, pi
+from sympy.abc import x, y
 
-P_X = Lx / 2             # p.d.f. of X
-P_Y = Ly / 2             # p.d.f. of Y
-P_XY = P_X * P_Y         # p_{X,Y}(x, y) = joint p.d.f. of (X, Y) = C
+Lx = 2 * (1 - x)  # width of rectangle
+Ly = 2 * (1 - y)  # heigth of rectangle
+r = Lx / 2  # radius of circle
 
-A_circ = pi * r**2       # area of circle
-A_rect = Lx * Ly         # area of rectangle
+P_X = Lx / 2  # p.d.f. of X
+P_Y = Ly / 2  # p.d.f. of Y
+P_XY = P_X * P_Y  # p_{X,Y}(x, y) = joint p.d.f. of (X, Y) = C
+
+A_circ = pi * r**2  # area of circle
+A_rect = Lx * Ly  # area of rectangle
 P_EXY = A_circ / A_rect  # P(E|X=x, Y=y)
 
 P_E = 8 * integrate(P_EXY * P_XY, (y, 0, x), (x, 0, 1))
 ans = 1 - P_E
-print(f'ans = {ans} = {float(ans):.4f}')
+print(f"ans = {ans} = {float(ans):.4f}")
 # ans = 1 - pi/6 = 0.4764

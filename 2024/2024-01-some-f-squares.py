@@ -1,17 +1,18 @@
 # Imports
 # ----------------------------------------------------------------------
-from itertools import product
 from functools import reduce
+from itertools import product
 from operator import mul
-from z3 import Solver, And, Or, Implies, sat, BoolRef, IntVector, ModelRef
-from scipy.ndimage import label, sum_labels
-from codetiming import Timer
-import numpy as np
-from tqdm import tqdm
 
+import numpy as np
+from codetiming import Timer
+from scipy.ndimage import label, sum_labels
+from tqdm import tqdm
+from z3 import And, BoolRef, Implies, IntVector, ModelRef, Or, Solver, sat
 
 # Given grid
 # ----------------------------------------------------------------------
+# fmt: off
 regions = np.array([
     [ 0, 0, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3],
     [ 0, 0,  0,  1,  1,  1,  1,  2,  2,  2,  3,  4,  4,  4,  4,  3, 3],
@@ -31,8 +32,9 @@ regions = np.array([
     [ 0, 0,  5,  5,  0, 19, 19, 18, 18, 18, 18, 18, 18, 18,  7,  7, 7],
     [ 0, 0,  0,  0,  0,  0, 19, 19, 19, 19, 19, 19, 19, 18,  7,  7, 7],
 ])
-rows = [14, 24, 24, 39, 43,  0, 22, 23, 29, 28, 34, 36, 29, 26, 26, 24, 20]
-cols = [13, 20, 22, 28, 30, 36, 35, 39, 49, 39, 39,  0, 23, 32, 23, 17, 13]
+# fmt: on
+rows = [14, 24, 24, 39, 43, 0, 22, 23, 29, 28, 34, 36, 29, 26, 26, 24, 20]
+cols = [13, 20, 22, 28, 30, 36, 35, 39, 49, 39, 39, 0, 23, 32, 23, 17, 13]
 n = regions.shape[0]
 num_regions = np.max(regions) + 1
 
@@ -41,7 +43,7 @@ Board = np.ndarray[(n, n), int]
 
 # Missing sum of row / col
 # ----------------------------------------------------------------------
-'''
+"""
 Let
     x = missing col sum
     y = missing row sum
@@ -59,7 +61,7 @@ Possibilities:
     24 480 22 39 <-
     25 500 42 59
     26 520 62 79
-'''
+"""
 rows[5] = 39
 cols[11] = 22
 region_sum = 24
@@ -68,7 +70,7 @@ region_sum = 24
 # Utility functions
 # ----------------------------------------------------------------------
 def areas(xm: Board) -> int:
-    ''' Product of the areas of the unfilled regions. '''
+    """Product of the areas of the unfilled regions."""
     mat = np.where(xm == 0, 1, 0)
     labels, k = label(mat)
     area = sum_labels(mat, labels, index=range(1, k + 1))
@@ -76,26 +78,26 @@ def areas(xm: Board) -> int:
 
 
 def evaluate_vars(m: ModelRef, vars: np.ndarray) -> np.ndarray:
-    ''' Evaluate variables in a z3 model. '''
+    """Evaluate variables in a z3 model."""
     return np.vectorize(lambda x: m.evaluate(x).as_long())(vars)
 
 
 def print_arr(arr: np.ndarray, name: str) -> None:
-    ''' Prints a numpy 2D array where each element is a str. '''
-    print(f'{name} = ', end='')
+    """Prints a numpy 2D array where each element is a str."""
+    print(f"{name} = ", end="")
     for i, row in enumerate(arr):
-        initial_spaces = (3 + len(name)) * ' ' if i else ''
-        row = ' '.join(np.char.strip(row, chars="'"))
-        print(initial_spaces + '[' + row + ']')
+        initial_spaces = (3 + len(name)) * " " if i else ""
+        row = " ".join(np.char.strip(row, chars="'"))
+        print(initial_spaces + "[" + row + "]")
 
 
 # Solver + variables + constraints
 # ----------------------------------------------------------------------
 s = Solver()
-X = np.array(IntVector('x', n**2)).reshape((n, n))
+X = np.array(IntVector("x", n**2)).reshape((n, n))
 
 # Ranges for each variable
-s += [And(0 <= x, x <= 3) for x in X.flat]
+s += [And(x >= 0, x <= 3) for x in X.flat]
 
 # The sum of the numbered squares inside each region must be the same
 s += [sum(X[regions == r]) == region_sum for r in range(num_regions)]
@@ -110,20 +112,17 @@ s += [sum(X[:, j]) == c for j, c in enumerate(cols)]
 # Phrase condition as:
 # X[i, j] == k  =>  there exists a k-pentomino region containing (i, j)
 
+
 def pentomino(k: int) -> np.ndarray:
-    '''Returns a pentomino with number m.'''
+    """Returns a pentomino with number m."""
     nums = k * np.ones((k, k), dtype=int)
     zero = np.zeros((k, k), dtype=int)
-    arr = np.block([
-        [nums, nums, zero],
-        [zero, nums, nums],
-        [zero, nums, zero]
-    ])
+    arr = np.block([[nums, nums, zero], [zero, nums, nums], [zero, nums, zero]])
     return arr
 
 
 def pentominos(k: int) -> list[np.ndarray]:
-    '''Returns all rotations/reflections of the m-pentomino.'''
+    """Returns all rotations/reflections of the m-pentomino."""
     ans = []
     for rotation in range(4):
         ans.append(np.rot90(pentomino(k), rotation))
@@ -132,13 +131,12 @@ def pentominos(k: int) -> list[np.ndarray]:
 
 
 def in_pentomino(i: int, j: int, k: int) -> BoolRef:
-    '''z3 bool: True iff (i, j) is in a pentomino with number m.'''
+    """z3 bool: True iff (i, j) is in a pentomino with number m."""
     conditions = []
-    side = 3*k
+    side = 3 * k
 
     # loop over pentominos with number m (all rotations and reflections)
     for p in pentominos(k):
-
         # loop over translations of the pentomino with m in (i, j)
         a_min = max(0, i - side + 1)
         a_max = min(n - side, i)
@@ -159,7 +157,7 @@ def in_pentomino(i: int, j: int, k: int) -> BoolRef:
     return Or(conditions)
 
 
-desc = 'Pentomino constraints'
+desc = "Pentomino constraints"
 for i, j in tqdm(product(range(n), repeat=2), total=n**2, desc=desc):
     for k in range(1, 4):
         s += Implies(X[i, j] == k, in_pentomino(i, j, k))
@@ -167,16 +165,16 @@ for i, j in tqdm(product(range(n), repeat=2), total=n**2, desc=desc):
 
 # Solve
 # ----------------------------------------------------------------------
-with Timer(initial_text='Checking z3 solver'):
+with Timer(initial_text="Checking z3 solver"):
     check = s.check()
 
 if check == sat:
     m = s.model()
     xm = evaluate_vars(m, X)
-    xm_str = np.vectorize(lambda x: '.' if x == 0 else str(x))(xm)
-    print_arr(xm_str, 'xm')
-    print(f'answer = {areas(xm)}')
-'''
+    xm_str = np.vectorize(lambda x: "." if x == 0 else str(x))(xm)
+    print_arr(xm_str, "xm")
+    print(f"answer = {areas(xm)}")
+"""
 Pentomino constraints: 100%|██████████| 289/289 [01:14<00:00,  3.88it/s]
 Checking z3 solver
 Elapsed time: 4.1584 seconds
@@ -198,4 +196,4 @@ xm = [. 1 . . 1 1 3 3 3 . . . . . 1 1 .]
      [. . 1 1 . 3 3 3 3 3 3 1 1 1 . 1 .]
      [. . 1 . . 3 3 3 3 3 3 . . 1 . . .]
 answer = 346816512
-'''
+"""

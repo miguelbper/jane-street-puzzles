@@ -1,25 +1,25 @@
 # Imports
 # ----------------------------------------------------------------------
+from collections import defaultdict
 from functools import partial
 from itertools import product
-from pysmt.typing import INT
-from pysmt.shortcuts import Equals, Implies, Int, Not, Symbol, get_model, Plus
-from collections import defaultdict
-from typing import Optional
 
+from pysmt.shortcuts import Equals, Implies, Int, Not, Plus, Symbol, get_model
+from pysmt.typing import INT
 
 # Types
 # ----------------------------------------------------------------------
-Grid = list[list[Optional[int]]]
+Grid = list[list[int | None]]
 Point = tuple[int, int]
 Island = int
-Islands = dict[Island, tuple[int, int, Optional[int]]]
+Islands = dict[Island, tuple[int, int, int | None]]
 Bridge = tuple[Island, Island]
 HashiSol = tuple[Island, dict[Bridge, int]]
 
 
 # Functions
 # ----------------------------------------------------------------------
+
 
 def island_dict(grid: Grid) -> Islands:
     m, n = len(grid), len(grid[0])
@@ -46,35 +46,35 @@ def valid(islands: Islands, i: Island, j: Island) -> bool:
 
     def obstructs(k):
         xk, yk, _ = islands[k]
-        midx = (xk == xi and (yy < yk < YY))
-        midy = (yk == yi and (xx < xk < XX))
+        midx = xk == xi and (yy < yk < YY)
+        midy = yk == yi and (xx < xk < XX)
         return midx or midy
 
-    others = (k for k in islands.keys() if k != i and k != j)
+    others = (k for k in islands if k != i and k != j)
 
     return not any(map(obstructs, others))
 
 
-def solve(islands: Islands) -> Optional[HashiSol]:
+def solve(islands: Islands) -> HashiSol | None:
     # Variables
     # ------------------------------------------------------------------
     is_valid = partial(valid, islands)
     n = len(islands)
     R = range(n)
-    x = [[Symbol(f'x[{i},{j}]', INT) for j in R] for i in R]
-    y = Symbol('y', INT)
+    x = [[Symbol(f"x[{i},{j}]", INT) for j in R] for i in R]
+    y = Symbol("y", INT)
 
     # Constraints
     # ------------------------------------------------------------------
     formula = True
 
     # bound for y
-    formula &= (0 <= y) & (y < n)
+    formula &= (y >= 0) & (y < n)
 
     # bounds for x
     for i, j in product(R, R):
         if is_valid(i, j):
-            formula &= (0 <= x[i][j]) & (x[i][j] <= 2)
+            formula &= (x[i][j] >= 0) & (x[i][j] <= 2)
         else:
             formula &= Equals(x[i][j], Int(0))
 
@@ -136,10 +136,10 @@ def print_hashi(grid: Grid) -> str:
     sol = solve(islands)
 
     if not sol:
-        return 'Could not find solution.'
+        return "Could not find solution."
 
     Y, A = sol
-    X = [[' ' for _ in range(n)] for _ in range(m)]
+    X = [[" " for _ in range(n)] for _ in range(m)]
 
     for island in islands.values():
         x, y, num_bridges = island
@@ -153,23 +153,23 @@ def print_hashi(grid: Grid) -> str:
         xj, yj, _ = islands[j]
         if xi == xj:
             for y in range(min(yi, yj) + 1, max(yi, yj)):
-                X[xi][y] = '-' if bridges == 1 else '='
+                X[xi][y] = "-" if bridges == 1 else "="
         else:
             for x in range(min(xi, xj) + 1, max(xi, xj)):
-                X[x][yi] = '|' if bridges == 1 else '║'
+                X[x][yi] = "|" if bridges == 1 else "║"
 
     B = defaultdict(int, A.items())
     num_wrong = islands[Y][2]
     num_right = sum(B[x, Y] + B[Y, x] for x in range(len(islands)))
 
     output0 = [
-        '\nSolution of Hashi puzzle',
-        f'ind_wrong = {Y}',
-        f'num_wrong = {num_wrong}',
-        f'num_right = {num_right}',
+        "\nSolution of Hashi puzzle",
+        f"ind_wrong = {Y}",
+        f"num_wrong = {num_wrong}",
+        f"num_right = {num_right}",
     ]
-    output1 = [' '.join(line) for line in X]
-    return '\n'.join(output0 + output1)
+    output1 = [" ".join(line) for line in X]
+    return "\n".join(output0 + output1)
 
 
 # Data
@@ -252,13 +252,9 @@ print(print_hashi(grid_1))
 print(print_hashi(grid_2))
 print(print_hashi(grid_3))
 ans = (8 * 9 * 10 * 12) / 13**4
-print(f'\nans = {ans:.7f}')
+print(f"\nans = {ans:.7f}")
+"""Solution of Hashi puzzle ind_wrong = 7 num_wrong = 2.
 
-
-'''
-Solution of Hashi puzzle
-ind_wrong = 7
-num_wrong = 2
 num_right = 5
 4===========5 - 3 - - - - - 4 - 1
 ║           ║   |           ║
@@ -363,4 +359,4 @@ Ans = P(bridge hand with shape 5431 has 0 aces)
     = ((13 - 5) * (13 - 4) * (13 - 3) * (13 - 1)) / 13^4
     = (8 * 9 * 10 * 12) / 13^4
     = 0.3025104
-'''
+"""

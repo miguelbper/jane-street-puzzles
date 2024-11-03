@@ -1,6 +1,7 @@
-from z3 import Solver, Distinct, sat, And, Or, IntVector
 from itertools import product
+
 import numpy as np
+from z3 import And, Distinct, IntVector, Or, Solver, sat
 
 grid = [
     [2, 0, 0, 0, 7, 1, 8, 3, 6],
@@ -16,13 +17,14 @@ grid = [
 
 
 def square(k: int) -> np.ndarray:
-    '''Return a boolean matrix with True in the kth square.'''
+    """Return a boolean matrix with True in the kth square."""
     i, j = divmod(k, 3)
-    i0, j0 = 3*i, 3*j
+    i0, j0 = 3 * i, 3 * j
     i1, j1 = i0 + 3, j0 + 3
     sq = np.full((9, 9), False)
     sq[i0:i1, j0:j1] = True
     return sq
+
 
 remote = []
 for i, j in product(range(9), repeat=2):
@@ -34,11 +36,11 @@ for i, j in product(range(9), repeat=2):
         remote.append((dist, coord))
 
 # Define variables and solver
-X = np.array(IntVector('x', 9**2)).reshape(9, 9)
+X = np.array(IntVector("x", 9**2)).reshape(9, 9)
 s = Solver()
 
 # Add constraints to the solver
-s += [And(1 <= x, x <= 9) for x in X.flat]
+s += [And(x >= 1, x <= 9) for x in X.flat]
 s += [Distinct(*X[i, :]) for i in range(9)]
 s += [Distinct(*X[:, j]) for j in range(9)]
 s += [Distinct(*X[square(k)]) for k in range(9)]
@@ -49,21 +51,19 @@ if s.check() == sat:
     m = s.model()
     xm = np.vectorize(lambda x: m.evaluate(x).as_long())(X)
     ans = np.sum(xm**2 * np.where(grid, 1, 0))
-    print(f'{ans = }\n', 'xm = \n', xm)
+    print(f"{ans = }\n", "xm = \n", xm)
 else:
-    print('no solution')
-'''
-ans = 1105
-grid =
-6 9 2  5 3 7  1 8 4
-1 3 7  8 4 2  5 6 9
-5 8 4  1 9 6  2 3 7
+    print("no solution")
+# ans = 1105
+# grid =
+# 6 9 2  5 3 7  1 8 4
+# 1 3 7  8 4 2  5 6 9
+# 5 8 4  1 9 6  2 3 7
 
-4 5 3  7 8 9  6 1 2
-9 1 6  4 2 3  7 5 8
-7 2 8  6 1 5  4 9 3
+# 4 5 3  7 8 9  6 1 2
+# 9 1 6  4 2 3  7 5 8
+# 7 2 8  6 1 5  4 9 3
 
-2 7 1  9 5 8  3 4 6
-8 6 5  3 7 4  9 2 1
-3 4 9  2 6 1  8 7 5
-'''
+# 2 7 1  9 5 8  3 4 6
+# 8 6 5  3 7 4  9 2 1
+# 3 4 9  2 6 1  8 7 5

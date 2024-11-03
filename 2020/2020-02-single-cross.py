@@ -1,21 +1,9 @@
-import math
-from random import uniform
-import matplotlib.pyplot as plt
-import numpy as np
-from sympy import integrate, symbols, cos, sin, pi, acos
-
-
-# Closed-form solution with SymPy
-# ----------------------------------------------------------------------
-
-'''
-Consider the lattice Z^2 in R^2.
-For a parameter D, consider the experiment of choosing x, y in [0, 1],
-theta in [0, 2 pi] uniformly at random. Consider the line segment with
-one endpoint (x, y), angle theta and length D. Define random variables
-    N  = num times the segment crosses a side of a square
-    Nx = num times the segment crosses a vertical side of a square
-    Ny = num times the segment crosses a horizontal side of a square
+"""Consider the lattice Z^2 in R^2. For a parameter D, consider the experiment
+of choosing x, y in [0, 1], theta in [0, 2 pi] uniformly at random. Consider
+the line segment with one endpoint (x, y), angle theta and length D. Define
+random variables N  = num times the segment crosses a side of a square Nx = num
+times the segment crosses a vertical side of a square Ny = num times the
+segment crosses a horizontal side of a square.
 
 We wish to compute P(N=1) for each D, and find D which maximizes P(N=1).
 
@@ -68,24 +56,34 @@ P(N=1) = (4/π) * ∫_0^{π/4} (P(Nx=1|θ) P(Ny=0|θ) + P(Nx=0|θ) P(Ny=1|θ)) d
          + (4/π) * ∫_{θ_D}^{π/4} (P(Nx=1|θ) P(Ny=0|θ) + P(Nx=0|θ) P(Ny=1|θ)) dθ
        = (4/π) * ∫_0^{θ_D} ((2 - Lx) (1 - Ly) + 0 Ly) dθ
          + (4/π) * ∫_{θ_D}^{π/4} (Lx (1 - Ly) + (1 - Lx) Ly) dθ
-'''
+"""
 
-d, th = symbols('d th')
+import math
+from random import uniform
+
+import matplotlib.pyplot as plt
+import numpy as np
+from sympy import acos, cos, integrate, pi, sin, symbols
+
+# Closed-form solution with SymPy
+# ----------------------------------------------------------------------
+
+d, th = symbols("d th")
 
 lx = d * cos(th)
 ly = d * sin(th)
 
-p1 = (4/pi) * integrate(lx * (1 - ly) + (1 - lx) * ly, (th, 0, pi/4))
+p1 = (4 / pi) * integrate(lx * (1 - ly) + (1 - lx) * ly, (th, 0, pi / 4))
 p1 = p1.simplify()
 
-td = acos(1/d)
+td = acos(1 / d)
 IA = integrate((2 - lx) * (1 - ly), (th, 0, td))
-IB = integrate(lx * (1 - ly) + (1 - lx) * ly, (th, td, pi/4))
-p2 = (4/pi) * (IA + IB)
+IB = integrate(lx * (1 - ly) + (1 - lx) * ly, (th, td, pi / 4))
+p2 = (4 / pi) * (IA + IB)
 p2 = p2.simplify()
 
-print(f'p1 = {p1}')
-print(f'p2 = {p2}')
+print(f"p1 = {p1}")
+print(f"p2 = {p2}")
 # p1 = 2*d*(2 - d)/pi
 # p2 = 2*(2*d**2 - 4*d*sqrt(1 - 1/d**2) - 4*d + 4*acos(1/d) + 3)/pi
 
@@ -97,7 +95,7 @@ def prob_one_crossing_cl(d_: float) -> float:
 # The plot below shows that P(N=1) attains its max when d = 1.
 p_max = p1.subs({d: 1})
 p_max_fl = float(p_max.evalf())
-print(f'p_max = {p_max} = {p_max_fl:.4f}')
+print(f"p_max = {p_max} = {p_max_fl:.4f}")
 # p_max = 2/pi = 0.6366
 
 
@@ -128,10 +126,10 @@ def prob_one_crossing_mc(d_: float) -> float:
         # throw x, y, theta unif random
         x = uniform(0, 1)
         y = uniform(0, 1)
-        theta = uniform(0, 2*pi)
+        theta = uniform(0, 2 * pi)
 
         # compute num_crossings
-        count += 1 == num_crossings(d_, x, y, theta)
+        count += num_crossings(d_, x, y, theta) == 1
 
     return count / NUM_EXPERIMENTS
 
@@ -146,12 +144,12 @@ ds = np.linspace(0, math.sqrt(2), NUM_POINTS)
 # plt.plot(ds, ps_mc, label='monte carlo')
 
 ps_cl = np.array([prob_one_crossing_cl(d) for d in ds])
-plt.plot(ds, ps_cl, label='closed form')
+plt.plot(ds, ps_cl, label="closed form")
 
-plt.scatter(1, p_max_fl, color='red')
+plt.scatter(1, p_max_fl, color="red")
 
-plt.xlabel('D')
-plt.ylabel('P(N=1)')
+plt.xlabel("D")
+plt.ylabel("P(N=1)")
 plt.legend()
 plt.grid(True)
 plt.show()

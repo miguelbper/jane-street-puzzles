@@ -1,11 +1,12 @@
-from sympy.ntheory import primefactors
 from functools import cache
-import numpy as np
 from math import gcd
 
+import numpy as np
+from sympy.ntheory import primefactors
 
 # Functions
 # ----------------------------------------------------------------------
+
 
 def r(a, b, c, d):
     k = min(a, b, c, d)
@@ -28,13 +29,12 @@ def f(a, b, c, d):
 
 # Experiment: solve problem for different (small) values of N = max(x)
 # ----------------------------------------------------------------------
-print('Experiment')
+print("Experiment")
 N = 50
 factors = [set(primefactors(x)) for x in range(N + 1)]
 factors[0] = set.union(*factors[1:])
 
 while N:
-
     M = 1
     S = 4 * N
     x = (0, 0, 0, 0)
@@ -52,12 +52,14 @@ while N:
 
     a, b, c, d = x
     p, q, u, v = r(*n(*x))
-    print(f'N = {N:2d}, max(x) = {max(x):2d}, M = {M:2d}, '
-          + f'x = ({a}, {b:d}, {c:2d}, {d:2d}), '
-          + f'r.n(x) = ({p}, {q:d}, {u:2d}, {v:2d})')
+    print(
+        f"N = {N:2d}, max(x) = {max(x):2d}, M = {M:2d}, "
+        + f"x = ({a}, {b:d}, {c:2d}, {d:2d}), "
+        + f"r.n(x) = ({p}, {q:d}, {u:2d}, {v:2d})"
+    )
     N = max(0, max(x) - 1)
 
-'''
+"""
 Experiment
 N = 50, max(x) = 44, M = 14, x = (0, 7, 20, 44), r.n(x) = (0, 6, 17, 37)
 N = 43, max(x) = 37, M = 13, x = (0, 6, 17, 37), r.n(x) = (0, 5, 14, 31)
@@ -73,12 +75,12 @@ Let x_M be the value of x that corresponds to each M.
 Notice that:
     1. x_M is nondecreasing
     2. r(n(x_{M+1})) = x_M, for M >= 7
-'''
+"""
 
 
 # Solution
 # ----------------------------------------------------------------------
-'''
+"""
 We solve the problem assuming that the properties 1 and 2 above are true
 in general.
 
@@ -105,23 +107,25 @@ Then,
 We can choose k = 1 + any(n % 2 for n in [b, c, d]).
 This equation allows us to find x_{M+1} from x_M. Keep computing x_{M+1}
 while max(x_{M+1}) <= 10**7.
-'''
+"""
 
-print('\nSolution')
+print("\nSolution")
 
 N = 10**7
 x = ans = (0, 1, 0, 1)
 M = f(*x)
-A = np.array([
-    [-1, -1, 1],
-    [ 0, -2, 2],
-    [-1, -1, 3],
-])
+A = np.array(
+    [
+        [-1, -1, 1],
+        [0, -2, 2],
+        [-1, -1, 3],
+    ]
+)
 
 while max(x) <= N:
     ans = x
     p, q, u, v = x
-    print(f'M = {M:2d}    =>    x = ({p}, {q:7d}, {u:7d}, {v:7d})')
+    print(f"M = {M:2d}    =>    x = ({p}, {q:7d}, {u:7d}, {v:7d})")
 
     b, c, d = A @ np.array((q, u, v))
     k = 1 + any(n % 2 for n in [b, c, d])
@@ -130,9 +134,8 @@ while max(x) <= N:
     x = (0, b, c, d)
     M += 1
 
-print(f'\nans = {ans[0]};{ans[1]};{ans[2]};{ans[3]}'
-      + f'    =>    M = f(ans) = {f(*ans)}')
-'''
+print(f"\nans = {ans[0]};{ans[1]};{ans[2]};{ans[3]}" + f"    =>    M = f(ans) = {f(*ans)}")
+"""
 Solution
 M =  3    =>    x = (0,       1,       0,       1)
 M =  4    =>    x = (0,       0,       1,       1)
@@ -178,4 +181,4 @@ M = 43    =>    x = (0, 1166220, 3311233, 7256527)
 M = 44    =>    x = (0, 1389537, 3945294, 8646064)
 
 ans = 0;1389537;3945294;8646064    =>    M = f(ans) = 44
-'''
+"""

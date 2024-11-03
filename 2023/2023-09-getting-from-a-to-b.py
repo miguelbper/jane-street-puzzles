@@ -1,16 +1,17 @@
 # Imports
 # ----------------------------------------------------------------------
-from math import log, gcd
 from itertools import product
-
+from math import gcd, log
 
 # Hidden sentence
 # ----------------------------------------------------------------------
-sentence = 'Initially, nobody thought out the huge energy needed. ' \
-    'Even quite useful approaches looked suspect, ' \
-    'adding tons of thought heretofore even beginning.'
+sentence = (
+    "Initially, nobody thought out the huge energy needed. "
+    "Even quite useful approaches looked suspect, "
+    "adding tons of thought heretofore even beginning."
+)
 
-first_letters = ''.join(word[0] for word in sentence.split())
+first_letters = "".join(word[0] for word in sentence.split())
 print(first_letters)
 # IntothenEqualsatotheb
 # n to the n equals a to the b
@@ -19,7 +20,10 @@ print(first_letters)
 # Compare with Jenga tower
 # ----------------------------------------------------------------------
 def solutions(n: int) -> set[tuple[int, int]]:
-    '''List of (a, b) s.t. n**n == a**b, with a != 0, b != 0 ints.'''
+    """List of (a, b) s.t.
+
+    n**n == a**b, with a != 0, b != 0 ints.
+    """
     if n <= 1:
         return set()
 
@@ -36,26 +40,26 @@ def solutions(n: int) -> set[tuple[int, int]]:
     return ans
 
 
-rows = [None, float('inf'), 3, 2, 7, 2, 6, 2]
+rows = [None, float("inf"), 3, 2, 7, 2, 6, 2]
 
 for n, x in list(enumerate(rows))[1:]:
     sols = solutions(n)
-    print(f'n = {n} => num_sols = {len(sols)} = {x}, (a, b) in {sols}')
+    print(f"n = {n} => num_sols = {len(sols)} = {x}, (a, b) in {sols}")
 
-'''
-n = 1 => num_sols = 0 = inf, (a, b) in set()
-n = 2 => num_sols = 3 = 3, (a, b) in {(-2, 2), (4, 1), (2, 2)}
-n = 3 => num_sols = 2 = 2, (a, b) in {(3, 3), (27, 1)}
-n = 4 => num_sols = 7 = 7, (a, b) in {(4, 4), (-4, 4), (-16, 2), (-2, 8), (256, 1), (16, 2), (2, 8)}
-n = 5 => num_sols = 2 = 2, (a, b) in {(5, 5), (3125, 1)}
-n = 6 => num_sols = 6 = 6, (a, b) in {(46656, 1), (36, 3), (-6, 6), (216, 2), (6, 6), (-216, 2)}
-n = 7 => num_sols = 2 = 2, (a, b) in {(823543, 1), (7, 7)}
-'''
+"""
+n = 1 => n_sols = 0 = inf, (a, b) in set()
+n = 2 => n_sols = 3 = 3, (a, b) in {(-2, 2), (4, 1), (2, 2)}
+n = 3 => n_sols = 2 = 2, (a, b) in {(3, 3), (27, 1)}
+n = 4 => n_sols = 7 = 7, (a, b) in {(4, 4), (-4, 4), (-16, 2), (-2, 8), (256, 1), (16, 2), (2, 8)}
+n = 5 => n_sols = 2 = 2, (a, b) in {(5, 5), (3125, 1)}
+n = 6 => n_sols = 6 = 6, (a, b) in {(46656, 1), (36, 3), (-6, 6), (216, 2), (6, 6), (-216, 2)}
+n = 7 => n_sols = 2 = 2, (a, b) in {(823543, 1), (7, 7)}
+"""
 
 
 # Compute smallest n with x_n = 2023
 # ----------------------------------------------------------------------
-'''
+"""
 Question: What is the smallest n such that there are 2023 ways to write
 n**n as a**b?
 
@@ -90,9 +94,9 @@ The smallest such n is given by
     u_2 + 1   = 17 => e_2 + m_2 = u_2 = 16
     u_3 + 1   = 17 => e_3 + m_3 = u_3 = 16
     gcd(m_1, m_2, ..., m_k) = p_1**e_1 * p_2**e_2 * ... * p_k**e_k
-'''
+"""
 
-n_smallest = float('inf')
+n_smallest = float("inf")
 m_1_, m_2_, m_3_ = 0, 0, 0
 
 for e_1, e_2, e_3 in product(range(4), range(17), range(17)):
@@ -114,4 +118,4 @@ for e_1, e_2, e_3 in product(range(4), range(17), range(17)):
         n_smallest = n
         m_1_, m_2_, m_3_ = m_1, m_2, m_3
 
-print(f'\nn = {n_smallest} = 2**{m_1_} * 3**{m_2_} * 5**{m_3_}')
+print(f"\nn = {n_smallest} = 2**{m_1_} * 3**{m_2_} * 5**{m_3_}")

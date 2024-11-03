@@ -1,15 +1,5 @@
-import numpy as np
-import sympy as sp
-from sympy.abc import x
-
-
-'''
-There is
-    1 ball of color 1
-    2 balls of color 2
-    ...
-    12 balls of color 12
-The total number of balls is 1 + 2 + ... + 12 = 78.
+"""There is 1 ball of color 1 2 balls of color 2 ... 12 balls of color 12 The
+total number of balls is 1 + 2 + ... + 12 = 78.
 
 Throughout, we will have the following indices
     i = maximum number of balls of the same color drawn before ball 1
@@ -43,7 +33,11 @@ where
 
 Therefore,
     P(N=i | X=j) = (c_{i,j} - c_{i-1,j}) / c_{12,j}
-'''
+"""
+
+import numpy as np
+import sympy as sp
+from sympy.abc import x
 
 
 # define polynomial f_{i,k}
@@ -70,5 +64,5 @@ C0 = CC[0:12]
 C1 = CC[1:13]
 P = (C1 - C0) / CC[12]
 e = np.sum(np.array(range(1, 13)) @ P) / 78
-print(f'e = {e:.6f}')
+print(f"e = {e:.6f}")
 # e = 6.859787

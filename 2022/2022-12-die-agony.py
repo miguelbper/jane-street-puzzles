@@ -1,12 +1,10 @@
-from typing import Optional
-
 # types
 # ----------------------------------------------------------------------
 
 Matrix = list[list[int]]
 Coords = tuple[int, int]
 Visited = list[Coords]
-MInt = Optional[int]
+MInt = int | None
 Die = tuple[MInt, MInt, MInt, MInt, MInt, MInt]
 State = tuple[int, Coords, Die, Visited]
 
@@ -14,6 +12,7 @@ State = tuple[int, Coords, Die, Visited]
 # data
 # ----------------------------------------------------------------------
 
+# fmt: off
 grid = [
     [ 57,  33, 132, 268, 492, 732],
     [ 81, 123, 240, 443, 353, 508],
@@ -22,6 +21,7 @@ grid = [
     [  5,  23,  -4, 592, 445, 620],
     [  0,  77,  32, 403, 337, 452],
 ]
+# fmt: on
 
 m = len(grid)
 
@@ -29,13 +29,14 @@ n0 = 0
 x0 = m - 1
 y0 = 0
 c0 = (x0, y0)
-die0 = (None,)*6
+die0 = (None,) * 6
 vis0 = [c0]
 initial = (n0, c0, die0, vis0)
 
 
 # functions
 # ----------------------------------------------------------------------
+
 
 def final(state: State) -> bool:
     # return if state is final, i.e. coord = top right
@@ -45,7 +46,7 @@ def final(state: State) -> bool:
 def tilt(dir: Coords, die: Die) -> Die:
     top, bottom, up, down, left, right = die
 
-    if dir == (0, 1):   # tilt up
+    if dir == (0, 1):  # tilt up
         return (
             down,
             up,
@@ -72,7 +73,7 @@ def tilt(dir: Coords, die: Die) -> Die:
             top,
             bottom,
         )
-    if dir == (1, 0):   # tilt right
+    if dir == (1, 0):  # tilt right
         return (
             left,
             right,
@@ -84,7 +85,7 @@ def tilt(dir: Coords, die: Die) -> Die:
     return die
 
 
-def move(direction: Coords, state: State) -> Optional[State]:
+def move(direction: Coords, state: State) -> State | None:
     n, c, die, vis = state
     x, y = c
     a, b = direction
@@ -154,32 +155,30 @@ ans = tot - vis
 # print
 # ----------------------------------------------------------------------
 
+
 def print_state(state: State):
     n, c, die, vis = state
-    output = f'''state:
+    output = f"""state:
     n = {n},
     c = {c},
     d = {die},
     v = {vis}.
 
-    '''
+    """
     print(output)
 
 
 print_state(final_state)
-print(f'answer = {ans}')
+print(f"answer = {ans}")
 
-'''
-final state:
-n = 32,
-c = (0, 5),
-d = (7, 9, -3, 9, 5, -9),
-v = [(5, 0), (4, 0), (4, 1), (4, 2), (5, 2), (5, 1), (4, 1), (3, 1),
-     (2, 1), (1, 1), (0, 1), (0, 2), (1, 2), (1, 1), (1, 0), (2, 0),
-     (2, 1), (2, 2), (3, 2), (3, 3), (4, 3), (5, 3), (5, 4), (5, 5),
-     (4, 5), (3, 5), (3, 4), (3, 3), (2, 3), (1, 3), (1, 4), (1, 5),
-     (0, 5)].
+# final state:
+# n = 32,
+# c = (0, 5),
+# d = (7, 9, -3, 9, 5, -9),
+# v = [(5, 0), (4, 0), (4, 1), (4, 2), (5, 2), (5, 1), (4, 1), (3, 1),
+#      (2, 1), (1, 1), (0, 1), (0, 2), (1, 2), (1, 1), (1, 0), (2, 0),
+#      (2, 1), (2, 2), (3, 2), (3, 3), (4, 3), (5, 3), (5, 4), (5, 5),
+#      (4, 5), (3, 5), (3, 4), (3, 3), (2, 3), (1, 3), (1, 4), (1, 5),
+#      (0, 5)].
 
-answer = 1935
-
-'''
+# answer = 1935

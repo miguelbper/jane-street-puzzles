@@ -1,7 +1,4 @@
-from math import comb
-from collections import Counter
-
-'''
+"""
 Facts:
     1. The center of each quarter-circle is in Z^2.
     2. The radius of each quarter circle is 1.
@@ -83,19 +80,22 @@ sol = 2 Σ_{0<=k<l<18, numcc(grid(k,l)) = 2} count(perimeter(grid(k,l)))
 
 Here, we need to multiply the sum by 2 because there are 2 possible ways
 we could align the 6x7 grid we drew above with the original 7x7 grid.
-'''
+"""
+
+from collections import Counter
+from math import comb
 
 
 def coordinates(k: int) -> tuple[int, int]:
-    ''' Given k in {0,...,17}, return coordinates (i, j) of the square
-    labeled k (in the grid drawn above). '''
-    return divmod(k + 11 + 5*(k > 1) + 3*(k > 5) + 3*(k > 11) + 5*(k > 15), 8)
+    """Given k in {0,...,17}, return coordinates (i, j) of the square labeled k
+    (in the grid drawn above)."""
+    return divmod(k + 11 + 5 * (k > 1) + 3 * (k > 5) + 3 * (k > 11) + 5 * (k > 15), 8)
 
 
 def grid(k: int, l: int) -> list[list[int]]:
-    ''' Given k, l in {0,...,17}, return a 7x8 array xss where
-        xss[i][j] = 1 if (i, j) has label m in {0,...,17} - {k, l}
-                    0 otherwise. '''
+    """Given k, l in {0,...,17}, return a 7x8 array xss where
+    xss[i][j] = 1 if (i, j) has label m in {0,...,17} - {k, l}
+                0 otherwise."""
     xss = [[0 for _ in range(8)] for _ in range(7)]
     for m in range(18):
         if m != l and m != k:
@@ -105,13 +105,15 @@ def grid(k: int, l: int) -> list[list[int]]:
 
 
 def numcc(xss: list[list[int]]) -> int:
-    ''' Given a 7x8 array xss, return the num of connected components
-    (this is computed using a depth first search). Connectedness is
+    """Given a 7x8 array xss, return the num of connected components (this is
+    computed using a depth first search).
+
+    Connectedness is
     defined as follows: if vertices (i0, j0) and (i1, j1) are such that
         1. distance((i0, j0), (i1, j1)) = 1
         2. xss[i0][j0] = xss[i1][j1]
     then (i0, j0) and (i1, j1) are in the same connected component.
-    '''
+    """
     direc = [(1, 0), (-1, 0), (0, 1), (0, -1)]
     verts = {(i, j) for i in range(7) for j in range(8)}
     ans = 0
@@ -131,8 +133,8 @@ def numcc(xss: list[list[int]]) -> int:
 
 
 def perimeter(xss: list[list[int]]) -> int:
-    ''' Given a 7x8 array xss (with 2 connected components), return
-    the perimeter of the area with xss[i][j] = 1. '''
+    """Given a 7x8 array xss (with 2 connected components), return the
+    perimeter of the area with xss[i][j] = 1."""
     ans = 0
     dirs = [(1, 0), (-1, 0), (0, 1), (0, -1)]
     for k in range(18):
@@ -143,12 +145,12 @@ def perimeter(xss: list[list[int]]) -> int:
 
 
 def count(p: int) -> int:
-    ''' Given a perimeter p, return the num of lists [s_0,...,s_{p-1}]
-    such that s_0 + ... + s_{p-1} = 0.
+    """Given a perimeter p, return the num of lists [s_0,...,s_{p-1}] such that
+    s_0 + ... + s_{p-1} = 0.
 
     Remark: the possible values of the perimeter are {18, 20, 22, 24},
     so this function could be just return comb(p, p // 2).
-    '''
+    """
     q, r = divmod(p, 2)
     return 0 if r else comb(p, q)
 
@@ -158,5 +160,5 @@ grids = (grid(k, l) for l in range(18) for k in range(l))
 counter = Counter(perimeter(xss) for xss in grids if numcc(xss) == 2)
 solution = 2 * sum(count(p) * n for p, n in counter.items())
 
-print(f'{solution = }')
+print(f"{solution = }")
 # solution = 89519144
