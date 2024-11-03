@@ -1,7 +1,4 @@
-'''
-Let
-    m = side of the square grid = 10
-    k = number of regions = 17
+"""Let m = side of the square grid = 10 k = number of regions = 17.
 
     n = number of steps the knight takes
     s = sum of every number in the grid
@@ -26,18 +23,18 @@ These facts taken together imply that
     n = 50
     r = 75
     s = 1275
-'''
+"""
 
 # Imports
 # ----------------------------------------------------------------------
-from itertools import product
-import numpy as np
 from copy import deepcopy
+from itertools import product
 
+import numpy as np
 
 # Data
 # ----------------------------------------------------------------------
-
+# fmt: off
 regions = [
     [ 0,  0,  0,  0,  0,  0,  0,  0,  0,  0],
     [ 0,  0,  0,  1,  0,  0,  0,  0,  2,  0],
@@ -63,15 +60,16 @@ grid = [
     [ 0, 0, 0,  0,  0, 0, 0, 0,  0,  0],
     [ 0, 0, 0,  0,  0, 0, 0, 0,  0, 28],
 ]
+# fmt: on
 
 directions = [
-    ( 2,  1),
-    ( 1,  2),
-    (-1,  2),
-    (-2,  1),
+    (2, 1),
+    (1, 2),
+    (-1, 2),
+    (-2, 1),
     (-1, -2),
-    ( 1, -2),
-    ( 2, -1),
+    (1, -2),
+    (2, -1),
     (-2, -1),
 ]
 
@@ -165,22 +163,20 @@ while stack:
 # ----------------------------------------------------------------------
 
 grid, coor, step = state
-ans = sum(max(row)**2 for row in grid)
-print(f'answer = {ans}\ngrid   = ')
+ans = sum(max(row) ** 2 for row in grid)
+print(f"answer = {ans}\ngrid   = ")
 for row in grid:
-    print('[' + ' '.join(f'{x:2d}' for x in row) + ']')
+    print("[" + " ".join(f"{x:2d}" for x in row) + "]")
 
-'''
-answer = 14820
-grid   =
-[12  0  0  0  0  9  0  7  0  0]
-[ 0  0 13 10  0  0  5  0 23  0]
-[ 0 11  0 17  4  0  8  0  6  0]
-[ 1  0  0 14  0 18  0 22  0 24]
-[ 0  0 16  3  0 21 50 25  0  0]
-[ 0  2  0  0 15  0 19 48  0  0]
-[ 0 41 34  0 20 49 26  0  0 47]
-[35 38  0 42 33 30 45  0 27  0]
-[40  0 36  0  0 43 32 29 46  0]
-[37  0 39  0 31  0  0 44  0 28]
-'''
+# answer = 14820
+# grid   =
+# [12  0  0  0  0  9  0  7  0  0]
+# [ 0  0 13 10  0  0  5  0 23  0]
+# [ 0 11  0 17  4  0  8  0  6  0]
+# [ 1  0  0 14  0 18  0 22  0 24]
+# [ 0  0 16  3  0 21 50 25  0  0]
+# [ 0  2  0  0 15  0 19 48  0  0]
+# [ 0 41 34  0 20 49 26  0  0 47]
+# [35 38  0 42 33 30 45  0 27  0]
+# [40  0 36  0  0 43 32 29 46  0]
+# [37  0 39  0 31  0  0 44  0 28]
