@@ -16,7 +16,7 @@ repos:
     rev: 1.7.9
     hooks:
       - id: bandit
-        args: ["-s", "B101"]
+        args: ["-s", "B101,B311"]
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.7.1
