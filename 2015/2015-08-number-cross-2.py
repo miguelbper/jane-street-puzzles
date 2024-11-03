@@ -101,8 +101,8 @@ def variables(i: int, j: int, dim: int) -> list[ArithRef]:
     i_, j_ = i, j
     di = int(dim == 0)
     dj = int(dim == 1)
-    in_bounds = lambda i_, j_: 0 <= i_ < n and 0 <= j_ < n  # noqa: E731
-    blocked = lambda i_, j_: grid[i_, j_] == B  # noqa: E731
+    in_bounds = lambda i_, j_: 0 <= i_ < n and 0 <= j_ < n
+    blocked = lambda i_, j_: grid[i_, j_] == B
     while in_bounds(i_, j_) and not blocked(i_, j_):
         ans.append(X[i_, j_])
         i_ += di

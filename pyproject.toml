@@ -23,6 +23,7 @@ dependencies = [
 
 [tool.ruff]
 line-length = 99
+ignore = ["E741", "E731"]
 
 [tool.ruff.lint]
 select = [

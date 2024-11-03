@@ -26,14 +26,14 @@ def evaluate_vars(m: ModelRef, vars: np.ndarray) -> np.ndarray:
 
 def maximal_product(xm: Board) -> int:
     """Largest product that can be achieved."""
-    prd = lambda p: np.prod([xm[i, j] for j, i in enumerate(p)])  # noqa: E731
+    prd = lambda p: np.prod([xm[i, j] for j, i in enumerate(p)])
     return max(map(prd, permutations(range(n))))
 
 
 # Variables, solver & constraints
 # ----------------------------------------------------------------------
 X = np.array(IntVector("x", n**2)).reshape((n, n))  # nums in grid
-O = IntVector("o", n)  # hook orientation  # noqa: E741
+O = IntVector("o", n)  # hook orientation
 
 s = Solver()
 
