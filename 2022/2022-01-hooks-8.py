@@ -1,17 +1,16 @@
-from itertools import product
 from functools import reduce
+from itertools import product
 from operator import mul
-from typing import Optional
-from z3 import (Solver, And, Or, Not, Implies, If, Distinct, PbEq, sat,
-                BoolRef, IntVector, ModelRef)
-from scipy.ndimage import label, sum_labels
 from pprint import pprint
-from codetiming import Timer
-import numpy as np
 
+import numpy as np
+from codetiming import Timer
+from scipy.ndimage import label, sum_labels
+from z3 import And, BoolRef, Distinct, If, Implies, IntVector, ModelRef, Not, Or, PbEq, Solver, sat
 
 # Parameters
 # ----------------------------------------------------------------------
+# fmt: off
 regions = np.array([
     [1,  0,  0,  0,  2,  3,  3,  4,  4],
     [1,  0,  5,  5,  2, 14,  3,  4,  7],
@@ -23,6 +22,7 @@ regions = np.array([
     [1,  1, 15, 15, 16, 12, 17, 17, 18],
     [1, 15, 15, 16, 16, 12, 12, 18, 18],
 ])
+# fmt: on
 n = regions.shape[0]
 
 total_sum = sum([x**2 for x in range(1, n + 1)])
@@ -36,19 +36,19 @@ Coord = tuple[int, int]
 # Utility functions
 # ----------------------------------------------------------------------
 def neighbours(i: int, j: int) -> list[Coord]:
-    ''' Return the coordinates of the neighbours of (i, j). '''
+    """Return the coordinates of the neighbours of (i, j)."""
     direc = [(1, 0), (-1, 0), (0, 1), (0, -1)]
     neigh = [(i + di, j + dj) for di, dj in direc]
     return [(x, y) for x, y in neigh if 0 <= x < n and 0 <= y < n]
 
 
 def connected(xm: Board) -> bool:
-    ''' True iff the board is connected. '''
+    """True iff the board is connected."""
     return label(xm)[1] <= 1
 
 
 def areas(xm: Board) -> int:
-    ''' Product of the areas of the unfilled regions. '''
+    """Product of the areas of the unfilled regions."""
     mat = np.where(xm == 0, 1, 0)
     labels, k = label(mat)
     area = sum_labels(mat, labels, index=range(1, k + 1))
@@ -56,15 +56,15 @@ def areas(xm: Board) -> int:
 
 
 def evaluate_vars(m: ModelRef, vars: np.ndarray) -> np.ndarray:
-    ''' Evaluate variables in a z3 model. '''
+    """Evaluate variables in a z3 model."""
     return np.vectorize(lambda x: m.evaluate(x).as_long())(vars)
 
 
 # Variables
 # ----------------------------------------------------------------------
-X = np.array(IntVector('x', n**2)).reshape((n, n))  # nums in grid
-O = IntVector('o', n)                               # hook orientation
-D = IntVector('d', n)                               # digit of each hook
+X = np.array(IntVector("x", n**2)).reshape((n, n))  # nums in grid
+O = IntVector("o", n)  # hook orientation
+D = IntVector("d", n)  # digit of each hook
 
 
 # Solver & constraints
@@ -72,9 +72,9 @@ D = IntVector('d', n)                               # digit of each hook
 s = Solver()
 
 # Ranges for each variable
-s += [And(0 <= x, x <= n) for x in X.flat]
-s += [And(0 <= o, o <= 3) for o in O]
-s += [And(1 <= d, d <= n) for d in D]
+s += [And(x >= 0, x <= n) for x in X.flat]
+s += [And(o >= 0, o <= 3) for o in O]
+s += [And(d >= 1, d <= n) for d in D]
 s += Distinct(D)
 s += X[0, 2] == 8
 
@@ -86,9 +86,10 @@ for i, j in product(range(n - 1), repeat=2):
 # There are d d's in the board
 s += [PbEq([(x == d, 1) for x in X.flat], d) for d in range(1, n + 1)]
 
+
 # The number in the kth hook is D[k]
 def in_hook(i: int, j: int, k: int) -> BoolRef:
-    '''z3 bool expression: True <=> (i, j) is in the k-th hook.'''
+    """z3 bool expression: True <=> (i, j) is in the k-th hook."""
     i0 = sum(If(Or(o == 0, o == 3), 1, 0) for o in O[:k])
     j0 = sum(If(Or(o == 0, o == 1), 1, 0) for o in O[:k])
     i1 = i0 + n - k
@@ -98,6 +99,7 @@ def in_hook(i: int, j: int, k: int) -> BoolRef:
     in_row = And(i == row, j0 <= j, j < j1)
     in_col = And(j == col, i0 <= i, i < i1)
     return Or(in_row, in_col)
+
 
 for i, j, k in product(range(n), repeat=3):
     s += Implies(in_hook(i, j, k), Or(X[i, j] == 0, X[i, j] == D[k]))
@@ -114,8 +116,9 @@ for i, j in product(range(n), repeat=2):
     neigh = neighbours(i, j)
     s += Implies(X[i, j] != 0, Or([X[a, b] != 0 for a, b in neigh]))
 
+
 # Wrap solver in a function which also checks connectivity
-def solve(s: Solver) -> Optional[Board]:
+def solve(s: Solver) -> Board | None:
     while s.check() == sat:
         m = s.model()
         xm = evaluate_vars(m, X)
@@ -133,22 +136,20 @@ with Timer():
 
 if xm is not None:
     ans = areas(xm)
-    print(f'ans = {ans}\nboard = ')
+    print(f"ans = {ans}\nboard = ")
     pprint(xm)
 else:
-    print('No solution found.')
+    print("No solution found.")
 
-'''
-Elapsed time: 2.2973 seconds
-ans = 680
-board =
-array([[5, 7, 8, 0, 6, 0, 6, 0, 6],
-       [5, 0, 0, 9, 9, 9, 9, 9, 6],
-       [5, 7, 8, 4, 0, 4, 0, 9, 0],
-       [0, 0, 0, 4, 2, 2, 3, 9, 6],
-       [0, 0, 8, 4, 0, 1, 0, 9, 0],
-       [0, 0, 0, 3, 0, 0, 3, 9, 6],
-       [0, 7, 8, 8, 8, 0, 8, 0, 8],
-       [0, 0, 7, 0, 7, 0, 7, 0, 7],
-       [0, 0, 0, 0, 0, 5, 5, 0, 0]])
-'''
+# Elapsed time: 2.2973 seconds
+# ans = 680
+# board =
+# array([[5, 7, 8, 0, 6, 0, 6, 0, 6],
+#        [5, 0, 0, 9, 9, 9, 9, 9, 6],
+#        [5, 7, 8, 4, 0, 4, 0, 9, 0],
+#        [0, 0, 0, 4, 2, 2, 3, 9, 6],
+#        [0, 0, 8, 4, 0, 1, 0, 9, 0],
+#        [0, 0, 0, 3, 0, 0, 3, 9, 6],
+#        [0, 7, 8, 8, 8, 0, 8, 0, 8],
+#        [0, 0, 7, 0, 7, 0, 7, 0, 7],
+#        [0, 0, 0, 0, 0, 5, 5, 0, 0]])
