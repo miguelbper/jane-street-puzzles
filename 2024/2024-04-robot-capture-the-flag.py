@@ -1,8 +1,4 @@
-from sympy import acos, sqrt, pi, diff, nsolve, Symbol
-
-
-'''
-Let x be the radius that Erin uses. Define
+"""Let x be the radius that Erin uses. Define.
 
     f(x) := P(Aaron wins | Erin uses radius x)
 
@@ -49,21 +45,20 @@ Using Wolfram Mathematica, we can show that
          = ((32 + 3*pi)*x**2 - 8*(1 + x)*s + 24*acos(s)) / (24*pi),
 
 where s := sqrt(x*(2 - x)).
-'''
+"""
 
-x = Symbol('x', positive=True)
+from sympy import Symbol, acos, diff, nsolve, pi, sqrt
+
+x = Symbol("x", positive=True)
 
 # compute f(x) according to the formula above
-s = sqrt(x*(2 - x))
-f = ((32 + 3*pi) * x**2 - 8 * (1 + x) * s + 24 * acos(s)) / (24 * pi)
+s = sqrt(x * (2 - x))
+f = ((32 + 3 * pi) * x**2 - 8 * (1 + x) * s + 24 * acos(s)) / (24 * pi)
 
 # compute the minimum of f(x)
 df = diff(f, x)
 x0 = nsolve(df, 0.5, prec=50)
 ans = f.subs(x, x0)
-print(f'x0          = {x0:.10f}')
-print(f'ans = f(x0) = {ans:.10f}')
-'''
-x0          = 0.5013069942
-ans = f(x0) = 0.1661864865
-'''
+print(f"x0          = {x0:.10f}")
+print(f"ans = f(x0) = {ans:.10f}")
+"""X0          = 0.5013069942 ans = f(x0) = 0.1661864865."""

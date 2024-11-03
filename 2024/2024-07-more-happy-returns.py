@@ -1,13 +1,14 @@
 # Imports
 # ----------------------------------------------------------------------
-from termcolor import colored
+# ruff: noqa: E501
 import pandas as pd
 import tabulate
-
+from termcolor import colored
 
 # Data & answers
 # ----------------------------------------------------------------------
 
+# fmt: off
 top = [
     (  1, "recipient"                    , "giftee"  , 13,),
     (  1, "popular type of street food"  , "taco"    ,  0,),
@@ -32,7 +33,6 @@ top = [
     ('Ø', "good luck charms"             , "gnomes"  , 20,),
 ]
 
-
 bot = [
     ("important C++ component"                       , 4 , 9 , "allocator"   ),
     ("le supermarché il ristorante and el dinosaurio", 5 , 8 , "cognates"    ),
@@ -56,10 +56,12 @@ bot = [
     ("person hovering a foot off the ground"         , 8 , 9 , "levitator"   ),
     ("dairy producer"                                , 0 , 0 , "cheesemonger"),
 ]
+# fmt: on
 
 
 # Print tables
 # ----------------------------------------------------------------------
+
 
 class Solution:
     def __init__(self, top: list[tuple], bot: list[tuple]):
@@ -73,7 +75,7 @@ class Solution:
 
     @staticmethod
     def get_ith_letter(row: pd.Series) -> str:
-        if not row["answer_bot"] or row["num"] == 'Ø':
+        if not row["answer_bot"] or row["num"] == "Ø":
             return ""
         answer = row["answer_bot"]
         i = row["num"] - 1  # Subtract 1 because indexing starts at 0
@@ -87,9 +89,9 @@ class Solution:
 
         if not answer_bot:
             return answer_bot
-        
-        if num == 'Ø':
-            return colored(answer_bot, attrs=['bold'])
+
+        if num == "Ø":
+            return colored(answer_bot, attrs=["bold"])
 
         reversed_top = answer_top[::-1]
         color = "yellow"
@@ -102,23 +104,23 @@ class Solution:
         if i < l:
             segment_0 = answer_bot[:i]
             segment_1 = colored(answer_bot[i], None, attrs=[formatting])
-            segment_2 = answer_bot[i+1:l]
+            segment_2 = answer_bot[i + 1 : l]
             segment_3 = colored(answer_bot[l:r], color)
             segment_4 = answer_bot[r:]
         elif i < r:
             segment_0 = answer_bot[:l]
             segment_1 = colored(answer_bot[l:i], color)
             segment_2 = colored(answer_bot[i], color, attrs=[formatting])
-            segment_3 = colored(answer_bot[i+1:r], color)
+            segment_3 = colored(answer_bot[i + 1 : r], color)
             segment_4 = answer_bot[r:]
         else:
             segment_0 = answer_bot[:l]
             segment_1 = colored(answer_bot[l:r], color)
             segment_2 = answer_bot[r:i]
             segment_3 = colored(answer_bot[i], None, attrs=[formatting])
-            segment_4 = answer_bot[i+1:]
+            segment_4 = answer_bot[i + 1 :]
 
-        return ''.join([segment_0, segment_1, segment_2, segment_3, segment_4])
+        return "".join([segment_0, segment_1, segment_2, segment_3, segment_4])
 
     def join(self) -> pd.DataFrame:
         bijec = self.bijection()
@@ -141,12 +143,12 @@ class Solution:
 
     def print(self) -> None:
         df = self.join()
-        print(tabulate.tabulate(df, headers='keys', tablefmt='pipe', showindex=False), end='\n\n')
+        print(tabulate.tabulate(df, headers="keys", tablefmt="pipe", showindex=False), end="\n\n")
 
 
 solution = Solution(top, bot)
 solution.print()
-'''
+"""
 | num   | hint_top                      | answer_top   | hint_bot                                       |   dollars |   cents | answer_bot   | ith_letter   |
 |:------|:------------------------------|:-------------|:-----------------------------------------------|----------:|--------:|:-------------|:-------------|
 | 1     | recipient                     | giftee       | one of the major scenes in West Side Story     |         6 |      11 | streetfight  | s            |
@@ -170,4 +172,4 @@ solution.print()
 | 7     | partner dance                 | tango        | le supermarché il ristorante and el dinosaurio |         5 |       8 | cognates     | e            |
 | 9     | type of symmetry              | rotative     | person hovering a foot off the ground          |         8 |       9 | levitator    | r            |
 | Ø     | good luck charms              | gnomes       | dairy producer                                 |         0 |       0 | cheesemonger |              |
-'''
+"""
