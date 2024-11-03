@@ -23,7 +23,11 @@ dependencies = [
 
 [tool.ruff]
 line-length = 99
-ignore = ["E741", "E731"]
+ignore = [
+    "E741",  # ambiguous variable name
+    "E731",  # do not assign a lambda expression, use a def
+    "B905",  # zip should be strict
+]
 
 [tool.ruff.lint]
 select = [
