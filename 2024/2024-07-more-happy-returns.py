@@ -134,9 +134,9 @@ class Solution:
 
         cols_top = ["num", "hint_top", "answer_top"]
         cols_bot = ["hint_bot", "dollars", "cents", "answer_bot"]
-        colsumns = cols_top + cols_bot
+        columns = cols_top + cols_bot
 
-        df = pd.DataFrame(joined, columns=colsumns)
+        df = pd.DataFrame(joined, columns=columns)
         df["ith_letter"] = df.apply(self.get_ith_letter, axis=1)
         df["answer_bot"] = df.apply(self.format_answer, axis=1)
         return df
