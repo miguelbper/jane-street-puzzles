@@ -48,3 +48,12 @@ style = "sphinx"  # Write docstrings in Sphinx style so that docformatter can fo
 
 [tool.bandit]
 skips = ["B311"]
+
+[dependency-groups]
+dev = [
+    "mypy>=1.13.0",
+]
+
+[[tool.mypy.overrides]]
+module = ["seaborn", "numba", "scipy.ndimage"]
+ignore_missing_imports = true

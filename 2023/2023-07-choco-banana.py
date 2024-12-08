@@ -1,25 +1,35 @@
-# Imports
-# ----------------------------------------------------------------------
-from copy import deepcopy
 from itertools import product
-from math import prod
-from pprint import pprint
-from time import time
 
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
+from codetiming import Timer
+from numba import njit
+from numpy.typing import NDArray
+from scipy.ndimage import label
 
 # Types
-Grid = list[list[int]]  # matrix containing Grid
-Choices = list[list[int]]  # bitmask for possible x
+# ----------------------------------------------------------------------
+Grid = NDArray[np.int32]  # Each element is an int (xm)
+Choices = NDArray[np.int32]  # Each element is an int representing a set (cm)
+Nums = NDArray[np.int32]  # Numbers in each cell
+Array = NDArray[np.int32]  # General array
+Trio = tuple[int, int, int]
+
+WHITE_VALUE = 0
+BLACK_VALUE = 1
+
+WHITE = 1 << WHITE_VALUE
+BLACK = 1 << BLACK_VALUE
+GRAY = WHITE | BLACK
+RED = WHITE & BLACK
+possible_colors = [RED, WHITE, BLACK, GRAY]
 
 # Input
 # ----------------------------------------------------------------------
-
 # fmt: off
 z = 0
-grid = [
+nums_big: Nums = np.array([
     [ 6,  6,  z,  z,  z,  z,  z,  z,  z,  z,  z,  z,  z,  z,  z,  z,  z,  z,  6,  6],
     [ 6,  z,  z,  z,  z,  z,  z,  z,  z,  8, 12,  z,  z,  z,  z,  z,  z,  z,  z,  6],
     [ z,  z,  z, 10, 10,  z,  z,  z,  z,  z,  z,  z,  z,  z,  z, 12, 12,  z,  z,  z],
@@ -32,404 +42,536 @@ grid = [
     [ z,  z,  z,  1,  9,  z,  z,  z,  z,  z,  z,  z,  z,  z,  z,  1,  7,  z,  z,  z],
     [ 4,  z,  z,  z,  z,  z,  z,  z,  z, 12,  8,  z,  z,  z,  z,  z,  z,  z,  z,  4],
     [ 4,  4,  z,  z,  z,  z,  z,  z,  z,  z,  z,  z,  z,  z,  z,  z,  z,  z,  4,  4],
-]
+], dtype=np.int32)
+
+nums_small: Nums = np.array([
+    [z, 6, z, z, z, z, z],
+    [z, z, z, z, z, z, 3],
+    [z, z, z, 3, z, z, z],
+    [z, z, 6, 1, 5, z, z],
+    [z, z, z, 4, z, z, z],
+    [5, z, z, z, z, z, z],
+    [z, z, z, z, z, 4, z],
+], dtype=np.int32)
 # fmt: on
 
-# grid = [
-#     [z, 6, z, z, z, z, z],
-#     [z, z, z, z, z, z, 3],
-#     [z, z, z, 3, z, z, z],
-#     [z, z, 6, 1, 5, z, z],
-#     [z, z, z, 4, z, z, z],
-#     [5, z, z, z, z, z, z],
-#     [z, z, z, z, z, 4, z],
-# ]
+debug = True
 
 
-# Bitmasks
-# ----------------------------------------------------------------------
-""" Problem: fill each cell with a number x <- {0,...,b-1} such that
-every constraint is satisfied.
-
-At each stage of the algorithm, for each cell there is a set of numbers
-that could be in that cell. When the algorithm starts, that set will be
-{0,...,b-1}. Each subset S < {0,...,b-1} can be represented by a bitmask
-c = Σ_{x <- S} 2^x.
-"""
-
-m, n = len(grid), len(grid[0])  # shape of the grid
-b = 2  # b = num_bits, x <- {0,...,b-1}
-bit = [(1 << x) for x in range(b)]
-B = 0  # black
-W = 1  # white
-
-# c &= remove[x] -> remove x from the bitmask c
-remove = [(1 << x) ^ ((1 << b) - 1) for x in range(b)]
-
-# c &= remove_except[x] -> remove everything except x from the bitmask c
-remove_except = [1 << x for x in range(b)]
-
-# count[c] = number of 1s in binary representation of c.
-count = [0 for _ in range(1 << b)]
-for c in range(1, 1 << b):
-    count[c] = 1 + count[c & (c - 1)]
-
-# value[c] = location of first 1 in binary representation of c.
-value = [-1 for _ in range(1 << b)]
-for c in range(1, 1 << b):
-    value[c] = next(v for v in range(b) if c & (1 << v))
-
-
-# Conversion between Grid and Choices
-def board(cm: Choices) -> Grid:
-    """Given matrix of choices, return matrix of values."""
-    x = lambda c: value[c] if count[c] == 1 else -1
-    return [[x(cm[i][j]) for j in range(n)] for i in range(m)]
-
-
-def choices(xm: Grid) -> Choices:
-    """Given matrix of values, return matrix of choices."""
-    c = lambda x: (1 << b) - 1 if x == -1 else 1 << x
-    return [[c(xm[i][j]) for j in range(n)] for i in range(m)]
-
-
-M = max(map(max, grid))
-divisors = [[d for d in range(1, x + 1) if x % d == 0] for x in range(M + 1)]
-nums = []
-for i, j in product(range(m), range(n)):
-    if grid[i][j]:
-        nums.append((i, j, grid[i][j]))
-nums.sort(key=lambda t: t[2] * len(divisors[t[2]]))
-
-
-# Algorithm
+# Precomputations
 # ----------------------------------------------------------------------
 
 
-def solution(xm: Grid) -> Grid | None:
-    """Main function of backtracking algorithm.
+def orthogonally_adjacent(nums: Nums) -> Array:
+    m, n = nums.shape
+    orthogonally_adjacent = []
+    for i0, j0 in product(range(m), range(n)):
+        for o in range(2):
+            di = o
+            dj = 1 - o
+            i1 = i0 + di
+            j1 = j0 + dj
+            if not (0 <= i1 < m and 0 <= j1 < n):
+                continue
+            if nums[i0, j0] == 0 or nums[i1, j1] == 0:
+                continue
+            if nums[i0, j0] == nums[i1, j1]:
+                continue
+            orthogonally_adjacent.append((i0, j0, i1, j1))
+            orthogonally_adjacent.append((i1, j1, i0, j0))
+    return np.array(orthogonally_adjacent, dtype=np.int32)
 
-    Given initial grid xm, compute filled grid. Return None if no
-    solution exists.
-    """
-    stack = [choices(xm)]
+
+def rectangle_masks(nums: Nums, i: np.int32, j: np.int32, k: np.int32) -> Array:
+    m, n = nums.shape
+    masks = []
+    rectangle_shapes = [(a, int(k // a)) for a in range(1, k + 1) if k % a == 0]
+    for a, b in rectangle_shapes:
+        r_min = max(i - a + 1, 0)
+        r_max = min(m - a + 1, i + 1)
+        c_min = max(j - b + 1, 0)
+        c_max = min(n - b + 1, j + 1)
+        row_indices = np.arange(r_min, r_max, dtype=np.int32)
+        col_indices = np.arange(c_min, c_max, dtype=np.int32)
+        black_rectangle = BLACK * np.ones((a, b), dtype=np.int32)
+        for r, c in product(row_indices, col_indices):
+            mask = np.zeros((m, n), dtype=np.int32)
+            mask[r : r + a, c : c + b] = black_rectangle
+            digit_mask = mask.astype(bool) * nums
+            if np.unique(digit_mask[digit_mask != 0]).size > 1:
+                continue
+            white_surrounds = WHITE * surroundings_2d(mask.astype(bool))
+            mask = np.where(white_surrounds, white_surrounds, mask)
+            masks.append(mask[None, :, :])
+    return np.concatenate(masks, axis=0) if masks else np.zeros((0, m, n), dtype=np.int32)
+
+
+def surroundings_2d(mask: NDArray[np.bool]) -> NDArray[np.bool]:
+    mask_u = np.pad(mask[:-1, :], ((1, 0), (0, 0)), constant_values=False)
+    mask_d = np.pad(mask[1:, :], ((0, 1), (0, 0)), constant_values=False)
+    mask_l = np.pad(mask[:, :-1], ((0, 0), (1, 0)), constant_values=False)
+    mask_r = np.pad(mask[:, 1:], ((0, 0), (0, 1)), constant_values=False)
+    return (mask_u | mask_d | mask_l | mask_r) & ~mask
+
+
+def surroundings_3d(mask: NDArray[np.bool]) -> NDArray[np.bool]:
+    return np.stack([surroundings_2d(slice) for slice in mask])
+
+
+def initial(nums: Nums, numbered: Array, rectangles: dict[Trio, Array]) -> Choices:
+    cm = np.where(nums == 1, BLACK, GRAY).astype(np.int32)
+    for (i, j, _), mask in zip(numbered, rectangles.values()):
+        if mask.shape[0] == 0:
+            cm[i, j] &= WHITE
+    return cm
+
+
+def tup(arr: NDArray[np.int32]) -> Trio:
+    return tuple(map(int, arr))
+
+
+# Solution loop
+# ----------------------------------------------------------------------
+
+
+def solution(
+    nums: Nums,
+    numbered: Array,
+    adjacent: Array,
+    rectangles: dict[Trio, Array],
+) -> Grid | None:
+    cm0 = initial(nums, numbered, rectangles)
+    stack = [cm0]
     while stack:
-        cm = prune(stack.pop())
-        if not cm:
+        cm_top = stack.pop()
+        cm = prune(nums, adjacent, cm_top)
+        if cm is None:
             continue
         if accept(cm):
-            return board(cm)
-        stack += expand(cm)
+            return grid(cm)
+        else:
+            stack += expand(nums, numbered, rectangles, cm)
     return None
 
 
-def accept(cm: Choices) -> bool:
-    """True iff the grid is completely filled."""
-    return all(count[cm[i][j]] == 1 for i, j in product(range(m), range(n)))
+def grid(cm: Choices) -> Grid:
+    return np.log2(cm).astype(np.int32)
 
 
-def expand(cm: Choices) -> list[Choices]:
-    """Start with a partially filled grid cm.
-
-    Then
-    1. Find a number in a cell which is unfilled or which is black
-       and incomplete. Fill grid with all possibilities of black
-       rectangles, return those possibilities. If such a number
-       can't be found, then:
-    2. Find an empty cell. Fill that cell with white or black.
-    """
-
-    components, num_components = ccs(cm)
-    _, complete = nbhds(cm, components, num_components)
-
-    for i, j, x in nums:
-        unknown = count[cm[i][j]] > 1
-        black_incompl = cm[i][j] == bit[B] and not complete[components[i][j]]
-        if unknown or black_incompl:
-            ans = []
-
-            # fill (i, j) with white
-            cm_new = deepcopy(cm)
-            cm_new[i][j] &= remove_except[W]
-            if cm_new[i][j]:
-                ans.append(cm_new)
-
-            # fill (i, j) with black rectangle + white neighbourhood
-            for m_ in divisors[x]:
-                n_ = x // m_
-                for k in range(x):
-                    i0 = i - (k // n_)
-                    j0 = j - (k % n_)
-                    if not ((0 <= i0 <= m - m_) and (0 <= j0 <= n - n_)):
-                        continue
-
-                    i1, j1 = i0 + m_, j0 + n_
-                    cm_new = deepcopy(cm)
-
-                    # fill cm_new with a black rectangle of shape (m_, n_)
-                    stopped = False
-                    for i_, j_ in product(range(i0, i1), range(j0, j1)):
-                        cm_new[i_][j_] &= remove_except[B]
-                        if not cm_new[i_][j_]:
-                            stopped = True
-                            break
-                    if stopped:
-                        continue
-
-                    # fill cm_new neighborhood of the rectangle with white
-                    nbhd_u = [(i0 - 1, j_) for j_ in range(j0, j1)]
-                    nbhd_d = [(i1, j_) for j_ in range(j0, j1)]
-                    nbhd_l = [(i_, j0 - 1) for i_ in range(i0, i1)]
-                    nbhd_r = [(i_, j1) for i_ in range(i0, i1)]
-                    nbhd = nbhd_u + nbhd_d + nbhd_l + nbhd_r
-
-                    stopped = False
-                    for i_, j_ in nbhd:
-                        if not (0 <= i_ < m and 0 <= j_ < n):
-                            continue
-                        cm_new[i_][j_] &= remove_except[W]
-                        if not cm_new[i_][j_]:
-                            stopped = True
-                            break
-                    if stopped:
-                        continue
-
-                    ans.append(cm_new)
-
-            return ans
-
-    # find empty cell, fill with black/white
-    func = lambda t: count[cm[t[0]][t[1]]] > 1
-    i0, j0 = next(filter(func, product(range(m), range(n))))
-    ans = []
-    for x in range(b):
-        cm_new = deepcopy(cm)
-        cm_new[i0][j0] = 1 << x
-        ans.append(cm_new)
-    return ans
+@njit
+def reject(cm: Choices | None) -> bool:
+    return cm is None or not np.all(cm)
 
 
-def prune(cm: Choices) -> Choices | None:
-    """Given partially filled grid, use constraints of the problem to remove
-    numbers from the list of possibilities of each cell."""
-    cm = deepcopy(cm)
-    edited = False
-
-    # compute connected components
-    components, num_components = ccs(cm)
-
-    # areas[k] = area of cc with index k
-    areas = [0 for _ in range(num_components)]
-    for i, j in product(range(m), range(n)):
-        areas[components[i][j]] += 1
-
-    # colors[k] = color of cc with index k
-    colors = [0 for _ in range(num_components)]
-    for i, j in product(range(m), range(n)):
-        colors[components[i][j]] = cm[i][j]
-
-    # coordinates[k] = [(i, j) | components[i][j] = k]
-    coordinates = [[] for _ in range(num_components)]
-    for i, j in product(range(m), range(n)):
-        coordinates[components[i][j]].append((i, j))
-
-    neighborhood, complete = nbhds(cm, components, num_components)
-
-    # complete and ((Black, not rectangle) or (White, rectangle)) -> reject
-    for k in range(num_components):
-        if (
-            count[colors[k]] == 1
-            and complete[k]
-            and value[colors[k]] == int(rectangle(coordinates[k]))
-        ):
-            return None
-
-    # areas
-    # num < area -> reject
-    # num > area -> if complete, reject
-    # num = area -> if not complete, surround with opposite color
-    for k in range(num_components):
-        if count[colors[k]] > 1:
-            continue
-        nums_k = set(grid[i][j] for i, j in coordinates[k] if grid[i][j])
-        if len(nums_k) > 1:
-            return None
-        for num in nums_k:
-            if num < areas[k]:
-                return None
-            elif num > areas[k]:
-                if complete[k]:
-                    return None
-            else:
-                if not complete[k]:
-                    for i, j in neighborhood[k]:
-                        cm[i][j] &= remove[value[colors[k]]]
-                        if not cm[i][j]:
-                            return None
-                    edited = True
-
-    # Two numbers orth adjacent and different => colors are different
-    # (o = 0) => 2 cells are vertical, (o = 1) => 2 cells are horizontal
-    # (u = 0) => [(i0,j0) | (i1,j1)], (u = 1) => [(i1,j1) | (i0,j0)]
-    for o, u in product(range(2), repeat=2):
-        ran_i = range(not o and u, m - (not o and not u))
-        ran_j = range(u and o, u - (o and not u))
-        for i0, j0 in product(ran_i, ran_j):
-            i1 = i0 + (not o) * (-1 if u else 1)
-            j1 = j0 + o * (-1 if u else 1)
-            n0 = grid[i0][j0]
-            n1 = grid[i1][j1]
-            if n0 and n1 and n0 != n1 and count[cm[i0][j0]] == 1:
-                c = cm[i1][j1]
-                cm[i1][j1] &= remove[value[cm[i0][j0]]]
-                edited |= cm[i1][j1] != c
-                if not cm[i1][j1]:
-                    return None
-
-    # Diagonal is [black, black] => Opposite diagonal has equal values
-    for i, j in product(range(m - 1), range(n - 1)):
-        for o in range(4):
-            i0, j0 = i + ((o + 0 - 1) % 4 < 2), j + ((o + 0) % 4 > 1)  # main
-            i1, j1 = i + ((o + 1 - 1) % 4 < 2), j + ((o + 1) % 4 > 1)  # diag
-            i2, j2 = i + ((o + 2 - 1) % 4 < 2), j + ((o + 2) % 4 > 1)  # op
-            i3, j3 = i + ((o + 3 - 1) % 4 < 2), j + ((o + 3) % 4 > 1)  # diag
-            if cm[i1][j1] == bit[B] and cm[i3][j3] == bit[B] and count[cm[i2][j2]] == 1:
-                c = cm[i0][j0]
-                cm[i0][j0] &= remove_except[value[cm[i2][j2]]]
-                edited |= cm[i0][j0] != c
-                if not cm[i0][j0]:
-                    return None
-
-    return prune(cm) if edited else cm
+@njit
+def accept(cm: Choices) -> np.bool:
+    return np.all(cm & (cm - 1) == 0)
 
 
-def nbhds(
-    cm: Grid, components: list[list[int]], num_components: int
-) -> tuple[
-    list[list[tuple[int, int]]],
-    list[int],
-]:
-    # neighborhood[k] = [(i,j) | (i,j) is orth adj to coordinates[k]]
-    neighborhood = [[] for _ in range(num_components)]
-    for o in range(2):
-        for i0, j0 in product(range(m - (o == 0)), range(n - (o == 1))):
-            i1 = i0 + (o == 0)
-            j1 = j0 + (o == 1)
-            k0 = components[i0][j0]
-            k1 = components[i1][j1]
-            if k0 != k1:
-                neighborhood[k0].append((i1, j1))
-                neighborhood[k1].append((i0, j0))
-
-    # complete[k] = 1 if comp k is surrounded by opposite color, else 0
-    complete = [0 for _ in range(num_components)]
-    for k in range(num_components):
-        complete[k] = int(all(count[cm[i][j]] == 1 for i, j in neighborhood[k]))
-
-    return (neighborhood, complete)
-
-
-def rectangle(arr: list[tuple[int, int]]) -> bool:
-    """Given sorted list of coordinates, return True if and only if the
-    coordinates are a rectangle."""
-    if not arr:
-        return True
-    i0, j0 = arr[0]
-    i1, j1 = arr[-1][0] + 1, arr[-1][1] + 1
-    m_, n_ = i1 - i0, j1 - j0
-    if m_ * n_ != len(arr):
-        return False
-    for k, (i, j) in enumerate(arr):
-        ik, jk = divmod(k, n_)
-        if (i0 + ik, j0 + jk) != (i, j):
-            return False
-    return True
-
-
-def ccs(xm: list[list[int]]) -> tuple[list[list[int]], int]:
-    """Use a DFS to compute the connected components of the grid."""
-    direc = [(1, 0), (-1, 0), (0, 1), (0, -1)]
-    comps = [[0 for _ in range(n)] for _ in range(m)]
-    n_ccs = 0
-
-    for i, j in product(range(m), range(n)):
-        if not comps[i][j]:
-            n_ccs += 1
-            # do a DFS starting from i, j, marking that cc with comps
-            stack = [(i, j)]
-            while stack:
-                x, y = stack.pop()
-                comps[x][y] = n_ccs
-                for dx, dy in direc:
-                    x_ = x + dx
-                    y_ = y + dy
-                    if not (0 <= x_ < m and 0 <= y_ < n):
-                        continue
-                    if comps[x_][y_]:
-                        continue
-                    if xm[x][y] != xm[x_][y_]:
-                        continue
-                    stack.append((x_, y_))
-
-    for i, j in product(range(m), range(n)):
-        comps[i][j] -= 1
-
-    return (comps, n_ccs)
-
-
-# Solve the puzzle
+# Expand
 # ----------------------------------------------------------------------
 
 
-def printsol(xm: Grid) -> None:
+def expand(
+    nums: Nums,
+    numbered: Array,
+    rectangles: dict[Trio, Array],
+    cm: Choices,
+) -> list[Choices]:
+    unfilled_numbered = unfilled(nums, numbered, cm)
+    if unfilled_numbered.size:
+        # If for some (i, j, k) there are no ways to complete, reject
+        expan = [expansions(rectangles[tup(cell)], cm, cell) for cell in unfilled_numbered]
+        if any(v.shape[0] == 0 for v in expan):
+            return []
+        # If all expansions agree on a region, fill just that region and return
+        or_masks = [np.bitwise_or.reduce(v, axis=0, keepdims=True) for v in expan]
+        or_mask = np.concatenate(or_masks, axis=0)
+        or_mask_singleton = or_mask & (or_mask - 1) == 0
+        cm_new_stack = np.where(or_mask_singleton, cm & or_mask, cm)
+        cm_new = np.bitwise_and.reduce(cm_new_stack, axis=0)
+        if not np.array_equal(cm, cm_new):
+            return [cm_new]
+        # Find cell with fewest possibilities, fill it with white and possible black rectangles
+        min_key = lambda arr: arr.shape[0]
+        minimal_expansion = min(expan, key=min_key)
+        return list(minimal_expansion)
+    else:
+        # Find an unfilled cell and fill it with black and white
+        i, j = np.argwhere(cm == GRAY)[0]
+        cm_copies = np.repeat(cm[np.newaxis, ...], 2, axis=0)
+        cm_copies[:, i, j] = [WHITE, BLACK]
+        return list(cm_copies)
+
+
+def unfilled(nums: Nums, numbered_cells: Array, cm: Choices) -> NDArray[np.bool]:
+    components = connected_components(cm)
+    cardinality_array = np.sum(components, axis=(1, 2))
+    cardinality_mask = np.sum(components * cardinality_array[:, None, None], axis=0)
+    digits_array = np.max(components * nums, axis=(1, 2))
+    digits_mask = np.sum(components * digits_array[:, None, None], axis=0)
+    mask = np.where(cm == BLACK, cardinality_mask < digits_mask, cm == GRAY)
+    rows = numbered_cells[:, 0]
+    cols = numbered_cells[:, 1]
+    indices = mask[rows, cols]
+    return numbered_cells[indices]
+
+
+def connected_components(cm: Choices) -> NDArray[np.bool]:
+    color_sets = cm == np.unique(cm)[:, None, None]
+    component_sets_list = []
+    for color_set in color_sets:
+        components, _ = label(color_set)
+        nonzero_values = np.unique(components[components != 0])
+        component_sets = components == nonzero_values[:, None, None]
+        component_sets_list.append(component_sets)
+    return np.concatenate(component_sets_list)
+
+
+def expansions(masks: Array, cm: Choices, cell: Array) -> Array:
+    i, j, _ = cell
+    if cm[i, j] == GRAY:
+        white_mask = np.zeros_like(cm)
+        white_mask[i, j] = WHITE
+        masks = np.concatenate((np.expand_dims(white_mask, axis=0), masks), axis=0)
+    possibilities = np.where(masks, cm & masks, cm)
+    valid_indices = np.all(possibilities, axis=(1, 2))
+    return possibilities[valid_indices]
+
+
+# Prune
+# ----------------------------------------------------------------------
+
+
+def prune(
+    nums: Nums,
+    adjacent: Array,
+    cm: Choices,
+) -> Choices | None:
+    rules = [
+        reject_invalid,
+        fill_surroundings,
+        fill_rectangular_closure,
+        adjacent_regions_different_nums,
+        orthogonally_adjacent_nums,
+        black_diagonal,
+        join_components_with_gray_cell,
+        unique_path_for_component,
+    ]
+
+    prune_again = True
+    while prune_again:
+        cm_temp = np.copy(cm)
+        for func in rules:
+            components = connected_components(cm)
+            closures = rectangle_closure_3d(components)
+            surroundings = surroundings_3d(components)
+            colors, cardinality, max_digit, num_digits, is_rectangle, is_finished = component_data(
+                nums, cm, components, closures, surroundings
+            )
+            args = (
+                nums,
+                adjacent,
+                cm,
+                components,
+                closures,
+                surroundings,
+                colors,
+                cardinality,
+                max_digit,
+                num_digits,
+                is_rectangle,
+                is_finished,
+            )
+
+            cm = func(*args)
+            if cm is None or not np.all(cm):
+                return None
+        prune_again = not np.array_equal(cm, cm_temp)
+    return cm
+
+
+@njit
+def rectangle_closure_2d(mask: NDArray[np.bool]) -> NDArray[np.bool]:
+    rows, cols = np.where(mask)
+    row_min, row_max = rows.min(), rows.max()
+    col_min, col_max = cols.min(), cols.max()
+    result = np.zeros(mask.shape, dtype=np.bool)
+    result[row_min : row_max + 1, col_min : col_max + 1] = True
+    return result
+
+
+def rectangle_closure_3d(mask: NDArray[np.bool]) -> NDArray[np.bool]:
+    return np.stack([rectangle_closure_2d(slice) for slice in mask])
+
+
+def component_data(
+    nums: Nums,
+    cm: Choices,
+    components: NDArray[np.bool],
+    closures: NDArray[np.bool],
+    surroundings: NDArray[np.bool],
+) -> tuple[NDArray, ...]:
+    digits = components * nums
+    colors = np.max(components * cm, axis=(1, 2))
+    cardinality = np.sum(components, axis=(1, 2), dtype=np.int32)
+    max_digit = np.max(digits, axis=(1, 2))
+    num_digits = np.array([np.unique(digs[digs != 0]).size for digs in digits])
+    is_rectangle = np.all(components == closures, axis=(1, 2))
+    is_finished = np.all(surroundings * cm != GRAY, axis=(1, 2))
+    return colors, cardinality, max_digit, num_digits, is_rectangle, is_finished
+
+
+@njit
+def reject_invalid(
+    nums: Nums,
+    adjacent: Array,
+    cm: Choices,
+    components: NDArray[np.bool],
+    closures: NDArray[np.bool],
+    surroundings: NDArray[np.bool],
+    colors: NDArray[np.int32],
+    cardinality: NDArray[np.int32],
+    max_digit: NDArray[np.int32],
+    num_digits: NDArray[np.int32],
+    is_rectangle: NDArray[np.bool],
+    is_finished: NDArray[np.bool],
+) -> Choices | None:
+    if np.any((colors == WHITE) & is_finished & is_rectangle):
+        return None
+    if np.any((colors == BLACK) & is_finished & ~is_rectangle):
+        return None
+    if np.any((colors != GRAY) & (num_digits > 1)):
+        return None
+    if np.any((colors != GRAY) & (num_digits == 1) & (cardinality > max_digit)):
+        return None
+    if np.any((colors != GRAY) & (num_digits == 1) & (cardinality < max_digit) & is_finished):
+        return None
+    return cm
+
+
+def fill_surroundings(
+    nums: Nums,
+    adjacent: Array,
+    cm: Choices,
+    components: NDArray[np.bool],
+    closures: NDArray[np.bool],
+    surroundings: NDArray[np.bool],
+    colors: NDArray[np.int32],
+    cardinality: NDArray[np.int32],
+    max_digit: NDArray[np.int32],
+    num_digits: NDArray[np.int32],
+    is_rectangle: NDArray[np.bool],
+    is_finished: NDArray[np.bool],
+) -> Choices | None:
+    indices = (colors != GRAY) & ~is_finished & (num_digits == 1) & (cardinality == max_digit)
+    mask = np.bitwise_or.reduce((colors[:, None, None] * surroundings)[indices], axis=0)
+    return np.where(mask, cm & ~mask, cm)
+
+
+def fill_rectangular_closure(
+    nums: Nums,
+    adjacent: Array,
+    cm: Choices,
+    components: NDArray[np.bool],
+    closures: NDArray[np.bool],
+    surroundings: NDArray[np.bool],
+    colors: NDArray[np.int32],
+    cardinality: NDArray[np.int32],
+    max_digit: NDArray[np.int32],
+    num_digits: NDArray[np.int32],
+    is_rectangle: NDArray[np.bool],
+    is_finished: NDArray[np.bool],
+) -> Choices | None:
+    indices = (colors == BLACK) & ~is_finished & ~is_rectangle
+    mask = BLACK * np.bitwise_or.reduce(closures[indices], axis=0)
+    return np.where(mask, cm & mask, cm)
+
+
+@njit
+def adjacent_regions_different_nums(
+    nums: Nums,
+    adjacent: Array,
+    cm: Choices,
+    components: NDArray[np.bool],
+    closures: NDArray[np.bool],
+    surroundings: NDArray[np.bool],
+    colors: NDArray[np.int32],
+    cardinality: NDArray[np.int32],
+    max_digit: NDArray[np.int32],
+    num_digits: NDArray[np.int32],
+    is_rectangle: NDArray[np.bool],
+    is_finished: NDArray[np.bool],
+) -> Choices | None:
+    cm = np.copy(cm)
+    indices = (colors != GRAY) & num_digits == 1
+    for digit, color, surround in zip(max_digit[indices], colors[indices], surroundings[indices]):
+        surrounding_digits = np.logical_and(surround, nums)
+        for i, j in np.argwhere(surrounding_digits):
+            if nums[i, j] != digit:
+                cm[i, j] &= ~color
+    return cm
+
+
+@njit
+def orthogonally_adjacent_nums(
+    nums: Nums,
+    adjacent: Array,
+    cm: Choices,
+    components: NDArray[np.bool],
+    closures: NDArray[np.bool],
+    surroundings: NDArray[np.bool],
+    colors: NDArray[np.int32],
+    cardinality: NDArray[np.int32],
+    max_digit: NDArray[np.int32],
+    num_digits: NDArray[np.int32],
+    is_rectangle: NDArray[np.bool],
+    is_finished: NDArray[np.bool],
+) -> Choices | None:
+    cm = np.copy(cm)
+    for i0, j0, i1, j1 in adjacent:
+        for color in [WHITE, BLACK]:
+            if cm[i0, j0] == color:
+                cm[i1, j1] &= ~color
+    return cm
+
+
+@njit
+def black_diagonal(
+    nums: Nums,
+    adjacent: Array,
+    cm: Choices,
+    components: NDArray[np.bool],
+    closures: NDArray[np.bool],
+    surroundings: NDArray[np.bool],
+    colors: NDArray[np.int32],
+    cardinality: NDArray[np.int32],
+    max_digit: NDArray[np.int32],
+    num_digits: NDArray[np.int32],
+    is_rectangle: NDArray[np.bool],
+    is_finished: NDArray[np.bool],
+) -> Choices | None:
+    m, n = cm.shape
+    cm = np.copy(cm)
+    for i in range(m - 1):
+        for j in range(n - 1):
+            for o in range(4):
+                i0, j0 = i + ((o + 0 - 1) % 4 < 2), j + ((o + 0) % 4 > 1)  # main
+                i1, j1 = i + ((o + 1 - 1) % 4 < 2), j + ((o + 1) % 4 > 1)  # diag
+                i2, j2 = i + ((o + 2 - 1) % 4 < 2), j + ((o + 2) % 4 > 1)  # op
+                i3, j3 = i + ((o + 3 - 1) % 4 < 2), j + ((o + 3) % 4 > 1)  # diag
+                if cm[i1, j1] == BLACK and cm[i2, j2] == WHITE and cm[i3, j3] == BLACK:
+                    cm[i0, j0] &= WHITE
+    return cm
+
+
+@njit
+def join_components_with_gray_cell(
+    nums: Nums,
+    adjacent: Array,
+    cm: Choices,
+    components: NDArray[np.bool],
+    closures: NDArray[np.bool],
+    surroundings: NDArray[np.bool],
+    colors: NDArray[np.int32],
+    cardinality: NDArray[np.int32],
+    max_digit: NDArray[np.int32],
+    num_digits: NDArray[np.int32],
+    is_rectangle: NDArray[np.bool],
+    is_finished: NDArray[np.bool],
+) -> Choices | None:
+    cm = np.copy(cm)
+    for i, j in np.argwhere(cm == GRAY):
+        for color in [BLACK, WHITE]:
+            filters = surroundings[:, i, j] & colors == color
+            cardinalities = cardinality[filters]
+            digit_list = max_digit[filters]
+            digit_list = digit_list[digit_list != 0]
+            num_unique_digits = np.unique(digit_list).size
+            minimal_digit = 10e6 if digit_list.size == 0 else np.min(digit_list)
+            if num_unique_digits > 1 or minimal_digit < 1 + np.sum(cardinalities):
+                cm[i, j] &= ~color
+    return cm
+
+
+def unique_path_for_component(
+    nums: Nums,
+    adjacent: Array,
+    cm: Choices,
+    components: NDArray[np.bool],
+    closures: NDArray[np.bool],
+    surroundings: NDArray[np.bool],
+    colors: NDArray[np.int32],
+    cardinality: NDArray[np.int32],
+    max_digit: NDArray[np.int32],
+    num_digits: NDArray[np.int32],
+    is_rectangle: NDArray[np.bool],
+    is_finished: NDArray[np.bool],
+) -> Choices | None:
+    unique_path = np.sum(np.logical_and(surroundings, cm == GRAY), axis=(1, 2)) == 1
+    indices = (colors != GRAY) & (num_digits == 1) & (cardinality < max_digit) & unique_path
+    colors_filtered = colors[indices]
+    surrounds_filtered = np.logical_and(surroundings[indices], cm == GRAY)
+    masks = colors_filtered[:, None, None] * surrounds_filtered
+    for mask in masks:
+        cm = np.where(mask, cm & mask, cm)
+    return cm
+
+
+# Display answer
+# ----------------------------------------------------------------------
+def plot(nums: Nums, cm: Choices, title: str = "") -> None:
     _, ax = plt.subplots(1, 1, figsize=(6, 6))
-    xm = np.array(xm)
-    gm = np.array(grid).astype("int").astype("str")
-    gm[gm == "0"] = ""
+    annot = np.array(nums).astype("str")
+    annot[annot == "0"] = ""
+    cmap = ["red", "white", "black", "gray"]
     ax = sns.heatmap(
-        xm,
-        annot=gm,
+        cm,
+        annot=annot,
         cbar=False,
         fmt="",
         linewidths=0.1,
         linecolor="black",
         square=True,
-        cmap=["black", "white"],
+        cmap=cmap,
+        vmin=0,
+        vmax=3,
     )
     ax.tick_params(left=False, labelleft=False, bottom=False, labelbottom=False)
+    if title:
+        plt.title(title)
     plt.show()
 
 
-# 2 Possible choices:
-# 1. Run script starting from scratch (~30 min on my machine)
-starting_grid_slow = [[-1 for _ in range(n)] for _ in range(m)]
+def answer(xm: Grid) -> np.int32:
+    return np.prod(np.sum(xm == 0, axis=1))
 
-# 2. Fill grid by hand and use script to fill last cells (<1 min)
-u = -1
-starting_grid_fast = [
-    [u, u, u, u, u, u, u, u, u, B, W, W, W, W, W, W, W, B, B, B],
-    [u, u, u, u, u, u, u, u, u, W, B, B, B, B, B, B, W, B, B, B],
-    [u, u, u, u, u, u, u, u, u, W, B, B, B, B, B, B, W, W, W, W],
-    [u, u, u, u, u, u, u, u, W, B, W, W, W, W, W, W, B, B, B, B],
-    [u, u, u, u, u, u, u, W, B, W, B, B, W, W, W, B, W, W, W, W],
-    [u, W, u, u, W, W, W, B, W, W, B, B, W, B, W, B, W, B, B, B],
-    [u, B, u, W, B, B, B, W, B, B, W, W, B, W, B, W, W, W, W, W],
-    [u, B, u, W, B, B, B, W, B, B, W, W, B, W, B, W, B, B, B, B],
-    [u, W, u, W, B, B, B, W, B, B, W, B, W, W, B, W, B, B, B, B],
-    [W, W, W, B, W, W, W, W, W, W, B, W, u, u, W, B, W, W, W, W],
-    [B, B, W, W, B, B, B, B, B, B, W, u, u, u, u, W, B, W, B, B],
-    [B, B, W, W, B, B, B, B, B, B, W, u, u, u, u, B, W, W, B, B],
-]
 
-# Choose the solution with faster runtime
-starting_grid = starting_grid_fast
+# Computations
+# ----------------------------------------------------------------------
 
-t0 = time()
-sol = solution(starting_grid)
-ans = prod(sum(sol[i][j] for j in range(n)) for i in range(m))
-t1 = time() - t0
-print(f"Found solution in {t1 / 60:.2f} min.")
+nums: Nums = nums_small
+numbered: Array = np.array([(i, j, k) for (i, j), k in np.ndenumerate(nums) if k], dtype=np.int32)
+adjacent: Array = orthogonally_adjacent(nums)
+rectangles: dict[Trio, Array] = {tup(c): rectangle_masks(nums, *c) for c in numbered}
+
+with Timer(initial_text="Solving example array (before compiling)..."):
+    sol = solution(nums, numbered, adjacent, rectangles)
+with Timer(initial_text="Solving example array (after compiling)..."):
+    sol = solution(nums, numbered, adjacent, rectangles)
+ans = answer(sol)
 print(f"{ans = }")
-print("sol = ")
-pprint(sol)
-printsol(sol)
+print(f"{sol = }")
+
+
+nums: Nums = nums_big
+numbered: Array = np.array([(i, j, k) for (i, j), k in np.ndenumerate(nums) if k], dtype=np.int32)
+adjacent: Array = orthogonally_adjacent(nums)
+rectangles: dict[Trio, Array] = {tup(c): rectangle_masks(nums, *c) for c in numbered}
+
+with Timer(initial_text="Solving puzzle..."):
+    sol = solution(nums, numbered, adjacent, rectangles)
+ans = answer(sol)
+print(f"{ans = }")
+print(f"{sol = }")
+plot(nums, 1 << sol, title=f"Answer = {ans}")
