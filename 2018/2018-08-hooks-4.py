@@ -256,3 +256,15 @@ ans = problem.answer(X)
 print(f"{ans = }")
 print(f"{X}")
 problem.plot(X, hooks)
+# Solving problem...
+# Elapsed time: 9.2542 seconds
+# ans = 6000
+# [[9 9 0 0 0 0 9 9 9]
+#  [0 8 8 0 8 8 8 0 9]
+#  [0 0 7 7 7 0 0 8 9]
+#  [6 6 0 0 0 0 7 8 0]
+#  [0 5 5 0 0 6 7 0 0]
+#  [4 4 0 4 5 6 0 0 0]
+#  [0 2 0 0 0 6 0 0 0]
+#  [3 2 1 0 5 6 7 0 9]
+#  [3 0 3 4 5 0 7 8 9]]
