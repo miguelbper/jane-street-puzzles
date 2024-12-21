@@ -157,9 +157,7 @@ class Hooks4(Backtracking):
 
         num_is_max = num_ds == max_ds  # (2, n) [d, k]
         mask = (xm_levels == 3) & num_is_max.reshape(2, n, 1, 1)  # (2, n, n, n) [d, k, i, j]
-        xm_levels_masked = np.where(
-            mask, 1 << (1 - ds.reshape(2, 1, 1, 1)), xm_levels
-        )  # (2, n, n, n) [d, k, i, j] # noqa: E501
+        xm_levels_masked = np.where(mask, 1 << (1 - ds.reshape(2, 1, 1, 1)), xm_levels)  # noqa: E501  # (2, n, n, n) [d, k, i, j]
         update = np.sum(xm_levels_masked, axis=1)  # (2, n, n) [d, i, j]
         xm_new = np.copy(xm)  # (n, n) [i, j]
         for upd in update:
