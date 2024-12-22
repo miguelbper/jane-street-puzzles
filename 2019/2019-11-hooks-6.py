@@ -1,5 +1,6 @@
-from functools import reduce
+from functools import partial, reduce
 from itertools import product
+from math import gcd
 from operator import mul
 
 import matplotlib.colors as mcolors
@@ -11,12 +12,26 @@ from numpy.typing import NDArray
 from pyprune import Backtracking
 from scipy.ndimage import label, sum_labels
 
-rows = np.array([810, 585, 415, 92, 67, 136, 8, 225, 567])
-cols = np.array([28, 552, 64, 15, 86, 1304, 170, 81, 810])
+# fmt: off
+red = np.array([
+    [9, 0, 6, 5, 0, 0, 0, 0, 0],  # L
+    [0, 1, 0, 0, 1, 0, 8, 0, 0],  # D
+    [0, 1, 0, 9, 0, 1, 0, 8, 0],  # R
+    [0, 0, 1, 0, 2, 0, 1, 0, 8],  # U
+], dtype=np.int32)
+
+blk = np.array([
+    [0, 0    , 0, 0    , 7**3, 0, 48**2, 0, 0    ], # L
+    [0, 0    , 0, 15**2, 0   , 0, 0    , 0, 99**2], # D
+    [0, 0    , 0, 0    , 0   , 0, 6**2 , 0, 0    ], # R
+    [0, 42**3, 0, 0    , 0   , 0, 0    , 0, 0    ], # U
+], dtype=np.int32)
+# fmt: on
+
 IntArray = NDArray[np.int32]
 
 
-class Hooks4(Backtracking):
+class Hooks6(Backtracking):
     """Backtracking is a class from PyPrune, a library I made to solve.
 
     these kinds of problems. To use it, we need to define methods
@@ -39,10 +54,11 @@ class Hooks4(Backtracking):
 
     # Init and utils
     # ------------------------------------------------------------------
-    def __init__(self, rows: IntArray, cols: IntArray) -> None:
-        n = rows.shape[0]
-        self.rows = rows
-        self.cols = cols
+    def __init__(self, red: IntArray, blk: IntArray) -> None:
+        _, n = red.shape
+        self.red = red
+        self.blk = blk
+        self.nums = np.stack([red, blk])  # red = 0, blk = 1
         self.masks = np.array(list(product(range(2), repeat=n)))
 
         xm = sum(1 << b for b in range(2)) * np.ones((n, n), dtype=np.int32)
@@ -100,18 +116,22 @@ class Hooks4(Backtracking):
         return hooks
 
     @staticmethod
-    def score_1d(X: IntArray) -> np.int32:
+    def score_1d(X: IntArray, color: int) -> np.int32:
+        if np.array_equal(X, np.zeros_like(X)):
+            return 0
         n = X.shape[-1]
         I = np.eye(n, dtype=bool)
         M = X.astype(np.bool)
-        starts = np.argwhere(M & (~np.roll(M, 1) | I[0]))
-        ends = np.argwhere(M & (~np.roll(M, -1) | I[n - 1])) + 1
-        cum_prod = np.cumulative_prod(np.where(X, X, 1), include_initial=True)
-        products = cum_prod[ends] // cum_prod[starts]
-        return np.sum(products)
+        starts = np.argwhere(M & (~np.roll(M, 1) | I[0])).reshape(-1)
+        ends = (np.argwhere(M & (~np.roll(M, -1) | I[n - 1])) + 1).reshape(-1)
+        lists_digits = [X[s:e] for s, e in zip(starts, ends)]
+        nums = [int("".join(map(str, digits))) for digits in lists_digits]
+        func = np.prod if color else partial(reduce, gcd)
+        return func(nums)
 
-    def score(self, X: IntArray) -> IntArray:
-        return np.vectorize(self.score_1d, signature="(n)->()")(X)
+    def score(self, X: IntArray, color: int) -> IntArray:
+        aux = lambda X: self.score_1d(X, color)
+        return np.vectorize(aux, signature="(n)->()")(X)
 
     # Expand
     # ------------------------------------------------------------------
@@ -133,6 +153,7 @@ class Hooks4(Backtracking):
         funcs = [
             self.connectedness,
             self.num_digits,
+            self.two_by_two,
             self.scores,
         ]
         for func in funcs:
@@ -174,23 +195,47 @@ class Hooks4(Backtracking):
         cm_new = self.join(xm_new, os)
         return cm_new
 
+    def two_by_two(self, cm: IntArray) -> IntArray | None:
+        xm, os = self.split(cm)
+        n, _ = xm.shape
+        mask = np.zeros_like(xm, dtype=np.bool)
+        for i, j in product(range(n - 1), repeat=2):
+            corners = [(i + ((c + 1) % 4 > 1), j + (c > 1)) for c in range(4)]
+            for corner in corners:
+                rest_filled = all(xm[a, b] == 1 << 1 for a, b in corners if (a, b) != corner)
+                if rest_filled:
+                    mask[*corner] = True
+        xm_new = np.where(mask, xm & (1 << 0), xm)
+        cm_new = self.join(xm_new, os)
+        return cm_new
+
     def scores(self, cm: IntArray) -> IntArray | None:
         xm, os = self.split(cm)
         hooks = self.get_hooks(os)  # (n, n) [i, j]
         xm_new = np.copy(xm)
-        for transpose in range(2):
-            nums = self.cols if transpose else self.rows
-            xm_t = xm_new.T if transpose else xm_new
-            hooks_t = hooks.T if transpose else hooks
-            update_t = self.scores_update(xm_t, hooks_t, nums)
-            if update_t is None:
+
+        for color, side in product(range(2), range(4)):
+            nums = self.nums[color, side]
+            xm_rot = np.rot90(xm_new, k=-side)
+            hooks_rot = np.rot90(hooks, k=-side)
+
+            update_rot = self.scores_update(xm_rot, hooks_rot, nums, color)
+            if update_rot is None:
                 return None
-            update = update_t.T if transpose else update_t
+
+            update = np.rot90(update_rot, k=side)
             xm_new = np.where(update, xm_new & update, xm_new)
+
         cm_new = self.join(xm_new, os)
         return cm_new
 
-    def scores_update(self, xm: IntArray, hooks: IntArray, nums: IntArray) -> IntArray | None:
+    def scores_update(
+        self,
+        xm: IntArray,
+        hooks: IntArray,
+        nums: IntArray,
+        color: int,
+    ) -> IntArray | None:
         n, _ = xm.shape
         ds = np.arange(2).reshape(2, 1, 1, 1)  # (2, 1, 1, 1) [d, ...]
         xm_is_ds = xm == 1 << ds  # (2, 1, n, n) [d, k, i, j]
@@ -198,9 +243,10 @@ class Hooks4(Backtracking):
         compatible = ~xm_is_ds | mask_is_ds  # (2, 2**n, n, n) [d, k, i, j]
         compatible_masks = np.all(compatible, axis=(0, 3))  # (2**n, n) [k, i]
         unknown_row = np.any(hooks == 0, axis=1)  # (n,) [i]
+        unknown_num = nums == 0  # (n,) [i]
         hooks_masked = hooks * self.masks.reshape(2**n, 1, n)  # (2**n, n, n) [k, i, j]
-        score = self.score(hooks_masked)  # (2**n, n) [k, i]
-        valid_masks = compatible_masks & (unknown_row | (score == nums))  # (2**n, n) [k, i]
+        score = self.score(hooks_masked, color)  # (2**n, n) [k, i]
+        valid_masks = compatible_masks & (unknown_row | unknown_num | (score == nums))  # noqa: E501 (2**n, n) [k, i]
 
         if not np.all(np.any(valid_masks, axis=0)):
             return None
@@ -227,8 +273,18 @@ class Hooks4(Backtracking):
         annot = np.array(X).astype("str")
         annot[annot == "0"] = ""
 
-        color_cycle = ["green", "orange", "red", "purple"]
-        base_colors = ["white", "blue"] + color_cycle + color_cycle
+        base_colors = [
+            "white",
+            "steelblue",
+            "cyan",
+            "lightgreen",
+            "orange",
+            "red",
+            "purple",
+            "olive",
+            "dimgray",
+            "lightgray",
+        ]
         reduced_alpha_colors = [(mcolors.to_rgba(c, alpha=0.6)) for c in base_colors]
         cmap = mcolors.ListedColormap(reduced_alpha_colors)
 
@@ -250,7 +306,7 @@ class Hooks4(Backtracking):
 
 # State and solve the problem
 # ----------------------------------------------------------------------
-problem = Hooks4(rows, cols)
+problem = Hooks6(red, blk)
 with Timer(initial_text="Solving problem..."):
     sol = problem.solution()
 
@@ -263,14 +319,14 @@ print(f"{ans = }")
 print(f"{X}")
 problem.plot(X, hooks)
 # Solving problem...
-# Elapsed time: 8.2394 seconds
-# ans = 6000
-# [[9 9 0 0 0 0 9 9 9]
-#  [0 8 8 0 8 8 8 0 9]
-#  [0 0 7 7 7 0 0 8 9]
-#  [6 6 0 0 0 0 7 8 0]
-#  [0 5 5 0 0 6 7 0 0]
-#  [4 4 0 4 5 6 0 0 0]
-#  [0 2 0 0 0 6 0 0 0]
-#  [3 2 1 0 5 6 7 0 9]
-#  [3 0 3 4 5 0 7 8 9]]
+# Elapsed time: 471.9583 seconds
+# ans = 10000
+# [[0 9 9 9 9 0 0 9 0]
+#  [0 0 8 0 8 8 8 8 0]
+#  [0 0 6 0 0 0 6 0 0]
+#  [8 7 6 5 0 5 5 5 0]
+#  [0 7 0 0 0 0 0 4 9]
+#  [0 7 6 5 4 3 2 0 9]
+#  [8 0 6 0 4 0 1 2 0]
+#  [8 7 6 0 4 3 3 0 9]
+#  [0 0 7 0 0 0 7 7 9]]
