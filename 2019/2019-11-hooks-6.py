@@ -1,3 +1,28 @@
+"""Solution using pyprune, a library I made to solve these kinds of problems.
+
+Usage:
+    1. Define a new class that inherits from pyprune.Backtracking.
+
+    2. __init__:
+        - Override
+        - Do super().__init__()
+        - Define the initial stack
+
+    3. expand -> expand_cell
+        Options (from less to more "manual")
+        - Leave the methods as is / do nothing
+        - Override expand_cell to specify what cell should be chosen
+        - Override expand to specify different logic
+
+    4. prune_repeatedly -> prune -> @rule's
+        Options (from less to more "manual")
+        - Define methods decorated with @rule, they will be called by prune
+        - Override prune
+        - Override prune_repeatedly
+
+    5. Instantiate and call 'solution' or 'solutions' to find the solution(s).
+"""
+
 from functools import partial, reduce
 from itertools import product
 from math import gcd
@@ -9,7 +34,7 @@ import numpy as np
 import seaborn as sns
 from codetiming import Timer
 from numpy.typing import NDArray
-from pyprune import Backtracking
+from pyprune import Backtracking, rule
 from scipy.ndimage import label, sum_labels
 
 # fmt: off
@@ -32,29 +57,10 @@ IntArray = NDArray[np.int32]
 
 
 class Hooks6(Backtracking):
-    """Backtracking is a class from PyPrune, a library I made to solve.
-
-    these kinds of problems. To use it, we need to define methods
-    - __init__: Initialize the starting matrix cm, where each cell is a bitmask
-    - prune: How cm should be filled
-    - expand: Choose a cell and fill that cell with all possible values
-
-    Notation:
-
-    cm = [xm | os]: (n, n + 1) matrix int
-    bm: (n, n) matrix int
-    os: (n, 1) matrix / (n,) vector int
-
-    bm -(log)-> B: (n, n) matrix bool
-    os -(log)-> O: (n, 1) matrix / (n,) vector int
-
-    hooks: (n, n) matrix int, with numbers of each hook
-    X = B * hooks: (n, n) matrix int
-    """
-
     # Init and utils
     # ------------------------------------------------------------------
     def __init__(self, red: IntArray, blk: IntArray) -> None:
+        super().__init__()
         _, n = red.shape
         self.red = red
         self.blk = blk
@@ -64,7 +70,8 @@ class Hooks6(Backtracking):
         xm = sum(1 << b for b in range(2)) * np.ones((n, n), dtype=np.int32)
         os = sum(1 << b for b in range(4)) * np.ones((n,), dtype=np.int32)
         os[n - 1] = 1 << 0
-        self.cm = self.join(xm, os)
+        cm = self.join(xm, os)
+        self.stack = [cm]
 
     @staticmethod
     def join(xm: IntArray, os: IntArray) -> IntArray:
@@ -135,33 +142,15 @@ class Hooks6(Backtracking):
 
     # Expand
     # ------------------------------------------------------------------
-    def expand(self, cm: IntArray) -> list[IntArray]:
+    def expand_cell(self, cm: IntArray) -> tuple[np.intp, np.intp]:
         isnt_singleton = (cm & (cm - 1)) != 0
         indices = np.argwhere(isnt_singleton)
         sorted_indices = indices[np.lexsort((indices[:, 0], -indices[:, 1]))]
-        i, j = tuple(sorted_indices[0])
-
-        powers_of_two = 1 << np.arange(4)
-        powers_present = powers_of_two[cm[i, j] & powers_of_two > 0]
-        cm_copies = np.repeat(cm[np.newaxis, ...], len(powers_present), axis=0)
-        cm_copies[:, i, j] = powers_present
-        return list(cm_copies)
+        return tuple(sorted_indices[0])
 
     # Prune
     # ------------------------------------------------------------------
-    def prune(self, cm: IntArray) -> IntArray | None:
-        funcs = [
-            self.connectedness,
-            self.num_digits,
-            self.two_by_two,
-            self.scores,
-        ]
-        for func in funcs:
-            cm = func(cm)
-            if cm is None:
-                return None
-        return cm
-
+    @rule
     def connectedness(self, cm: IntArray) -> IntArray | None:
         if not np.all(cm & (cm - 1) == 0):
             return cm
@@ -169,6 +158,7 @@ class Hooks6(Backtracking):
         xm = self.singletons(xm, dtype=np.bool)
         return cm if label(xm)[1] <= 1 else None
 
+    @rule
     def num_digits(self, cm: IntArray) -> IntArray | None:
         n, _ = cm.shape
         xm, os = self.split(cm)
@@ -195,6 +185,7 @@ class Hooks6(Backtracking):
         cm_new = self.join(xm_new, os)
         return cm_new
 
+    @rule
     def two_by_two(self, cm: IntArray) -> IntArray | None:
         xm, os = self.split(cm)
         n, _ = xm.shape
@@ -209,6 +200,7 @@ class Hooks6(Backtracking):
         cm_new = self.join(xm_new, os)
         return cm_new
 
+    @rule
     def scores(self, cm: IntArray) -> IntArray | None:
         xm, os = self.split(cm)
         hooks = self.get_hooks(os)  # (n, n) [i, j]

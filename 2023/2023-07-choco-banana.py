@@ -1,3 +1,28 @@
+"""Solution using pyprune, a library I made to solve these kinds of problems.
+
+Usage:
+    1. Define a new class that inherits from pyprune.Backtracking.
+
+    2. __init__:
+        - Override
+        - Do super().__init__()
+        - Define the initial stack
+
+    3. expand -> expand_cell
+        Options (from less to more "manual")
+        - Leave the methods as is / do nothing
+        - Override expand_cell to specify what cell should be chosen
+        - Override expand to specify different logic
+
+    4. prune_repeatedly -> prune -> @rule's
+        Options (from less to more "manual")
+        - Define methods decorated with @rule, they will be called by prune
+        - Override prune
+        - Override prune_repeatedly
+
+    5. Instantiate and call 'solution' or 'solutions' to find the solution(s).
+"""
+
 from itertools import product
 
 import matplotlib.pyplot as plt
@@ -5,7 +30,7 @@ import numpy as np
 import seaborn as sns
 from codetiming import Timer
 from numpy.typing import NDArray
-from pyprune import Backtracking, Choices, Grid  # Library I made for these types of problems
+from pyprune import Backtracking, Choices, Grid, rule
 from scipy.ndimage import label
 
 # Types
@@ -58,11 +83,13 @@ class ChocoBanana(Backtracking):
     # Precomputations
     # ------------------------------------------------------------------
     def __init__(self, nums: Nums) -> None:
+        super().__init__()
         self.nums = nums
         self.numbered = np.array([(i, j, k) for (i, j), k in np.ndenumerate(nums) if k])
         self.adjacent = self.orthogonally_adjacent(nums)
         self.rectangles = {self.tup(c): self.rectangle_masks(nums, *c) for c in self.numbered}
         self.cm = self.initial(nums, self.numbered, self.rectangles)
+        self.stack = [self.cm]
 
     @staticmethod
     def orthogonally_adjacent(nums: Nums) -> Array:
@@ -195,26 +222,6 @@ class ChocoBanana(Backtracking):
 
     # Prune
     # ------------------------------------------------------------------
-
-    def prune(self, cm: Choices) -> Choices | None:
-        rules = [
-            self.reject_invalid,
-            self.fill_surroundings,
-            self.fill_rectangular_closure,
-            self.adjacent_regions_different_nums,
-            self.orthogonally_adjacent_nums,
-            self.black_diagonal,
-            self.join_components_with_gray_cell,
-            self.unique_path_for_component,
-        ]
-
-        cm = np.copy(cm)
-        for func in rules:
-            cm = func(cm)
-            if self.reject(cm):
-                return None
-        return cm
-
     @staticmethod
     def rectangle_closure_2d(mask: NDArray[np.bool]) -> NDArray[np.bool]:
         rows, cols = np.where(mask)
@@ -227,6 +234,7 @@ class ChocoBanana(Backtracking):
     def rectangle_closure_3d(self, mask: NDArray[np.bool]) -> NDArray[np.bool]:
         return np.stack([self.rectangle_closure_2d(slice) for slice in mask])
 
+    @rule
     def reject_invalid(self, cm: Choices) -> Choices | None:
         components = self.connected_components(cm)
         closures = self.rectangle_closure_3d(components)
@@ -251,6 +259,7 @@ class ChocoBanana(Backtracking):
             return None
         return cm
 
+    @rule
     def fill_surroundings(self, cm: Choices) -> Choices | None:
         components = self.connected_components(cm)
         surroundings = self.surroundings_3d(components)
@@ -265,6 +274,7 @@ class ChocoBanana(Backtracking):
         mask = np.bitwise_or.reduce((colors[:, None, None] * surroundings)[indices], axis=0)
         return np.where(mask, cm & ~mask, cm)
 
+    @rule
     def fill_rectangular_closure(self, cm: Choices) -> Choices | None:
         components = self.connected_components(cm)
         closures = self.rectangle_closure_3d(components)
@@ -277,6 +287,7 @@ class ChocoBanana(Backtracking):
         mask = BLACK * np.bitwise_or.reduce(closures[indices], axis=0)
         return np.where(mask, cm & mask, cm)
 
+    @rule
     def adjacent_regions_different_nums(self, cm: Choices) -> Choices | None:
         components = self.connected_components(cm)
         surroundings = self.surroundings_3d(components)
@@ -296,6 +307,7 @@ class ChocoBanana(Backtracking):
                     cm[i, j] &= ~color
         return cm
 
+    @rule
     def orthogonally_adjacent_nums(self, cm: Choices) -> Choices | None:
         cm = np.copy(cm)
         for i0, j0, i1, j1 in self.adjacent:
@@ -304,6 +316,7 @@ class ChocoBanana(Backtracking):
                     cm[i1, j1] &= ~color
         return cm
 
+    @rule
     def black_diagonal(self, cm: Choices) -> Choices | None:
         m, n = cm.shape
         cm = np.copy(cm)
@@ -318,6 +331,7 @@ class ChocoBanana(Backtracking):
                         cm[i0, j0] &= WHITE
         return cm
 
+    @rule
     def join_components_with_gray_cell(self, cm: Choices) -> Choices | None:
         components = self.connected_components(cm)
         surroundings = self.surroundings_3d(components)
@@ -339,6 +353,7 @@ class ChocoBanana(Backtracking):
                     cm[i, j] &= ~color
         return cm
 
+    @rule
     def unique_path_for_component(self, cm: Choices) -> Choices | None:
         components = self.connected_components(cm)
         surroundings = self.surroundings_3d(components)
