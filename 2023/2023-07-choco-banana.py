@@ -298,9 +298,7 @@ class ChocoBanana(Backtracking):
 
         cm = np.copy(cm)
         indices = (colors != GRAY) & num_digits == 1
-        for digit, color, surround in zip(
-            max_digit[indices], colors[indices], surroundings[indices]
-        ):
+        for digit, color, surround in zip(max_digit[indices], colors[indices], surroundings[indices]):
             surrounding_digits = np.logical_and(surround, self.nums)
             for i, j in np.argwhere(surrounding_digits):
                 if self.nums[i, j] != digit:

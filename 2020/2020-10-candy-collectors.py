@@ -53,11 +53,7 @@ from sympy.abc import a, b, c, d, e
 def f(a, b, c, d, e):
     T5 = comb(5, 5) * a**5
     T4 = comb(5, 4) * a**4 * (b + c + d + e)
-    T3 = (
-        comb(5, 3)
-        * a**3
-        * ((b**2 + c**2 + d**2 + e**2) + 2 * (b * c + b * d + b * e + c * d + c * e + d * e))
-    )
+    T3 = comb(5, 3) * a**3 * ((b**2 + c**2 + d**2 + e**2) + 2 * (b * c + b * d + b * e + c * d + c * e + d * e))
     T2 = comb(5, 2) * a**2 * factorial(3) * (c * d * e + b * d * e + b * c * e + b * c * d)
     return T5 + T4 + T3 + T2
 

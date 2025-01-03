@@ -199,9 +199,7 @@ for k, state in enumerate(states):
     C = np.zeros((m, m))
     C[0, m - 1] = 2
     C[x, y] = 1
-    sns.heatmap(
-        C, annot=A, cmap=cmap, cbar=False, ax=ax, vmin=0, vmax=2, linewidths=0.5, linecolor="gray"
-    )
+    sns.heatmap(C, annot=A, cmap=cmap, cbar=False, ax=ax, vmin=0, vmax=2, linewidths=0.5, linecolor="gray")
     caption = f"({moves[k-1][0]}, {moves[k-1][1]})" if k else "initial"
     ax.set_title(caption)
     ax.set_xticks([])

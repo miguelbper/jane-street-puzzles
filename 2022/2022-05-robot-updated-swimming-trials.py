@@ -41,12 +41,7 @@ def prob_3(i, j):
 
 # prob_w(p) = P(W)
 def prob_w(p):
-    return Float(
-        sum(
-            prob_1(i, p) * sum(prob_2(i, j) * prob_3(i, j) for j in range(0, 8))
-            for i in range(0, 24)
-        )
-    )
+    return Float(sum(prob_1(i, p) * sum(prob_2(i, j) * prob_3(i, j) for j in range(0, 8)) for i in range(0, 24)))
 
 
 # solve for p

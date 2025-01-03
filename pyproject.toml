@@ -7,6 +7,7 @@ requires-python = ">=3.10"
 dependencies = [
     "codetiming>=1.4.0",
     "matplotlib>=3.9.2",
+    "numba>=0.60.0",
     "numpy>=2.0.0",
     "pandas>=2.2.3",
     "pre-commit>=4.0.1",
@@ -25,7 +26,7 @@ dependencies = [
 ]
 
 [tool.ruff]
-line-length = 99
+line-length = 120
 ignore = [
     "E741",  # ambiguous variable name
     "E731",  # do not assign a lambda expression, use a def
