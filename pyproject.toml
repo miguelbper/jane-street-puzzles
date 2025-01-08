@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "codetiming>=1.4.0",
+    "joblib>=1.4.2",
     "matplotlib>=3.9.2",
     "numba>=0.60.0",
     "numpy>=2.0.0",
@@ -51,6 +52,7 @@ skips = ["B311"]
 
 [dependency-groups]
 dev = [
+    "docformatter>=1.7.5",
     "mypy>=1.13.0",
 ]
 
