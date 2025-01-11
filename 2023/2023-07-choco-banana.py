@@ -30,11 +30,13 @@ import numpy as np
 import seaborn as sns
 from codetiming import Timer
 from numpy.typing import NDArray
-from pyprune import Backtracking, Choices, Grid, rule
+from pyprune import Backtracking, rule
 from scipy.ndimage import label
 
 # Types
 # ----------------------------------------------------------------------
+Choices = NDArray[np.int32]
+Grid = NDArray[np.int32]
 Nums = NDArray[np.int32]  # Numbers in each cell
 Array = NDArray[np.int32]  # General array
 Trio = tuple[int, int, int]
@@ -82,14 +84,12 @@ nums_small: Nums = np.array([
 class ChocoBanana(Backtracking):
     # Precomputations
     # ------------------------------------------------------------------
-    def __init__(self, nums: Nums) -> None:
+    def __init__(self, nums: Nums, numbered: Array, adjacent: Array, rectangles: dict) -> None:
         super().__init__()
         self.nums = nums
-        self.numbered = np.array([(i, j, k) for (i, j), k in np.ndenumerate(nums) if k])
-        self.adjacent = self.orthogonally_adjacent(nums)
-        self.rectangles = {self.tup(c): self.rectangle_masks(nums, *c) for c in self.numbered}
-        self.cm = self.initial(nums, self.numbered, self.rectangles)
-        self.stack = [self.cm]
+        self.numbered = numbered
+        self.adjacent = adjacent
+        self.rectangles = rectangles
 
     @staticmethod
     def orthogonally_adjacent(nums: Nums) -> Array:
@@ -111,7 +111,8 @@ class ChocoBanana(Backtracking):
                 orthogonally_adjacent.append((i1, j1, i0, j0))
         return np.array(orthogonally_adjacent, dtype=np.int32)
 
-    def rectangle_masks(self, nums: Nums, i: np.int32, j: np.int32, k: np.int32) -> Array:
+    @staticmethod
+    def rectangle_masks(nums: Nums, i: np.int32, j: np.int32, k: np.int32) -> Array:
         m, n = nums.shape
         masks = []
         rectangle_shapes = [(a, int(k // a)) for a in range(1, k + 1) if k % a == 0]
@@ -129,7 +130,7 @@ class ChocoBanana(Backtracking):
                 digit_mask = mask.astype(bool) * nums
                 if np.unique(digit_mask[digit_mask != 0]).size > 1:
                     continue
-                white_surrounds = WHITE * self.surroundings_2d(mask.astype(bool))
+                white_surrounds = WHITE * ChocoBanana.surroundings_2d(mask.astype(bool))
                 mask = np.where(white_surrounds, white_surrounds, mask)
                 masks.append(mask[None, :, :])
         return np.concatenate(masks, axis=0) if masks else np.zeros((0, m, n), dtype=np.int32)
@@ -401,10 +402,16 @@ class ChocoBanana(Backtracking):
 
 # Solve puzzle
 # ----------------------------------------------------------------------
+nums = nums
+numbered = np.array([(i, j, k) for (i, j), k in np.ndenumerate(nums) if k])
+adjacent = ChocoBanana.orthogonally_adjacent(nums)
+rectangles = {ChocoBanana.tup(c): ChocoBanana.rectangle_masks(nums, *c) for c in numbered}
+cm = ChocoBanana.initial(nums, numbered, rectangles)
+stack = [cm]
 
-problem = ChocoBanana(nums)
+problem = ChocoBanana(nums, numbered, adjacent, rectangles)
 with Timer(initial_text="Solving puzzle..."):
-    xm = problem.solution()
+    xm = problem.solution(stack, verbose=True)
 ans = problem.answer(xm)
 problem.plot(xm)
 print(f"{ans = }")

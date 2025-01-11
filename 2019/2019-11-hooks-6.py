@@ -67,12 +67,6 @@ class Hooks6(Backtracking):
         self.nums = np.stack([red, blk])  # red = 0, blk = 1
         self.masks = np.array(list(product(range(2), repeat=n)))
 
-        xm = sum(1 << b for b in range(2)) * np.ones((n, n), dtype=np.int32)
-        os = sum(1 << b for b in range(4)) * np.ones((n,), dtype=np.int32)
-        os[n - 1] = 1 << 0
-        cm = self.join(xm, os)
-        self.stack = [cm]
-
     @staticmethod
     def join(xm: IntArray, os: IntArray) -> IntArray:
         n, _ = xm.shape
@@ -298,9 +292,16 @@ class Hooks6(Backtracking):
 
 # State and solve the problem
 # ----------------------------------------------------------------------
+_, n = red.shape
+xm = sum(1 << b for b in range(2)) * np.ones((n, n), dtype=np.int32)
+os = sum(1 << b for b in range(4)) * np.ones((n,), dtype=np.int32)
+os[n - 1] = 1 << 0
+cm = np.concatenate([xm, os.reshape(n, 1)], axis=1)
+stack = [cm]
+
 problem = Hooks6(red, blk)
 with Timer(initial_text="Solving problem..."):
-    sol = problem.solution()
+    sol = problem.solution(stack, verbose=True)
 
 B, O = problem.split(sol)
 hooks = problem.get_hooks(1 << O)

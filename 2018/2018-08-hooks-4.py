@@ -51,12 +51,6 @@ class Hooks4(Backtracking):
         self.cols = cols
         self.masks = np.array(list(product(range(2), repeat=n)))
 
-        xm = sum(1 << b for b in range(2)) * np.ones((n, n), dtype=np.int32)
-        os = sum(1 << b for b in range(4)) * np.ones((n,), dtype=np.int32)
-        os[n - 1] = 1 << 0
-        cm = self.join(xm, os)
-        self.stack = [cm]
-
     @staticmethod
     def join(xm: IntArray, os: IntArray) -> IntArray:
         n, _ = xm.shape
@@ -242,9 +236,16 @@ class Hooks4(Backtracking):
 
 # State and solve the problem
 # ----------------------------------------------------------------------
+n = rows.shape[0]
+xm = sum(1 << b for b in range(2)) * np.ones((n, n), dtype=np.int32)
+os = sum(1 << b for b in range(4)) * np.ones((n,), dtype=np.int32)
+os[n - 1] = 1 << 0
+cm = np.concatenate([xm, os.reshape(n, 1)], axis=1)
+stack = [cm]
+
 problem = Hooks4(rows, cols)
 with Timer(initial_text="Solving problem..."):
-    sol = problem.solution()
+    sol = problem.solution(stack, verbose=True)
 
 B, O = problem.split(sol)
 hooks = problem.get_hooks(1 << O)
