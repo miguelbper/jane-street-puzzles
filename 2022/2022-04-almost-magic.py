@@ -50,7 +50,7 @@ model.add(X[3, 3] < X[3, 2])
 
 # Solve problem
 # ----------------------------------------------------------------------
-statuses = {
+status_names = {
     cp_model.UNKNOWN: "UNKNOWN",
     cp_model.MODEL_INVALID: "MODEL_INVALID",
     cp_model.FEASIBLE: "FEASIBLE",
@@ -60,11 +60,11 @@ statuses = {
 
 with Timer(initial_text="Solving model..."):
     solver = cp_model.CpSolver()
-    status_id = solver.solve(model)
-    status = statuses[status_id]
-print(f"Status = {status}")
+    solver.parameters.log_search_progress = True
+    status = solver.solve(model)
+print(f"Status = {status_names[status]}")
 
-if status_id in [cp_model.OPTIMAL, cp_model.FEASIBLE]:
+if status in [cp_model.OPTIMAL, cp_model.FEASIBLE]:
     xm = np.array([[solver.value(X[i, j]) for j in range(6)] for i in range(6)], dtype=np.int32)
     print(f"Minimum of objective function: {solver.objective_value}")
     print("X = \n", xm, sep="")
