@@ -1,6 +1,6 @@
 import numpy as np
 from codetiming import Timer
-from z3 import And, Distinct, IntVector, Optimize, sat
+from ortools.sat.python import cp_model
 
 
 def square(i: int, j: int) -> np.ndarray:
@@ -14,22 +14,22 @@ corners = [(0, 1), (2, 0), (3, 2), (1, 3)]
 grid = np.logical_or.reduce([square(i, j) for i, j in corners])
 
 
-# Variables, optimizer & objective
+# Solver, variables, objective, constraints
 # ----------------------------------------------------------------------
-X = np.array(IntVector("x", 6**2)).reshape((6, 6))
-s = Optimize()
-s.minimize(sum(X.flat))
+model = cp_model.CpModel()
+X = np.array([[model.new_int_var(0, 60, f"x[{i}, {j}]") for j in range(6)] for i in range(6)])
 
-
-# Constraints
-# ----------------------------------------------------------------------
+# Objective
+model.minimize(sum(X.flat))
 
 # Range for the variables
-s += [x >= 1 for x in X[grid]]
-s += [x == 0 for x in X[~grid]]
+for x in X[~grid]:
+    model.add(x == 0)
+for x in X[grid]:
+    model.add(x != 0)
 
 # Numbers in grid should be distinct
-s += Distinct(*X[grid])
+model.add_all_different(*X[grid])
 
 # Each square is almost magic
 for i, j in corners:
@@ -39,32 +39,42 @@ for i, j in corners:
     diag = [np.trace(X_sq), np.trace(np.fliplr(X_sq))]
     sums = np.array(rows + cols + diag).reshape(-1, 1)
     diff = np.triu(sums - sums.T)
-    diff = diff[~(diff == 0)]
-    s += [And(d >= -1, d <= 1) for d in diff]
+    for d in diff.flat:
+        model.add(d <= 1)
+        model.add(d >= -1)
 
 # Break symmetry, so that solution is unique (=> faster)
-s += X[3, 3] < X[2, 2]
-s += X[3, 3] < X[2, 3]
-s += X[3, 3] < X[3, 2]
+model.add(X[3, 3] < X[2, 2])
+model.add(X[3, 3] < X[2, 3])
+model.add(X[3, 3] < X[3, 2])
 
-# Solve
+# Solve problem
 # ----------------------------------------------------------------------
-with Timer():
-    sat_ = s.check()
+statuses = {
+    cp_model.UNKNOWN: "UNKNOWN",
+    cp_model.MODEL_INVALID: "MODEL_INVALID",
+    cp_model.FEASIBLE: "FEASIBLE",
+    cp_model.INFEASIBLE: "INFEASIBLE",
+    cp_model.OPTIMAL: "OPTIMAL",
+}
 
-if sat_ == sat:
-    m = s.model()
-    xm = np.vectorize(lambda x: m.evaluate(x).as_long())(X)
-    ans = xm[grid].flatten()
-    print(f"sum = {np.sum(xm)}")
-    print(f"ans = {ans}")
-    print("xm = \n", xm)
+with Timer(initial_text="Solving model..."):
+    solver = cp_model.CpSolver()
+    status_id = solver.solve(model)
+    status = statuses[status_id]
+print(f"Status = {status}")
+
+if status_id in [cp_model.OPTIMAL, cp_model.FEASIBLE]:
+    xm = np.array([[solver.value(X[i, j]) for j in range(6)] for i in range(6)], dtype=np.int32)
+    print(f"Minimum of objective function: {solver.objective_value}")
+    print("X = \n", xm, sep="")
 else:
-    print("No solution")
-# Elapsed time: 161.2319 seconds
-# sum = 470
-# ans = [26, 2, 34, 29, 21, 13, 4, 18, 24, 7, 39, 16, 12, 6, 37, 23, 9, 5, 19, 10, 8, 40, 22, 11, 1, 3, 17, 14]  # noqa: E501
-# xm =
+    print("No solution found.")
+# Solving model...
+# Elapsed time: 3.9020 seconds
+# Status = OPTIMAL
+# Minimum of objective function: 470.0
+# X =
 # [[ 0 26  2 34  0  0]
 #  [ 0 29 21 13  4 18]
 #  [24  7 39 16 12  6]
