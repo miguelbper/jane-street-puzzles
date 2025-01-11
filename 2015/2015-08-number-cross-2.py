@@ -140,7 +140,7 @@ if check == sat:
     print(f"answer = {np.sum(xm)}")
     print_arr(xm_str, "xm")
 # Checking z3 solver
-# Elapsed time: 4.3804 seconds
+# Elapsed time: 150.9897 seconds
 # answer = 276
 # xm = [9 1 1 1 . 9 8 9 9]
 #      [5 1 2 1 . 9 9 3 9]

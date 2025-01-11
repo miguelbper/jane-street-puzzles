@@ -10,6 +10,7 @@ dependencies = [
     "matplotlib>=3.9.2",
     "numba>=0.60.0",
     "numpy>=2.0.0",
+    "ortools>=9.11.4210",
     "pandas>=2.2.3",
     "pre-commit>=4.0.1",
     "pyprune>=0.1.7",

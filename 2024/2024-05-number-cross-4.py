@@ -7,7 +7,9 @@ import numpy as np
 import seaborn as sns
 import sympy
 from codetiming import Timer
-from z3 import And, ArithRef, BoolRef, BoolVal, If, Implies, IntVector, ModelRef, Or, Solver, sat
+from z3 import And, ArithRef, BoolRef, BoolVal, If, Implies, IntVector, ModelRef, Or, Solver, sat, set_param
+
+set_param("parallel.enable", True)
 
 # Constants & input
 # ----------------------------------------------------------------------
@@ -411,18 +413,17 @@ if check == sat:
     print(f"answer = {answer(xm)}")
     print_arr(xm_str, "xm")
     plot_grid(xm)
-"""
-Elapsed time: 44.4874 seconds
-answer = 88243711283
-xm = [1 1 1 2 2 2 3 3 4 4 4]
-     [1 3 3 3 2 . 3 4 4 4 .]
-     [1 3 3 1 . 7 3 4 4 4 9]
-     [1 3 3 . 1 0 0 4 1 1 .]
-     [1 3 . 1 4 4 . 4 1 8 1]
-     [1 4 4 4 . 4 4 4 8 8 9]
-     [7 4 4 4 4 . 7 4 8 8 8]
-     [7 7 1 4 1 7 7 . 9 8 9]
-     [7 7 1 1 1 7 7 9 9 9 9]
-     [. 1 1 4 4 . 7 9 9 9 2]
-     [4 4 4 4 4 3 . 3 9 9 2]
-"""
+# Checking z3 solver
+# Elapsed time: 6.3795 seconds
+# answer = 88243711283
+# xm = [1 1 1 2 2 2 3 3 4 4 4]
+#      [1 3 3 3 2 . 3 4 4 4 .]
+#      [1 3 3 1 . 7 3 4 4 4 9]
+#      [1 3 3 . 1 0 0 4 1 1 .]
+#      [1 3 . 1 4 4 . 4 1 8 1]
+#      [1 4 4 4 . 4 4 4 8 8 9]
+#      [7 4 4 4 4 . 7 4 8 8 8]
+#      [7 7 1 4 1 7 7 . 9 8 9]
+#      [7 7 1 1 1 7 7 9 9 9 9]
+#      [. 1 1 4 4 . 7 9 9 9 2]
+#      [4 4 4 4 4 3 . 3 9 9 2]

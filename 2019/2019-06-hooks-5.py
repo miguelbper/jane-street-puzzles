@@ -141,7 +141,7 @@ if xm is not None:
     pprint(xm)
 else:
     print("No solution found.")
-# Elapsed time: 2.1580 seconds
+# Elapsed time: 1.1306 seconds
 # ans = 78125
 # board =
 # array([[0, 8, 8, 0, 0, 0, 8, 8, 9],
