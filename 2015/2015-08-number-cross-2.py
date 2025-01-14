@@ -87,11 +87,11 @@ def print_arr(arr: np.ndarray, name: str) -> None:
 
 # Variables, solver & constraints
 # ----------------------------------------------------------------------
-s = Tactic("qfnia").solver()  # Quantifier-Free Non-linear Integer Arithmetic
+s = Tactic("qflia").solver()  # Quantifier-Free Linear Integer Arithmetic
 X = np.array(IntVector("x", n**2)).reshape((n, n))
 
 # Ranges for each variable + black cells
-s += [And(x > 0, x < 10) for (i, j), x in np.ndenumerate(X) if grid[i, j] != B]
+s += [And(x > 0, x <= 9) for (i, j), x in np.ndenumerate(X) if grid[i, j] != B]
 s += [x == B for (i, j), x in np.ndenumerate(X) if grid[i, j] == B]
 
 
@@ -140,7 +140,7 @@ if check == sat:
     print(f"answer = {np.sum(xm)}")
     print_arr(xm_str, "xm")
 # Checking z3 solver
-# Elapsed time: 150.9897 seconds
+# Elapsed time: 1.7796 seconds
 # answer = 276
 # xm = [9 1 1 1 . 9 8 9 9]
 #      [5 1 2 1 . 9 9 3 9]
