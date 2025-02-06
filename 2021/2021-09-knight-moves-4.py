@@ -25,17 +25,16 @@ These facts taken together imply that
     s = 1275
 """
 
-# Imports
-# ----------------------------------------------------------------------
-from copy import deepcopy
 from itertools import product
 
 import numpy as np
+from codetiming import Timer
+from z3 import And, Implies, IntVector, PbEq, Solver, sat
 
 # Data
 # ----------------------------------------------------------------------
 # fmt: off
-regions = [
+regions = np.array([
     [ 0,  0,  0,  0,  0,  0,  0,  0,  0,  0],
     [ 0,  0,  0,  1,  0,  0,  0,  0,  2,  0],
     [ 0,  0,  0,  1,  0,  0,  0,  0,  2,  0],
@@ -46,9 +45,9 @@ regions = [
     [ 5, 12,  6,  7,  7,  8,  8,  8, 10, 11],
     [ 5, 12, 13,  7, 16, 16, 16, 15, 15, 11],
     [12, 12, 13, 14, 14, 14, 14, 14, 15, 11],
-]
+])
 
-grid = [
+grid = np.array([
     [12, 0, 0,  0,  0, 0, 0, 0,  0,  0],
     [ 0, 0, 0,  0,  0, 0, 5, 0, 23,  0],
     [ 0, 0, 0,  0,  0, 0, 8, 0,  0,  0],
@@ -59,124 +58,56 @@ grid = [
     [ 0, 0, 0,  0, 33, 0, 0, 0,  0,  0],
     [ 0, 0, 0,  0,  0, 0, 0, 0,  0,  0],
     [ 0, 0, 0,  0,  0, 0, 0, 0,  0, 28],
-]
+])
 # fmt: on
-
-directions = [
-    (2, 1),
-    (1, 2),
-    (-1, 2),
-    (-2, 1),
-    (-1, -2),
-    (1, -2),
-    (2, -1),
-    (-2, -1),
-]
-
-m = len(grid)
-k = 1 + np.max(regions)
-n = 50
-s = n * (n + 1) // 2
-r = s // k
-
-coords = {r: [] for r in range(k)}
-for i, j in product(range(m), repeat=2):
-    coords[regions[i][j]].append((i, j))
-
-stack = []
-i, j = 5, 1
-state = (grid, (i, j), 2)
-for x, y in directions:
-    x += i
-    y += j
-    if not (0 <= x < m and 0 <= y < m):
-        continue
-    new_grid = deepcopy(grid)
-    new_grid[x][y] = 1
-    stack.append((new_grid, (x, y), 1))
+n, _ = grid.shape
+num_regions = np.max(regions) + 1
+num_steps = 50
+sum_region = 75
 
 
-# Solution
-# ----------------------------------------------------------------------
+s = Solver()
+X = np.array(IntVector("x", n**2)).reshape((n, n))
 
-while stack:
-    state = stack.pop()
-    grid, coor, step = state
-    a, b = coor
-    reg_sum = [sum(grid[i][j] for i, j in coords[l]) for l in range(k)]
+s += [And(x >= 0, x <= num_steps) for x in X.flat]
+s += [PbEq([(x == m, 1) for x in X.flat], 1) for m in range(1, num_steps + 1)]
+s += [sum(X[reg]) == sum_region for reg in regions == np.arange(num_regions).reshape(-1, 1, 1)]
+s += [x == y for x, y in zip(X.flat, grid.flat) if y]
 
-    # If state is solution, break
-    # ------------------------------------------------------------------
-    if step == n and all(r == reg_sum[l] for l in range(k)):
-        break
+directions = [(-2, -1), (-2, 1), (-1, -2), (-1, 2), (1, -2), (1, 2), (2, -1), (2, 1)]
 
-    # If state is blocked, continue
-    # ------------------------------------------------------------------
+for i, j in product(range(n), repeat=2):
+    knight_moves = [(i + di, j + dj) for di, dj in directions if 0 <= i + di < n and 0 <= j + dj < n]
 
-    # if grid has a duplicate, block
-    seen = set()
-    flag = False
-    for i, j in product(range(m), repeat=2):
-        g = grid[i][j]
-        if g in seen:
-            flag = True
-            break
-        elif g:
-            seen.add(g)
-    if flag:
-        continue
+    # next
+    needs_move = And(X[i, j] != 0, X[i, j] != num_steps)
+    moves = [(X[i, j] + 1 == X[k, l], 1) for k, l in knight_moves]
+    s += Implies(needs_move, PbEq(moves, 1) if moves else False)
 
-    # if there is a region l s.t. its region sum will never be r, block
-    flag = False
-    for l in range(k):
-        sl = reg_sum[l]
-        # sum > r => sum will never be r
-        if sl > r:
-            flag = True
-            break
-        # r > sum >= r - step => sum will never be r (next step is 'step + 1')
-        if r > sl >= r - step:
-            flag = True
-            break
-        # sum != r and (final step or region is filled) => sum will never be r
-        if sl != r and (step == n or all(grid[i][j] for i, j in coords[l])):
-            flag = True
-            break
-    if flag:
-        continue
-
-    # Compute new states and add them to the stack
-    # ------------------------------------------------------------------
-    for x, y in directions:
-        x += a
-        y += b
-        if not (0 <= x < m and 0 <= y < m):
-            continue
-        if grid[x][y] not in {0, step + 1}:
-            continue
-        new_grid = deepcopy(grid)
-        new_grid[x][y] = step + 1
-        stack.append((new_grid, (x, y), step + 1))
+    # previous
+    needs_move = And(X[i, j] != 0, X[i, j] != 1)
+    moves = [(X[i, j] - 1 == X[k, l], 1) for k, l in knight_moves]
+    s += Implies(needs_move, PbEq(moves, 1) if moves else False)
 
 
-# Output
-# ----------------------------------------------------------------------
+with Timer(initial_text="Checking z3 solver"):
+    check = s.check()
 
-grid, coor, step = state
-ans = sum(max(row) ** 2 for row in grid)
-print(f"answer = {ans}\ngrid   = ")
-for row in grid:
-    print("[" + " ".join(f"{x:2d}" for x in row) + "]")
-
+if check == sat:
+    m = s.model()
+    xm = np.vectorize(lambda x: m.evaluate(x).as_long())(X)
+    ans = np.sum(np.max(xm, axis=1) ** 2)
+    print(f"answer = {ans}")
+    print(xm)
+# Elapsed time: 1.0842 seconds
 # answer = 14820
-# grid   =
-# [12  0  0  0  0  9  0  7  0  0]
-# [ 0  0 13 10  0  0  5  0 23  0]
-# [ 0 11  0 17  4  0  8  0  6  0]
-# [ 1  0  0 14  0 18  0 22  0 24]
-# [ 0  0 16  3  0 21 50 25  0  0]
-# [ 0  2  0  0 15  0 19 48  0  0]
-# [ 0 41 34  0 20 49 26  0  0 47]
-# [35 38  0 42 33 30 45  0 27  0]
-# [40  0 36  0  0 43 32 29 46  0]
-# [37  0 39  0 31  0  0 44  0 28]
+# [[12  0  0  0  0  9  0  7  0  0]
+#  [ 0  0 13 10  0  0  5  0 23  0]
+#  [ 0 11  0 17  4  0  8  0  6  0]
+#  [ 1  0  0 14  0 18  0 22  0 24]
+#  [ 0  0 16  3  0 21 50 25  0  0]
+#  [ 0  2  0  0 15  0 19 48  0  0]
+#  [ 0 41 34  0 20 49 26  0  0 47]
+#  [35 38  0 42 33 30 45  0 27  0]
+#  [40  0 36  0  0 43 32 29 46  0]
+#  [37  0 39  0 31  0  0 44  0 28]]
