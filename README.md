@@ -1,7 +1,25 @@
-# Jane Street Puzzles
+<p align='center'><img src='utils/banner.png' alt='Jane Street Banner'></p>
 
-My solutions to past Jane Street puzzles (see https://www.janestreet.com/puzzles/archive/).
+<p align='center'><strong>My solutions to past Jane Street puzzles</strong></p>
 
+<div align='center'>
+
+![Python](https://img.shields.io/badge/Python-3776ab?logo=python&logoColor=white)
+![NumPy](https://img.shields.io/badge/NumPy-4dabcf?logo=numpy&logoColor=white)
+![SciPy](https://img.shields.io/badge/SciPy-013243?logo=scipy&logoColor=white)
+![SymPy](https://img.shields.io/badge/SymPy-3b5526?logo=sympy&logoColor=white)
+![ruff](https://img.shields.io/badge/Ruff-261230?logo=ruff&logoColor=white)
+![uv](https://img.shields.io/badge/uv-de5fe9?logo=uv&logoColor=white)
+</div>
+
+- 🤖 Python solutions for the Jane Street puzzles, using **math**, **algorithms**, and helpful **Python libraries**.
+- 🎯 See [https://www.janestreet.com/puzzles/current-puzzle/](https://www.janestreet.com/puzzles/current-puzzle/) for the current puzzle.
+- 📚 See [https://www.janestreet.com/puzzles/archive/](https://www.janestreet.com/puzzles/archive/) for all past puzzles.
+- ⚡ *I only post solutions to puzzles whose solution has already been released by Jane Street.*
+
+## Solutions
+Click on a checkmark in the table below to view the solution for that month.
+<!-- TABLE_START -->
 |      |  1 |  2 |  3 |  4 |  5 |  6 |  7 |  8 |  9 | 10 | 11 | 12 |
 |------|----|----|----|----|----|----|----|----|----|----|----|----|
 | 2014 | [✔](https://github.com/miguelbper/jane-street-puzzles/blob/main/2014/2014-01-sum-of-squares.py) | [✔](https://github.com/miguelbper/jane-street-puzzles/blob/main/2014/2014-02-hooks.py) |  |  |  |  |  |  |  |  |  |  |
@@ -16,3 +34,33 @@ My solutions to past Jane Street puzzles (see https://www.janestreet.com/puzzles
 | 2023 | [✔](https://github.com/miguelbper/jane-street-puzzles/blob/main/2023/2023-01-lesses-more.py) | [✔](https://github.com/miguelbper/jane-street-puzzles/blob/main/2023/2023-02-twenty-four-seven-four-in-one.py) | [✔](https://github.com/miguelbper/jane-street-puzzles/blob/main/2023/2023-03-robot-long-jump.py) | [✔](https://github.com/miguelbper/jane-street-puzzles/blob/main/2023/2023-04-arc-edge-acreage.py) | [✔](https://github.com/miguelbper/jane-street-puzzles/blob/main/2023/2023-05-game-night.py) | [✔](https://github.com/miguelbper/jane-street-puzzles/blob/main/2023/2023-06-hooks-9.py) | [✔](https://github.com/miguelbper/jane-street-puzzles/blob/main/2023/2023-07-choco-banana.py) | [✔](https://github.com/miguelbper/jane-street-puzzles/blob/main/2023/2023-08-single-cross-2.py) | [✔](https://github.com/miguelbper/jane-street-puzzles/blob/main/2023/2023-09-getting-from-a-to-b.py) | [✔](https://github.com/miguelbper/jane-street-puzzles/blob/main/2023/2023-10-a-weird-tour.py) | [✔](https://github.com/miguelbper/jane-street-puzzles/blob/main/2023/2023-11-knight-moves-5.py) | [✔](https://github.com/miguelbper/jane-street-puzzles/blob/main/2023/2023-12-hall-of-mirrors-2.py) |
 | 2024 | [✔](https://github.com/miguelbper/jane-street-puzzles/blob/main/2024/2024-01-some-f-squares.py) | [✔](https://github.com/miguelbper/jane-street-puzzles/blob/main/2024/2024-02-some-off-squares.py) | [✔](https://github.com/miguelbper/jane-street-puzzles/blob/main/2024/2024-03-hooks-10.py) | [✔](https://github.com/miguelbper/jane-street-puzzles/blob/main/2024/2024-04-robot-capture-the-flag.py) | [✔](https://github.com/miguelbper/jane-street-puzzles/blob/main/2024/2024-05-number-cross-4.py) | [✔](https://github.com/miguelbper/jane-street-puzzles/blob/main/2024/2024-06-altered-state.py) | [✔](https://github.com/miguelbper/jane-street-puzzles/blob/main/2024/2024-07-more-happy-returns.py) | [✔](https://github.com/miguelbper/jane-street-puzzles/blob/main/2024/2024-08-tree-edge-triage.py) | [✔](https://github.com/miguelbper/jane-street-puzzles/blob/main/2024/2024-09-fences-2.py) | [✔](https://github.com/miguelbper/jane-street-puzzles/blob/main/2024/2024-10-knight-moves-6.py) | [✔](https://github.com/miguelbper/jane-street-puzzles/blob/main/2024/2024-11-beside-the-point.py) | [✔](https://github.com/miguelbper/jane-street-puzzles/blob/main/2024/2024-12-games-night.py) |
 | 2025 | [✔](https://github.com/miguelbper/jane-street-puzzles/blob/main/2025/2025-01-somewhat-square-sudoku-ortools.py) |  |  |  |  |  |  |  |  |  |  |  |
+
+<!-- TABLE_END -->
+
+## Usage
+- Each puzzle in this repo has a corresponding python script, that can be run independently.
+- I use [uv](https://docs.astral.sh/uv/getting-started/installation/) (a modern package manager for Python, which is written in Rust and very fast) to manage the dependencies.
+- To run the scripts in this repo with uv, follow these steps (but you can use your own package manager if you want):
+
+```bash
+# Install uv if you don't have it yet
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Clone the repo
+git clone https://github.com/miguelbper/jane-street-puzzles.git
+cd jane-street-puzzles
+
+# Install the dependencies
+uv sync
+
+# Run the solution of a specific puzzle
+uv run 2014/2014-01-sum-of-squares.py
+```
+
+## Acknowledgements
+- [Jane Street](https://www.janestreet.com/) for the puzzles.
+- In addition to the libraries mentioned above, I also use [Z3](https://github.com/Z3Prover/z3) and [OR-Tools](https://github.com/google/or-tools) a lot in this repo. These libraries are great for constraint satisfaction / optimization problems.
+- Other very nice repos containing solutions to Jane Street puzzles:
+    - [gowen100/Jane-Street-Solutions](https://github.com/gowen100/Jane-Street-Solutions)
+    - [evansemet/Jane-Street-Solutions](https://github.com/evansemet/Jane-Street-Solutions)
+    - [flameworks/JaneStreetPuzzles](https://github.com/flameworks/JaneStreetPuzzles)
