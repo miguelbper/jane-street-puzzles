@@ -11,6 +11,7 @@ dependencies = [
     "numpy>=2.0.0",
     "ortools>=9.11.4210",
     "pandas>=2.2.3",
+    "polars>=1.23.0",
     "pre-commit>=4.0.1",
     "pyprune>=0.1.8",
     "pyqt6>=6.7.1",
