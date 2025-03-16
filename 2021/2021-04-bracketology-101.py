@@ -97,7 +97,7 @@ for i in range(16):
             i_max = i
             j_max = j
 
-        print(f"swap seeds: {players[i]:2d} and {players[j]:2d}" f"    =>    P(2 wins) = {p:.8f}")
+        print(f"swap seeds: {players[i]:2d} and {players[j]:2d}    =>    P(2 wins) = {p:.8f}")
 
 p_inc = p_max - p0
 output = f"""\nbest swap:

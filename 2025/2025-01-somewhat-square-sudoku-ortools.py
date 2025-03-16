@@ -67,7 +67,7 @@ for n, xs in zip(N, X):
 
 # Solve problem
 # ----------------------------------------------------------------------
-status_names = {
+status_names: dict[int, str] = {
     cp_model.UNKNOWN: "UNKNOWN",
     cp_model.MODEL_INVALID: "MODEL_INVALID",
     cp_model.FEASIBLE: "FEASIBLE",
@@ -78,7 +78,7 @@ status_names = {
 print(model.validate())
 with Timer(initial_text="Solving model..."):
     solver = cp_model.CpSolver()
-    status = solver.solve(model)
+    status: int = solver.solve(model)  # type: ignore
 print(f"Status = {status_names[status]}")
 
 if status in [cp_model.OPTIMAL, cp_model.FEASIBLE]:

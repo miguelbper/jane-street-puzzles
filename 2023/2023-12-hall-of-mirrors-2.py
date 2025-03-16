@@ -1,5 +1,4 @@
-"""
-No programming is required for this puzzle, so this is just a text file.
+"""No programming is required for this puzzle, so this is just a text file.
 
 Step 1: Light ray
 - The puzzle name suggests that the small dashes are mirrors

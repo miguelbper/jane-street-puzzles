@@ -8,11 +8,11 @@ Usage:
         - Do super().__init__()
         - Define the initial stack
 
-    3. expand -> expand_cell
+    3. branch -> branch_cell
         Options (from less to more "manual")
         - Leave the methods as is / do nothing
-        - Override expand_cell to specify what cell should be chosen
-        - Override expand to specify different logic
+        - Override branch_cell to specify what cell should be chosen
+        - Override branch to specify different logic
 
     4. prune_repeatedly -> prune -> @rule's
         Options (from less to more "manual")
@@ -158,10 +158,10 @@ class ChocoBanana(Backtracking):
     def tup(arr: NDArray[np.int32]) -> Trio:
         return tuple(map(int, arr))
 
-    # Expand
+    # Branch
     # ------------------------------------------------------------------
 
-    def expand(self, cm: Choices) -> list[Choices]:
+    def branch(self, cm: Choices) -> list[Choices]:
         unfilled_numbd = self.unfilled(cm)
         if unfilled_numbd.size:
             # If for some (i, j, k) there are no ways to complete, reject
@@ -411,13 +411,13 @@ stack = [cm]
 
 problem = ChocoBanana(nums, numbered, adjacent, rectangles)
 with Timer(initial_text="Solving puzzle..."):
-    xm = problem.solution(stack, verbose=True)
+    xm = problem.solution(stack)
 ans = problem.answer(xm)
 problem.plot(xm)
 print(f"{ans = }")
 print(xm)
 # Solving puzzle...
-# Elapsed time: 2.6556 seconds
+# Elapsed time: 1.1690 seconds
 # ans = np.int64(809321103360)
 # [[0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0 0 1 1 1]
 #  [0 0 1 0 1 1 1 1 0 0 1 1 1 1 1 1 0 1 1 1]

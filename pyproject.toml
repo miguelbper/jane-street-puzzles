@@ -3,7 +3,7 @@ name = "jane-street-puzzles"
 version = "0.1.0"
 description = "My solutions to past Jane Street puzzles."
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 dependencies = [
     "codetiming>=1.4.0",
     "joblib>=1.4.2",
@@ -12,8 +12,7 @@ dependencies = [
     "ortools>=9.11.4210",
     "pandas>=2.2.3",
     "polars>=1.23.0",
-    "pre-commit>=4.0.1",
-    "pyprune>=0.1.8",
+    "pyprune>=0.1.9",
     "pyqt6>=6.7.1",
     "pysmt>=0.9.6",
     "scipy>=1.14.1",
@@ -27,6 +26,15 @@ dependencies = [
     "z3-solver>=4.13.3.0",
 ]
 
+[dependency-groups]
+dev = [
+    "pre-commit>=4.0.1",
+]
+
+# ------------------------------------------------------------------------------
+# Linting
+# ------------------------------------------------------------------------------
+
 [tool.ruff]
 line-length = 120
 ignore = [
@@ -35,6 +43,7 @@ ignore = [
     "B905",  # zip should be strict
 ]
 
+# Set of rules taken from https://docs.astral.sh/ruff/linter/#rule-selection
 [tool.ruff.lint]
 select = [
     "E",  # pycodestyle
@@ -45,18 +54,13 @@ select = [
     "SIM",  # flake8-simplify
 ]
 
-[tool.docformatter]
-style = "sphinx"  # Write docstrings in Sphinx style so that docformatter can format them
+# Set of rules taken from https://rdrn.me/postmodern-python/
+[tool.pyright]
+venvPath = "."
+venv = ".venv"
+pythonVersion = "3.11"
+strict = ["2025/**/*.py"]
+stubPath = "utils/stubs"
 
 [tool.bandit]
 skips = ["B311"]
-
-[dependency-groups]
-dev = [
-    "docformatter>=1.7.5",
-    "mypy>=1.13.0",
-]
-
-[[tool.mypy.overrides]]
-module = ["seaborn", "numba", "scipy.ndimage"]
-ignore_missing_imports = true

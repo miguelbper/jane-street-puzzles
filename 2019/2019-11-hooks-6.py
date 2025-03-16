@@ -8,11 +8,11 @@ Usage:
         - Do super().__init__()
         - Define the initial stack
 
-    3. expand -> expand_cell
+    3. branch -> branch_cell
         Options (from less to more "manual")
         - Leave the methods as is / do nothing
-        - Override expand_cell to specify what cell should be chosen
-        - Override expand to specify different logic
+        - Override branch_cell to specify what cell should be chosen
+        - Override branch to specify different logic
 
     4. prune_repeatedly -> prune -> @rule's
         Options (from less to more "manual")
@@ -136,7 +136,7 @@ class Hooks6(Backtracking):
 
     # Expand
     # ------------------------------------------------------------------
-    def expand_cell(self, cm: IntArray) -> tuple[np.intp, np.intp]:
+    def branch_cell(self, cm: IntArray) -> tuple[np.intp, np.intp]:
         isnt_singleton = (cm & (cm - 1)) != 0
         indices = np.argwhere(isnt_singleton)
         sorted_indices = indices[np.lexsort((indices[:, 0], -indices[:, 1]))]
@@ -301,7 +301,7 @@ stack = [cm]
 
 problem = Hooks6(red, blk)
 with Timer(initial_text="Solving problem..."):
-    sol = problem.solution(stack, verbose=True)
+    sol = problem.solution(stack)
 
 B, O = problem.split(sol)
 hooks = problem.get_hooks(1 << O)
@@ -312,7 +312,7 @@ print(f"{ans = }")
 print(f"{X}")
 problem.plot(X, hooks)
 # Solving problem...
-# Elapsed time: 471.9583 seconds
+# Elapsed time: 170.0845 seconds
 # ans = 10000
 # [[0 9 9 9 9 0 0 9 0]
 #  [0 0 8 0 8 8 8 8 0]
