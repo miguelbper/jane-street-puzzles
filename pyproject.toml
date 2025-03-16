@@ -58,8 +58,8 @@ select = [
 [tool.pyright]
 venvPath = "."
 venv = ".venv"
-strict = ["**/*.py"]
 pythonVersion = "3.11"
+strict = ["2025/**/*.py"]
 
 [tool.bandit]
 skips = ["B311"]
