@@ -60,6 +60,7 @@ venvPath = "."
 venv = ".venv"
 pythonVersion = "3.11"
 strict = ["2025/**/*.py"]
+stubPath = "utils/stubs"
 
 [tool.bandit]
 skips = ["B311"]

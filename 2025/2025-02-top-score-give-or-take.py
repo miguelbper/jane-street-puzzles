@@ -21,7 +21,7 @@ BLUE = True
 
 
 # fmt: off
-df_top = [
+df_top_table = [
     ("ADMIRERS"  , 7 , "RAIDERS"    , "M"),
     ("ASTIR"     , 2 , "STAR"       , "I"),
     ("BLACK"     , 3 , "BACK"       , "L"),
@@ -38,7 +38,7 @@ df_top = [
     ("WRAP"      , 8 , "WAR"        , "P"),
 ]
 
-df_bot = [
+df_bot_table = [
     ("ARK"       , 8 , "PARK"       , "P"),
     ("CHILDREN'S", 10, "SCHINDLER'S", "S"),
     ("CUIRASS"   , 13, "JURASSIC"   , "J"),
@@ -56,14 +56,15 @@ df_bot = [
 ]
 # fmt: on
 
-df_top = pl.from_records(df_top, schema=["word", "number", "anagram", "extra letter"], orient="row").sort("number")
-df_bot = pl.from_records(df_bot, schema=["word", "number", "anagram", "extra letter"], orient="row").sort("number")
+schema: list[str] = ["word", "number", "anagram", "extra letter"]
+df_top: pl.DataFrame = pl.from_records(df_top_table, schema=schema, orient="row").sort("number")
+df_bot: pl.DataFrame = pl.from_records(df_bot_table, schema=schema, orient="row").sort("number")
 
 
-def word(color: bool, index: int) -> str:
-    df = df_top if color else df_bot
-    color = "blue" if color else "red"
-    title = df["anagram"][index - 1]
+def word(is_blue: bool, index: int) -> str:
+    df: pl.DataFrame = df_top if is_blue else df_bot
+    color: str = "blue" if is_blue else "red"
+    title: str = df["anagram"][index - 1]
     return colored(title, color)
 
 
