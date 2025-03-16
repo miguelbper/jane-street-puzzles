@@ -42,7 +42,7 @@ for w in transports[1:]:
     i0, i1 = order.index(v0), order.index(v1)
     order[i0], order[i1] = order[i1], order[i0]
     orders.append("".join(order))
-    print(f'{w = :<7}, vowels = {"".join(vowels)}, order = {"".join(order)}')
+    print(f"{w = :<7}, vowels = {''.join(vowels)}, order = {''.join(order)}")
 """
 w = plane  , vowels = ae, order = eaiou
 w = tour   , vowels = ou, order = eaiuo
