@@ -120,7 +120,7 @@ I1 = integrate(f1 * (F1.subs({l: m}) - F0.subs({l: m, s: m})), (s, m, 1))
 I2 = integrate(f2 * (F2.subs({l: m}) - F0.subs({l: m, s: m})), (s, 1, l + 1))
 I3 = integrate(f3 * (F2.subs({l: m}) - F0.subs({l: m, s: m})), (s, l + 1, m + 1))
 I4 = integrate(f3 * (F3.subs({l: m}) - F0.subs({l: m, s: m})), (s, m + 1, 2))
-q = I0 + I1 + I2 + I3 + I4  # type: ignore
+q = I0 + I1 + I2 + I3 + I4
 p = ((1 - F0) * (F0.subs({l: m})) + q) / (1 - F0 * F0.subs({l: m}))
 """We now compute the Nash equilibrium of this game, as well as the answer to
 the original question.

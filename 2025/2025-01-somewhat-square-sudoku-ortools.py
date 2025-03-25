@@ -78,7 +78,7 @@ status_names: dict[int, str] = {
 print(model.validate())
 with Timer(initial_text="Solving model..."):
     solver = cp_model.CpSolver()
-    status: int = solver.solve(model)  # type: ignore
+    status: int = solver.solve(model)
 print(f"Status = {status_names[status]}")
 
 if status in [cp_model.OPTIMAL, cp_model.FEASIBLE]:
