@@ -7,7 +7,7 @@
 [![SymPy](https://img.shields.io/badge/SymPy-3b5526?logo=sympy&logoColor=white)](https://www.sympy.org/)
 [![Ruff](https://img.shields.io/badge/Ruff-261230?logo=ruff&logoColor=white)](https://github.com/astral-sh/ruff)
 [![uv](https://img.shields.io/badge/uv-de5fe9?logo=uv&logoColor=white)](https://github.com/astral-sh/uv)
-[![License](https://img.shields.io/badge/License-MIT-green.svg?labelColor=gray)](LICENCE)
+[![License](https://img.shields.io/badge/License-MIT-green.svg?labelColor=gray)](LICENSE)
 
 My solutions to past Jane Street Puzzles
 
