@@ -79,14 +79,16 @@ print(message)  # Output: Hello, World!
 You can also include screenshots or GIFs here to demonstrate usage.
 
 ## License
-
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Acknowledgements
+- [Jane Street](https://www.janestreet.com/) for the puzzles.
+- In addition to the libraries mentioned above, I also use [Z3](https://github.com/Z3Prover/z3) and [OR-Tools](https://github.com/google/or-tools) a lot in this repo. These libraries are great for constraint satisfaction / optimization problems.
+- Other very nice repos containing solutions to Jane Street puzzles:
+    - [gowen100/Jane-Street-Solutions](https://github.com/gowen100/Jane-Street-Solutions)
+    - [evansemet/Jane-Street-Solutions](https://github.com/evansemet/Jane-Street-Solutions)
+    - [flameworks/JaneStreetPuzzles](https://github.com/flameworks/JaneStreetPuzzles)
 
-- List any resources, libraries, or tools that you used or were inspired by
-- Credit any collaborators or contributors
-- Link to any relevant documentation or articles
 
 
 
