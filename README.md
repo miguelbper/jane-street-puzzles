@@ -20,10 +20,10 @@ My solutions to past Jane Street Puzzles
 
 ## Description
 
-Provide a more detailed explanation about your project here. You can include:
-- What problem does it solve?
-- What technologies are used?
-- What are the key features?
+- 🤖 Python solutions for the Jane Street puzzles, using **math**, **algorithms**, and helpful **Python libraries**.
+- 🎯 See [https://www.janestreet.com/puzzles/current-puzzle/](https://www.janestreet.com/puzzles/current-puzzle/) for the current puzzle.
+- 📚 See [https://www.janestreet.com/puzzles/archive/](https://www.janestreet.com/puzzles/archive/) for all past puzzles.
+- ⚡ *I only post solutions to puzzles whose solution has already been released by Jane Street.*
 
 ## Solutions
 Click on a checkmark in the table below to view the solution for that month.
