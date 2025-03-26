@@ -11,8 +11,7 @@
 
 My solutions to past Jane Street Puzzles
 
-<!-- TODO: add an image with outputs from the puzzles? -->
-![img.png](img.png)
+![img.png](readme_img.png)
 
 </div>
 
