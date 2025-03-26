@@ -45,38 +45,26 @@ Click on a checkmark in the table below to view the solution for that month.
 
 <!-- TABLE_END -->
 
-## Installation
+## Installation and usage
+
+- Each puzzle in this repo has a corresponding python script, that can be run independently of others.
+- I use [uv](https://docs.astral.sh/uv/getting-started/installation/) (a modern package manager for Python, which is written in Rust and very fast) to manage the dependencies.
+- To run the scripts in this repo with uv, follow these steps (but you can use whatever package manager you prefer)
 
 ```bash
+# Install uv if you don't have it yet
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
 # Clone the repository
-git clone https://github.com/username/project-name.git
-
-# Navigate to the project directory
-cd project-name
-
-# Create a virtual environment (optional)
-python -m venv venv
-source venv/bin/activate  # On Windows use: venv\Scripts\activate
+git clone https://github.com/miguelbper/jane-street-puzzles.git
+cd jane-street-puzzles
 
 # Install dependencies
-pip install -r requirements.txt
+uv sync
+
+# Run the solution of a specific puzzle (example)
+uv run 2014/2014-01-sum-of-squares.py
 ```
-
-## Usage
-
-Explain how to use your project. Include code examples:
-
-```python
-# Example code
-def greet(name: str) -> str:
-    return f"Hello, {name}!"
-
-# Using the function
-message = greet("World")
-print(message)  # Output: Hello, World!
-```
-
-You can also include screenshots or GIFs here to demonstrate usage.
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
@@ -88,24 +76,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
     - [gowen100/Jane-Street-Solutions](https://github.com/gowen100/Jane-Street-Solutions)
     - [evansemet/Jane-Street-Solutions](https://github.com/evansemet/Jane-Street-Solutions)
     - [flameworks/JaneStreetPuzzles](https://github.com/flameworks/JaneStreetPuzzles)
-
-
-## Usage
-- Each puzzle in this repo has a corresponding python script, that can be run independently.
-- I use [uv](https://docs.astral.sh/uv/getting-started/installation/) (a modern package manager for Python, which is written in Rust and very fast) to manage the dependencies.
-- To run the scripts in this repo with uv, follow these steps (but you can use whatever package manager you prefer):
-
-```bash
-# Install uv if you don't have it yet
-curl -LsSf https://astral.sh/uv/install.sh | sh
-
-# Clone the repo
-git clone https://github.com/miguelbper/jane-street-puzzles.git
-cd jane-street-puzzles
-
-# Install the dependencies
-uv sync
-
-# Run the solution of a specific puzzle
-uv run 2014/2014-01-sum-of-squares.py
-```
