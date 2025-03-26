@@ -90,29 +90,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
     - [flameworks/JaneStreetPuzzles](https://github.com/flameworks/JaneStreetPuzzles)
 
 
-
-
-<p align='center'><img src='utils/banner.png' alt='Jane Street Banner'></p>
-
-<p align='center'><strong>My solutions to past Jane Street puzzles</strong></p>
-
-<div align='center'>
-
-![Python](https://img.shields.io/badge/Python-3776ab?logo=python&logoColor=white)
-![NumPy](https://img.shields.io/badge/NumPy-4dabcf?logo=numpy&logoColor=white)
-![SciPy](https://img.shields.io/badge/SciPy-013243?logo=scipy&logoColor=white)
-![SymPy](https://img.shields.io/badge/SymPy-3b5526?logo=sympy&logoColor=white)
-![ruff](https://img.shields.io/badge/Ruff-261230?logo=ruff&logoColor=white)
-![uv](https://img.shields.io/badge/uv-de5fe9?logo=uv&logoColor=white)
-</div>
-
-- 🤖 Python solutions for the Jane Street puzzles, using **math**, **algorithms**, and helpful **Python libraries**.
-- 🎯 See [https://www.janestreet.com/puzzles/current-puzzle/](https://www.janestreet.com/puzzles/current-puzzle/) for the current puzzle.
-- 📚 See [https://www.janestreet.com/puzzles/archive/](https://www.janestreet.com/puzzles/archive/) for all past puzzles.
-- ⚡ *I only post solutions to puzzles whose solution has already been released by Jane Street.*
-
-
-
 ## Usage
 - Each puzzle in this repo has a corresponding python script, that can be run independently.
 - I use [uv](https://docs.astral.sh/uv/getting-started/installation/) (a modern package manager for Python, which is written in Rust and very fast) to manage the dependencies.
@@ -132,11 +109,3 @@ uv sync
 # Run the solution of a specific puzzle
 uv run 2014/2014-01-sum-of-squares.py
 ```
-
-## Acknowledgements
-- [Jane Street](https://www.janestreet.com/) for the puzzles.
-- In addition to the libraries mentioned above, I also use [Z3](https://github.com/Z3Prover/z3) and [OR-Tools](https://github.com/google/or-tools) a lot in this repo. These libraries are great for constraint satisfaction / optimization problems.
-- Other very nice repos containing solutions to Jane Street puzzles:
-    - [gowen100/Jane-Street-Solutions](https://github.com/gowen100/Jane-Street-Solutions)
-    - [evansemet/Jane-Street-Solutions](https://github.com/evansemet/Jane-Street-Solutions)
-    - [flameworks/JaneStreetPuzzles](https://github.com/flameworks/JaneStreetPuzzles)
