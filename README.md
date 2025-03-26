@@ -1,16 +1,23 @@
-<p align='center'><img src='utils/banner.png' alt='Jane Street Banner'></p>
+<div align="center">
 
-<p align='center'><strong>My solutions to past Jane Street puzzles</strong></p>
+# Jane Street Puzzles
+[![Python](https://img.shields.io/badge/Python-3776ab?logo=python&logoColor=white)](https://www.python.org/)
+[![NumPy](https://img.shields.io/badge/NumPy-4dabcf?logo=numpy&logoColor=white)](https://numpy.org/)
+[![SciPy](https://img.shields.io/badge/SciPy-013243?logo=scipy&logoColor=white)](https://scipy.org/)
+[![SymPy](https://img.shields.io/badge/SymPy-3b5526?logo=sympy&logoColor=white)](https://www.sympy.org/)
+[![Ruff](https://img.shields.io/badge/Ruff-261230?logo=ruff&logoColor=white)](https://github.com/astral-sh/ruff)
+[![uv](https://img.shields.io/badge/uv-de5fe9?logo=uv&logoColor=white)](https://github.com/astral-sh/uv)
+[![License](https://img.shields.io/badge/License-MIT-green.svg?labelColor=gray)](path/to/LICENCE)
 
-<div align='center'>
+My solutions to past Jane Street Puzzles
 
-![Python](https://img.shields.io/badge/Python-3776ab?logo=python&logoColor=white)
-![NumPy](https://img.shields.io/badge/NumPy-4dabcf?logo=numpy&logoColor=white)
-![SciPy](https://img.shields.io/badge/SciPy-013243?logo=scipy&logoColor=white)
-![SymPy](https://img.shields.io/badge/SymPy-3b5526?logo=sympy&logoColor=white)
-![ruff](https://img.shields.io/badge/Ruff-261230?logo=ruff&logoColor=white)
-![uv](https://img.shields.io/badge/uv-de5fe9?logo=uv&logoColor=white)
+![img.png](readme_img.png)
+
 </div>
+
+---
+
+## Description
 
 - 🤖 Python solutions for the Jane Street puzzles, using **math**, **algorithms**, and helpful **Python libraries**.
 - 🎯 See [https://www.janestreet.com/puzzles/current-puzzle/](https://www.janestreet.com/puzzles/current-puzzle/) for the current puzzle.
@@ -37,25 +44,29 @@ Click on a checkmark in the table below to view the solution for that month.
 
 <!-- TABLE_END -->
 
-## Usage
-- Each puzzle in this repo has a corresponding python script, that can be run independently.
+## Installation and usage
+
+- Each puzzle in this repo has a corresponding python script, that can be run independently of others.
 - I use [uv](https://docs.astral.sh/uv/getting-started/installation/) (a modern package manager for Python, which is written in Rust and very fast) to manage the dependencies.
-- To run the scripts in this repo with uv, follow these steps (but you can use whatever package manager you prefer):
+- To run the scripts in this repo with uv, follow these steps (but you can use whatever package manager you prefer)
 
 ```bash
 # Install uv if you don't have it yet
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
-# Clone the repo
+# Clone the repository
 git clone https://github.com/miguelbper/jane-street-puzzles.git
 cd jane-street-puzzles
 
-# Install the dependencies
+# Install dependencies
 uv sync
 
-# Run the solution of a specific puzzle
+# Run the solution of a specific puzzle (example)
 uv run 2014/2014-01-sum-of-squares.py
 ```
+
+## License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Acknowledgements
 - [Jane Street](https://www.janestreet.com/) for the puzzles.
