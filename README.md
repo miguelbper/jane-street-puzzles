@@ -11,6 +11,7 @@
 
 My solutions to past Jane Street Puzzles
 
+Some examples:
 ![img.png](readme_img.png)
 
 </div>
