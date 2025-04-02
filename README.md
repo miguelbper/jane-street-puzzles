@@ -10,7 +10,7 @@
 [![Code Quality](https://github.com/miguelbper/jane-street-puzzles/actions/workflows/code-quality.yaml/badge.svg)](https://github.com/miguelbper/jane-street-puzzles/actions/workflows/code-quality.yaml)
 [![License](https://img.shields.io/badge/License-MIT-green.svg?labelColor=gray)](LICENSE)
 
-My solutions to past Jane Street Puzzles
+My solutions to past [Jane Street Puzzles](https://www.janestreet.com/puzzles/)
 
 Some examples:
 ![img.png](readme_img.png)
