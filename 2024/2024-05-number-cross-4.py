@@ -262,8 +262,8 @@ def is_number(i: int, l: int, r: int) -> BoolRef:
     This means that the boundaries of [l:r] are black and the interior
     is not black.
     """
-    l_boundary = BoolVal(True) if l == 0 else X[i, l - 1] == black
-    r_boundary = BoolVal(True) if r == n else X[i, r] == black
+    l_boundary = l == 0 or X[i, l - 1] == black
+    r_boundary = r == n or X[i, r] == black
     interior = And([x != black for x in X[i, l:r]])
     return And(l_boundary, r_boundary, interior)
 
@@ -284,32 +284,52 @@ for i in range(n):
 
 
 def plot_grid(xm: np.ndarray) -> None:
-    """Plot the grid as a seaborn heatmap."""
-    # compute data for heatmap
+    """Plot the grid as a seaborn heatmap with region borders and annotations."""
+    # Create figure and axis
     _, ax = plt.subplots(1, 1, figsize=(10, 10))
-    data = xm == black
-    annot = np.array(xm).astype("str")
-    annot[annot == "-1"] = ""
 
-    # create heatmap
-    ax = sns.heatmap(
+    # Flip arrays vertically to match the correct orientation
+    xm = np.flipud(xm)
+    regions_flipped = np.flipud(regions)
+
+    # Create annotations and colors array
+    data = xm == black
+    annot = np.array(xm, dtype=str)
+    annot[annot == str(black)] = ""
+
+    # Create heatmap
+    sns.heatmap(
         data,
         annot=annot,
-        cbar=False,
         fmt="",
-        linewidths=0.005,
+        cmap=["white", "black"],
+        cbar=False,
+        linewidths=0.5,
         linecolor="black",
         square=True,
-        cmap=["white", "black"],
-    )
-    ax.tick_params(
-        left=False,
-        labelleft=False,
-        bottom=False,
-        labelbottom=False,
+        xticklabels=False,
+        yticklabels=False,
     )
 
-    # annotations
+    # Set axis limits
+    ax.set_xlim(0, n)
+    ax.set_ylim(0, n)
+
+    # Draw thick lines around the grid edges
+    line_width = 2
+    ax.axhline(y=0, color="black", linewidth=line_width, clip_on=False)
+    ax.axhline(y=n, color="black", linewidth=line_width, clip_on=False)
+    ax.axvline(x=0, color="black", linewidth=line_width, clip_on=False)
+    ax.axvline(x=n, color="black", linewidth=line_width, clip_on=False)
+
+    # Draw region borders
+    for (i, j), region in np.ndenumerate(regions_flipped):
+        if j < n - 1 and regions_flipped[i, j + 1] != region:
+            ax.plot([j + 1, j + 1], [i, i + 1], "black", linewidth=2)
+        if i < n - 1 and regions_flipped[i + 1, j] != region:
+            ax.plot([j, j + 1], [i + 1, i + 1], "black", linewidth=2)
+
+    # Add row annotations
     annotations = [
         "square",
         "one more than a palindrome",
@@ -323,71 +343,10 @@ def plot_grid(xm: np.ndarray) -> None:
         "multiple of 88",
         "one less than a palindrome",
     ]
-    for i, annotation in enumerate(annotations):
+    for i, annotation in enumerate(reversed(annotations)):
         ax.text(n + 0.5, i + 0.5, annotation, va="center")
 
-    # add thick region lines
-    lines = [
-        ([1, 4], [1, 1]),
-        ([7, 8], [1, 1]),
-        ([10, 11], [1, 1]),
-        ([3, 4], [2, 2]),
-        ([5, 7], [3, 3]),
-        ([8, 10], [3, 3]),
-        ([2, 3], [4, 4]),
-        ([4, 6], [4, 4]),
-        ([9, 10], [4, 4]),
-        ([1, 4], [5, 5]),
-        ([6, 7], [5, 5]),
-        ([8, 9], [5, 5]),
-        ([10, 11], [5, 5]),
-        ([0, 1], [6, 6]),
-        ([5, 7], [6, 6]),
-        ([10, 11], [6, 6]),
-        ([1, 3], [7, 7]),
-        ([4, 5], [7, 7]),
-        ([8, 9], [7, 7]),
-        ([10, 11], [7, 7]),
-        ([3, 4], [8, 8]),
-        ([9, 10], [8, 8]),
-        ([1, 2], [9, 9]),
-        ([3, 6], [9, 9]),
-        ([10, 11], [9, 9]),
-        ([1, 3], [10, 10]),
-        ([5, 6], [10, 10]),
-        ([7, 8], [10, 10]),
-        ([1, 1], [1, 7]),
-        ([1, 1], [9, 10]),
-        ([2, 2], [4, 5]),
-        ([2, 2], [7, 9]),
-        ([3, 3], [0, 1]),
-        ([3, 3], [2, 4]),
-        ([3, 3], [7, 8]),
-        ([3, 3], [9, 10]),
-        ([4, 4], [1, 2]),
-        ([4, 4], [4, 5]),
-        ([4, 4], [7, 8]),
-        ([5, 5], [3, 4]),
-        ([5, 5], [6, 9]),
-        ([5, 5], [10, 11]),
-        ([6, 6], [0, 3]),
-        ([6, 6], [4, 5]),
-        ([6, 6], [9, 10]),
-        ([7, 7], [1, 5]),
-        ([7, 7], [6, 10]),
-        ([8, 8], [0, 1]),
-        ([8, 8], [3, 7]),
-        ([8, 8], [10, 11]),
-        ([9, 9], [4, 5]),
-        ([9, 9], [7, 8]),
-        ([10, 10], [1, 3]),
-        ([10, 10], [4, 6]),
-        ([10, 10], [7, 8]),
-        ([10, 10], [9, 11]),
-    ]
-    for (a, b), (c, d) in lines:
-        plt.plot([a, b], [c, d], linewidth=4, color="black")
-
+    plt.tight_layout()
     plt.show()
 
 
