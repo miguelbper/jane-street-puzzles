@@ -7,7 +7,7 @@ import numpy as np
 import seaborn as sns
 import sympy
 from codetiming import Timer
-from z3 import And, ArithRef, BoolRef, BoolVal, If, Implies, IntVector, ModelRef, Or, Solver, sat, set_param
+from z3 import And, ArithRef, BoolRef, If, Implies, IntVector, ModelRef, Or, Solver, sat, set_param
 
 set_param("parallel.enable", True)
 
