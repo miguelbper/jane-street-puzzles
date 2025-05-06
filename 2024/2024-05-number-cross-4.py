@@ -7,7 +7,7 @@ import numpy as np
 import seaborn as sns
 import sympy
 from codetiming import Timer
-from z3 import And, ArithRef, BoolRef, If, Implies, IntVector, ModelRef, Or, Solver, sat, set_param, Tactic
+from z3 import And, ArithRef, BoolRef, If, Implies, IntVector, ModelRef, Or, Tactic, sat, set_param
 
 set_param("parallel.enable", True)
 
@@ -284,7 +284,8 @@ for i in range(n):
 
 
 def plot_grid(xm: np.ndarray) -> None:
-    """Plot the grid as a seaborn heatmap with region borders and annotations."""
+    """Plot the grid as a seaborn heatmap with region borders and
+    annotations."""
     # Create figure and axis
     _, ax = plt.subplots(1, 1, figsize=(10, 10))
 
