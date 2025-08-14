@@ -1,6 +1,6 @@
-"""
-Consider the probability space of pairs (u, v), where u, v in [1, 2] and u < v are the speeds of the cars, with a
-probability density function p(u, v) that we will compute later.
+"""Consider the probability space of pairs (u, v), where u, v in [1, 2] and u <
+v are the speeds of the cars, with a probability density function p(u, v) that
+we will compute later.
 
 Define the random variable
     D_a := "Distance that u loses due to being passed by v in a highway with parameter a"
