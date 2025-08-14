@@ -15,7 +15,7 @@ and after that minimize f(a). All this is straightforward with SymPy, it remains
 
 Even though the speed of each car is sampled uniformly from [1, 2] in the "zoomed out" statement, when we look at a
 particular intersection the speed of each car is not uniformly distributed, since then the distribution is "conditional
-on an intersection taking place". Intuitivelly, more intersections will take place between cars with speeds that differ
+on an intersection taking place". Intuitively, more intersections will take place between cars with speeds that differ
 a lot than between cars with similar speeds.
 
 Say that the car u spawns at (x, t) = (0, 0). Draw the region (x, t) where v could spawn such that v would overtake u,
